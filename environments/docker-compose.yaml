@@ -1,0 +1,24 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:13.1
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "henesis"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+
+  sdk:
+    image: haechi/sdk-enclave:stable
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=test
+    command:
+      - "npm"
+      - "start"

@@ -32,6 +32,9 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
 	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.3.4'
+	// https://mvnrepository.com/artifact/javax.validation/validation-api
+	compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+
 }
 
 test {

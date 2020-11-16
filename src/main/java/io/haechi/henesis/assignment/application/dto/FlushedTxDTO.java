@@ -1,4 +1,4 @@
 package io.haechi.henesis.assignment.application.dto;
 
-public class FlushDTO {
+public class FlushedTxDTO {
 }

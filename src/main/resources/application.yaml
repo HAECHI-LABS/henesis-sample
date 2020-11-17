@@ -8,16 +8,13 @@ restTemplate:
     maxConnTotal: 100
     maxConnPerRoute: 5
 
-
-header:
-  walletAccessToken: dkdkdk
-  walletApiSecret: dfdfdf
-
-server:
-  error:
-    whitelabel:
-      enabled: false
-  port: 8080
+app:
+    name: enclave-api
+    henesis-wallet:
+      url: http://localhost:3000
+      access-token:
+      api-secret:
+      passphrase: passphrase
 
 spring:
   datasource:
@@ -48,3 +45,4 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+

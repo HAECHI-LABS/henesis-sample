@@ -1,14 +1,21 @@
 package io.haechi.henesis.assignment.config;
 
+import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+
+import java.io.IOException;
+import java.util.Collections;
 
 @Configuration
 public class RestTemplateConfig {
@@ -25,10 +32,44 @@ public class RestTemplateConfig {
     @Value("${restTemplate.httpClient.maxConnPerRoute}")
     private int MAX_CONN_PER_ROUTE;
 
-    @Value()
+    private final String walletAccessToken;
+    private final String walletApiSecret;
+    private final String walletUrl;
+
+
+    public RestTemplateConfig(
+            @Qualifier("walletAccessToken") String walletAccessToken,
+            @Qualifier("walletApiSecret") String walletApiSecret,
+            @Qualifier("walletUrl") String walletUrl
+    ) {
+        this.walletAccessToken = walletAccessToken;
+        this.walletApiSecret = walletApiSecret;
+        this.walletUrl = walletUrl;
+    }
 
     @Bean
-    public RestTemplate restTemplate(){
+    public RestTemplate defaultRestTemplate() {
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
+        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory());
+        return restTemplate;
+    }
+
+    @Bean
+    @Qualifier("walletClient")
+    public RestTemplate walletRestTemplate(){
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
+        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(
+                String.format("%s/api/v2/eth/",walletUrl)
+        ));
+        restTemplate.setInterceptors(
+                Collections.singletonList(new HeaderInterceptor())
+        );
+
+        return restTemplate;
+    }
+
+
+    private ClientHttpRequestFactory clientHttpRequestFactory(){
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setReadTimeout(READ_TIMEOUT);
         factory.setConnectTimeout(CONNECT_TIMEOUT);
@@ -38,18 +79,20 @@ public class RestTemplateConfig {
                 .setMaxConnPerRoute(MAX_CONN_PER_ROUTE)
                 .build();
         factory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(factory);
-
-        return restTemplate;
+        return factory;
     }
 
-    @Bean
-    public HttpEntity<String> createHttpHeaders(){
-        HttpHeaders headers = new HttpHeaders();
 
-        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+    private class HeaderInterceptor implements ClientHttpRequestInterceptor{
 
-        return httpEntity;
+        @Override
+        public ClientHttpResponse intercept(org.springframework.http.HttpRequest request, byte[] body,
+                                            ClientHttpRequestExecution execution) throws IOException {
+            HttpHeaders headers = request.getHeaders();
+            headers.add("X-Henesis-Secret", walletApiSecret);
+            headers.add("Authorization","Bearer "+ walletAccessToken);
+            return execution.execute(request, body);
+        }
     }
 
 

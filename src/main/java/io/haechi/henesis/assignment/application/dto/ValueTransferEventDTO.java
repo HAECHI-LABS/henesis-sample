@@ -9,7 +9,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class ValueTransferEventDTO {
-
+public class ValueTransferEventDTO {
+    private String txHash;
+    private String from;
+    private String to;
+    private String amount;
+    private String status;
 
 }

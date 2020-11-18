@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.domain;
+package io.haechi.henesis.assignment.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -28,5 +28,11 @@ public class HenesisWalletConfig {
     @Qualifier("walletAccessToken")
     public String accessToken(HenesisWalletProperties henesisWalletProperties){
         return henesisWalletProperties.getAccessToken();
+    }
+
+    @Bean
+    @Qualifier("masterWalletId")
+    public String masterWalletId(HenesisWalletProperties henesisWalletProperties){
+        return henesisWalletProperties.getMasterWalletId();
     }
 }

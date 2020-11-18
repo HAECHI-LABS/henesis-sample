@@ -35,16 +35,18 @@ public class RestTemplateConfig {
     private final String walletAccessToken;
     private final String walletApiSecret;
     private final String walletUrl;
-
+    private final String masterWalletId;
 
     public RestTemplateConfig(
             @Qualifier("walletAccessToken") String walletAccessToken,
             @Qualifier("walletApiSecret") String walletApiSecret,
-            @Qualifier("walletUrl") String walletUrl
+            @Qualifier("walletUrl") String walletUrl,
+            @Qualifier("masterWalletId") String masterWalletId
     ) {
         this.walletAccessToken = walletAccessToken;
         this.walletApiSecret = walletApiSecret;
         this.walletUrl = walletUrl;
+        this.masterWalletId = masterWalletId;
     }
 
     @Bean
@@ -54,20 +56,32 @@ public class RestTemplateConfig {
         return restTemplate;
     }
 
+
     @Bean
     @Qualifier("walletClient")
     public RestTemplate walletRestTemplate(){
         RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(
-                String.format("%s/api/v2/eth/",walletUrl)
+                String.format("%s/api/v2/eth",walletUrl)
         ));
         restTemplate.setInterceptors(
                 Collections.singletonList(new HeaderInterceptor())
         );
-
         return restTemplate;
     }
 
+    @Bean
+    @Qualifier("masterWalletClient")
+    public RestTemplate masterWalletRestTemplate(){
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
+        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(
+                String.format("%s/api/v2/eth/%s",walletUrl,masterWalletId)
+        ));
+        restTemplate.setInterceptors(
+                Collections.singletonList(new HeaderInterceptor())
+        );
+        return restTemplate;
+    }
 
     private ClientHttpRequestFactory clientHttpRequestFactory(){
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();

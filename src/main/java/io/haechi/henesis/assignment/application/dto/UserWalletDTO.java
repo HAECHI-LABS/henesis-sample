@@ -10,8 +10,14 @@ import javax.persistence.Entity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserWalletDTO {
 
-    private String walletId;
-    private String txId;
-    private String balance;
+    private String id;
+    private String name;
+    private String address;
+    private String blockchain;
+    private String status;
+    private String error;
+    private String transactionId;
+    private String createdAt;
+    private String updatedAt;
 
 }

@@ -1,10 +1,7 @@
 package io.haechi.henesis.assignment.web;
 
 import io.haechi.henesis.assignment.application.ExchangeApplicationService;
-import io.haechi.henesis.assignment.application.dto.FlushedTxDTO;
-import io.haechi.henesis.assignment.application.dto.MasterWalletDTO;
-import io.haechi.henesis.assignment.application.dto.UserWalletDTO;
-import io.haechi.henesis.assignment.application.dto.WalletCreateRequestDTO;
+import io.haechi.henesis.assignment.application.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +18,8 @@ public class ExchangeController {
     // 사용자 지갑 생성
     @PostMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public UserWalletDTO createUserWallet(@RequestBody WalletCreateRequestDTO walletCreateRequestDTO){
-        return exchangeApplicationService.createUserWallet(walletCreateRequestDTO.getMasterWalletId());
+    public UserWalletDTO createUserWallet(String walletName){
+        return exchangeApplicationService.createUserWallet(walletName);
     }
 
     // 마스터 지갑 잔고 조회
@@ -40,7 +37,7 @@ public class ExchangeController {
     }
 
 
-    // 코인/토큰 전송하기
+    // 사용자 지갑 조회 (walletId)
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
     public UserWalletDTO findUserWalletByWalletId(@RequestParam String walletId){
@@ -48,7 +45,5 @@ public class ExchangeController {
     }
 
     //출금
-
-    //집금
 
 }

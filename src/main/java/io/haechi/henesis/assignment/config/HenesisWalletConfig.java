@@ -35,4 +35,10 @@ public class HenesisWalletConfig {
     public String masterWalletId(HenesisWalletProperties henesisWalletProperties){
         return henesisWalletProperties.getMasterWalletId();
     }
+
+    @Bean
+    @Qualifier("walletPassphrase")
+    public String walletPassphrase(HenesisWalletProperties henesisWalletProperties){
+        return henesisWalletProperties.getPassphrase();
+    }
 }

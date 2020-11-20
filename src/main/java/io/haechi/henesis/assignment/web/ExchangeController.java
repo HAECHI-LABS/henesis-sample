@@ -15,17 +15,20 @@ public class ExchangeController {
         this.exchangeApplicationService = exchangeApplicationService;
     }
 
+
     // 사용자 지갑 생성
     @PostMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public UserWalletDTO createUserWallet(String walletName){
+    public UserWalletDTO createUserWallet(@RequestBody String walletName){
         return exchangeApplicationService.createUserWallet(walletName);
     }
+
+
 
     // 마스터 지갑 잔고 조회
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public MasterWalletDTO findMasterWalletBalance(@RequestParam String masterWalletId){
+    public MasterWalletBalanceDTO findMasterWalletBalance(@RequestParam String masterWalletId){
         return exchangeApplicationService.findMasterWalletBalanceById(masterWalletId);
     }
 
@@ -45,5 +48,7 @@ public class ExchangeController {
     }
 
     //출금
+    @PostMapping
+    @ResponseStatus(value = HttpStatus.OK)
 
 }

@@ -10,24 +10,26 @@ public class UserWallet {
     private int id;
     private String walletId;
     private String walletName;
-    private String walletBalance;
     private String walletAddress;
-    private String masterWalletId;
+    private String blockchain;
+    private String status;
     private String createdAt;
     private String updatedAt;
-    private String blockchain;
+    private String walletBalance;
+    private String masterWalletId;
 
     @Builder
     public UserWallet(String walletId,
                       String walletName,
                       String walletAddress,
                       String masterWalletId,
-                      String blockchain){
+                      String blockchain,
+                      String status){
         this.walletId = walletId;
         this.walletName = walletName;
         this.walletAddress = walletAddress;
         this.masterWalletId = masterWalletId;
         this.blockchain= blockchain;
+        this.status = status;
     }
-
 }

@@ -2,23 +2,23 @@ package io.haechi.henesis.assignment.infra;
 
 import io.haechi.henesis.assignment.domain.ExchangeService;
 import io.haechi.henesis.assignment.domain.FlushedTx;
-import io.haechi.henesis.assignment.domain.MasterWallet;
+import io.haechi.henesis.assignment.domain.MasterWalletBalance;
 import io.haechi.henesis.assignment.domain.UserWallet;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ExchangeServiceImpl implements ExchangeService {
 
-    private final HenesisWalletService henesisWalletSerivce;
+    private final HenesisWalletService henesisWalletService;
 
-    public ExchangeServiceImpl(HenesisWalletService henesisWalletSerivce){
-        this.henesisWalletSerivce = henesisWalletSerivce;
+    public ExchangeServiceImpl(HenesisWalletService henesisWalletService){
+        this.henesisWalletService = henesisWalletService;
     }
 
 
     @Override
     public UserWallet createUserWallet(String walletName){
-        return henesisWalletSerivce.createUserWallet(walletName);
+        return henesisWalletService.createUserWallet(walletName);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public MasterWallet findMasterWalletBalanceById(String masterWalletId) {
+    public MasterWalletBalance findMasterWalletBalanceById(String masterWalletId) {
         return null;
     }
 

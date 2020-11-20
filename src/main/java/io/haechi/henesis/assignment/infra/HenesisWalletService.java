@@ -4,10 +4,10 @@ import io.haechi.henesis.assignment.application.dto.UserWalletDTO;
 import io.haechi.henesis.assignment.domain.UserWallet;
 import io.haechi.henesis.assignment.infra.dto.CreateUserWalletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+@Service
 public class HenesisWalletService {
     private final RestTemplate masterWalletRestTemplate;
     private final RestTemplate restTemplate;
@@ -41,7 +41,10 @@ public class HenesisWalletService {
                 .walletName(response.getName())
                 .masterWalletId(masterWalletId)
                 .blockchain(response.getBlockchain())
+                .status(response.getStatus())
                 .build();
 
     }
+
+    public
 }

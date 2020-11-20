@@ -1,10 +1,10 @@
 package io.haechi.henesis.assignment.application;
 
 import io.haechi.henesis.assignment.application.dto.FlushedTxDTO;
-import io.haechi.henesis.assignment.application.dto.MasterWalletDTO;
+import io.haechi.henesis.assignment.application.dto.MasterWalletBalanceDTO;
 import io.haechi.henesis.assignment.application.dto.UserWalletDTO;
 import io.haechi.henesis.assignment.domain.FlushedTx;
-import io.haechi.henesis.assignment.domain.MasterWallet;
+import io.haechi.henesis.assignment.domain.MasterWalletBalance;
 import io.haechi.henesis.assignment.domain.UserWallet;
 import io.haechi.henesis.assignment.domain.ExchangeService;
 import org.modelmapper.ModelMapper;
@@ -27,10 +27,10 @@ public class ExchangeApplicationService {
         return modelMapper.map(userWallet, UserWalletDTO.class);
     }
 
-    // 마스터 지갑 조회
-    public MasterWalletDTO findMasterWalletBalanceById(String masterWalletId){
-        MasterWallet masterWallet = exchangeService.findMasterWalletBalanceById(masterWalletId);
-        return modelMapper.map(masterWallet, MasterWalletDTO.class);
+    // 마스터 지갑 잔고 조회
+    public MasterWalletBalanceDTO findMasterWalletBalanceById(String masterWalletId){
+        MasterWalletBalance masterWalletBalance = exchangeService.findMasterWalletBalanceById(masterWalletId);
+        return modelMapper.map(masterWalletBalance, MasterWalletBalanceDTO.class);
     }
 
     // FLUSH 된 트랜잭션 조회

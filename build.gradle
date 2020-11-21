@@ -35,7 +35,7 @@ dependencies {
 	// https://mvnrepository.com/artifact/javax.validation/validation-api
 	compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper
-	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.1.1'
+	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.2'
 
 }
 

@@ -10,5 +10,6 @@ import lombok.*;
 public class FlushedTx {
     private String id;
     private String txId;
-    private String walletId;
+    private String blockchain;
+    private String status;
 }

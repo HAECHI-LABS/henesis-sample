@@ -1,7 +1,7 @@
 package io.haechi.henesis.assignment.application;
 
-import io.haechi.henesis.assignment.application.dto.FlushedTxDTO;
 import io.haechi.henesis.assignment.application.dto.MasterWalletBalanceDTO;
+import io.haechi.henesis.assignment.application.dto.TransactionDTO;
 import io.haechi.henesis.assignment.application.dto.UserWalletDTO;
 import io.haechi.henesis.assignment.domain.FlushedTx;
 import io.haechi.henesis.assignment.domain.MasterWalletBalance;
@@ -27,6 +27,12 @@ public class ExchangeApplicationService {
         return modelMapper.map(userWallet, UserWalletDTO.class);
     }
 
+    //사용자 지갑 잔고 조회
+    public UserWalletDTO findUserWalletByWalletId(String walletId){
+        UserWallet userWallet = exchangeService.findUserWalletByWalletId(walletId);
+        return modelMapper.map(userWallet, UserWalletDTO.class);
+    }
+
     // 마스터 지갑 잔고 조회
     public MasterWalletBalanceDTO findMasterWalletBalanceById(String masterWalletId){
         MasterWalletBalance masterWalletBalance = exchangeService.findMasterWalletBalanceById(masterWalletId);
@@ -34,19 +40,10 @@ public class ExchangeApplicationService {
     }
 
     // FLUSH 된 트랜잭션 조회
-    public FlushedTxDTO findFlushedTxByTxId(String txId){
+    public TransactionDTO findFlushedTxByTxId(String txId){
         FlushedTx flushedTx = exchangeService.findFlushedTxByTxId(txId);
-        return modelMapper.map(flushedTx, FlushedTxDTO.class);
+        return modelMapper.map(flushedTx, TransactionDTO.class);
     }
-
-    public UserWalletDTO findUserWalletByWalletId(String walletId){
-        UserWallet userWallet = exchangeService.findUserWalletByWalletId(walletId);
-        return modelMapper.map(userWallet, UserWalletDTO.class);
-    }
-
-
-
-
 
 
 }

@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class TransactionDTO {
+public class TransactionDTO {
 
     @JsonProperty("id")
     private String id;

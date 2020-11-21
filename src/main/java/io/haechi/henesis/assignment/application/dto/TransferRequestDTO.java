@@ -1,4 +1,4 @@
 package io.haechi.henesis.assignment.application.dto;
 
-public class BalanceDTO {
+public class TransferRequestDTO {
 }

@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class ValueTransferEventsDTO {
+public class ValueTransferEventsDTO {
 
     @JsonProperty("pagination")
     private PaginationDTO pagination;

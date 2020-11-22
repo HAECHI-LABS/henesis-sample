@@ -12,8 +12,8 @@ app:
     name: enclave-api
     henesis-wallet:
       url: http://localhost:3000
-      access-token: XP0SZ8TY/6O6hlMAfjcAtmESj/ihFlVed/nkNTDHrmo=
-      api-secret: eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6ImptZWVmMDgwMkBnbWFpbC5jb20iLCJpZCI6IjI2ZTQyMjliOTQ0ZWZlNjNiYWU4MThlZDMyYTY0YTkxIiwidHlwZSI6IkxPTkciLCJsb25nVHlwZSI6dHJ1ZSwiaXNzIjoiaGVuZXNpcy13YWxsZXQtaWRlbnRpdHktcHJvZC10ZXN0bmV0IiwiaWF0IjoxNjA1NjY4Mzg5LCJleHAiOjE5MjEwMjgzODl9.6d1HBljaYYaDB0xkI8zZ7wiUcGrDgx7K-PcfGUE1JPwOuZnng7QQWcvHrLM98C6-m8PENLNKr7m8-N7uIriqAw
+      api-secret: XP0SZ8TY/6O6hlMAfjcAtmESj/ihFlVed/nkNTDHrmo=
+      access-token: eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6ImptZWVmMDgwMkBnbWFpbC5jb20iLCJpZCI6IjI2ZTQyMjliOTQ0ZWZlNjNiYWU4MThlZDMyYTY0YTkxIiwidHlwZSI6IkxPTkciLCJsb25nVHlwZSI6dHJ1ZSwiaXNzIjoiaGVuZXNpcy13YWxsZXQtaWRlbnRpdHktcHJvZC10ZXN0bmV0IiwiaWF0IjoxNjA1NjY4Mzg5LCJleHAiOjE5MjEwMjgzODl9.6d1HBljaYYaDB0xkI8zZ7wiUcGrDgx7K-PcfGUE1JPwOuZnng7QQWcvHrLM98C6-m8PENLNKr7m8-N7uIriqAw
       masterWalletId: a8aec27b3e8dfeb24fdde89ec4f3b891
       passphrase: passphrase
 

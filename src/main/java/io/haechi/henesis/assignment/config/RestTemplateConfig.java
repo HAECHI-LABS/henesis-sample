@@ -35,13 +35,13 @@ public class RestTemplateConfig {
     private final String masterWalletId;
 
     public RestTemplateConfig(
-            @Qualifier("walletAccessToken") String walletAccessToken,
             @Qualifier("walletApiSecret") String walletApiSecret,
+            @Qualifier("walletAccessToken") String walletAccessToken,
             @Qualifier("walletUrl") String walletUrl,
             @Qualifier("masterWalletId") String masterWalletId
     ) {
-        this.walletAccessToken = walletAccessToken;
         this.walletApiSecret = walletApiSecret;
+        this.walletAccessToken = walletAccessToken;
         this.walletUrl = walletUrl;
         this.masterWalletId = masterWalletId;
     }

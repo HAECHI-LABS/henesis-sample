@@ -16,7 +16,7 @@ public class ExchangeController {
     }
 
     // 사용자 지갑 생성
-    @PostMapping
+    @PostMapping("/create-user-wallet")
     @ResponseStatus(value = HttpStatus.OK)
     public UserWalletDTO createUserWallet(@RequestBody String walletName){
         return exchangeApplicationService.createUserWallet(walletName);

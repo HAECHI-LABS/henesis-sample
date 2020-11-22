@@ -5,6 +5,8 @@ import io.haechi.henesis.assignment.domain.UserWallet;
 import io.haechi.henesis.assignment.infra.dto.CreateUserWalletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -27,14 +29,15 @@ public class HenesisWalletService {
     }
 
     public UserWallet createUserWallet(String walletName){
+
         UserWalletDTO response = masterWalletRestTemplate.postForEntity(
                 "/user-wallets",
                 CreateUserWalletRequest.builder()
-                        .walletName(walletName)
+                        .name(walletName)
                         .passphrase(walletPassphrase)
                         .build(),
                 UserWalletDTO.class).getBody();
-
+        System.out.println("response : "+response);
         return UserWallet.builder()
                 .walletId(response.getId())
                 .walletAddress(response.getAddress())

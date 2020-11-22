@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreateUserWalletRequest {
-    private String walletName;
+    private String name;
     private String passphrase;
 }

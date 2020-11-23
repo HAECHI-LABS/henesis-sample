@@ -1,12 +1,10 @@
 package io.haechi.henesis.assignment.application;
 
-import io.haechi.henesis.assignment.application.dto.MasterWalletBalanceDTO;
-import io.haechi.henesis.assignment.application.dto.TransactionDTO;
-import io.haechi.henesis.assignment.application.dto.UserWalletDTO;
-import io.haechi.henesis.assignment.domain.FlushedTx;
-import io.haechi.henesis.assignment.domain.MasterWalletBalance;
-import io.haechi.henesis.assignment.domain.UserWallet;
-import io.haechi.henesis.assignment.domain.ExchangeService;
+import io.haechi.henesis.assignment.application.dto.*;
+import io.haechi.henesis.assignment.domain.*;
+import io.haechi.henesis.assignment.application.dto.CreateUserWalletDTO;
+import io.haechi.henesis.assignment.infra.dto.TransactionDTO;
+import io.haechi.henesis.assignment.application.dto.TransferDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -21,23 +19,25 @@ public class ExchangeApplicationService {
     }
 
 
-    // 사용자 지갑 생성
-    public UserWalletDTO createUserWallet(String walletName){
-        UserWallet userWallet = exchangeService.createUserWallet(walletName);
-        return modelMapper.map(userWallet, UserWalletDTO.class);
+    // 지갑 생성하기
+    public CreateWalletDTO createUserWallet(CreateUserWalletDTO createUserWalletDTO){
+        UserWallet userWallet = exchangeService.createUserWallet(createUserWalletDTO);
+        return modelMapper.map(userWallet, CreateWalletDTO.class);
     }
+
+    // 출금 하기
+    public TransferCoinDTO transferCoin(TransferDTO transferDTO) {
+        Transaction transaction = exchangeService.transferCoin(transferDTO);
+        return modelMapper.map(transaction, TransferCoinDTO.class);
+    }
+
 
     //사용자 지갑 잔고 조회
-    public UserWalletDTO findUserWalletByWalletId(String walletId){
+    public CreateWalletDTO findUserWalletByWalletId(String walletId){
         UserWallet userWallet = exchangeService.findUserWalletByWalletId(walletId);
-        return modelMapper.map(userWallet, UserWalletDTO.class);
+        return modelMapper.map(userWallet, CreateWalletDTO.class);
     }
 
-    // 마스터 지갑 잔고 조회
-    public MasterWalletBalanceDTO findMasterWalletBalanceById(String masterWalletId){
-        MasterWalletBalance masterWalletBalance = exchangeService.findMasterWalletBalanceById(masterWalletId);
-        return modelMapper.map(masterWalletBalance, MasterWalletBalanceDTO.class);
-    }
 
     // FLUSH 된 트랜잭션 조회
     public TransactionDTO findFlushedTxByTxId(String txId){

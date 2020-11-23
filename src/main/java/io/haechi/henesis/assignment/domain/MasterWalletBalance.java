@@ -2,6 +2,9 @@ package io.haechi.henesis.assignment.domain;
 
 import lombok.*;
 
+import java.math.BigInteger;
+
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
@@ -9,10 +12,10 @@ import lombok.*;
 public class MasterWalletBalance {
     private String coinId;
     private String coinType;
-    private String amount;
-    private String decimals;
-    private String spendableAmount;
-    private String aggregatedAmount;
+    private BigInteger amount;
+    private Integer decimals;
+    private BigInteger spendableAmount;
+    private BigInteger aggregatedAmount;
     private String name;
     private String symbol;
 }

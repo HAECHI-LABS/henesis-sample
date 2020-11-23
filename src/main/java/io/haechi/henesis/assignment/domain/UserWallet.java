@@ -2,11 +2,18 @@ package io.haechi.henesis.assignment.domain;
 
 import lombok.*;
 
+import javax.persistence.*;
+import java.math.BigInteger;
+
+@Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserWallet {
+    @Id
+    @Column(updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String walletId;
     private String walletName;
@@ -15,7 +22,7 @@ public class UserWallet {
     private String status;
     private String createdAt;
     private String updatedAt;
-    private String walletBalance;
+    private BigInteger walletBalance;
     private String masterWalletId;
 
     @Builder
@@ -24,12 +31,14 @@ public class UserWallet {
                       String walletAddress,
                       String masterWalletId,
                       String blockchain,
-                      String status){
+                      String status,
+                      BigInteger walletBalance){
         this.walletId = walletId;
         this.walletName = walletName;
         this.walletAddress = walletAddress;
         this.masterWalletId = masterWalletId;
         this.blockchain= blockchain;
         this.status = status;
+        this.walletBalance = walletBalance;
     }
 }

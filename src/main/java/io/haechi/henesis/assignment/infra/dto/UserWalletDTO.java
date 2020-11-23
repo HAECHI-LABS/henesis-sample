@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.application.dto;
+package io.haechi.henesis.assignment.infra.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

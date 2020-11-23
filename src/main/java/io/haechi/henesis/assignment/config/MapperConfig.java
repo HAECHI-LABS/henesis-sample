@@ -1,8 +1,10 @@
 package io.haechi.henesis.assignment.config;
 
 import io.haechi.henesis.assignment.application.dto.MasterWalletBalanceDTO;
-import io.haechi.henesis.assignment.application.dto.TransactionDTO;
-import io.haechi.henesis.assignment.application.dto.UserWalletDTO;
+import io.haechi.henesis.assignment.application.dto.TransferCoinDTO;
+import io.haechi.henesis.assignment.domain.Transaction;
+import io.haechi.henesis.assignment.infra.dto.TransactionDTO;
+import io.haechi.henesis.assignment.application.dto.CreateWalletDTO;
 import io.haechi.henesis.assignment.domain.FlushedTx;
 import io.haechi.henesis.assignment.domain.MasterWalletBalance;
 import io.haechi.henesis.assignment.domain.UserWallet;
@@ -19,8 +21,8 @@ public class MapperConfig {
 
 
     @Bean
-    public PropertyMap<UserWallet, UserWalletDTO> userWalletUserWalletDTOPropertyMap(){
-        return new PropertyMap<UserWallet, UserWalletDTO>() {
+    public PropertyMap<UserWallet, CreateWalletDTO> userWalletUserWalletDTOPropertyMap(){
+        return new PropertyMap<UserWallet, CreateWalletDTO>() {
             @Override
             protected void configure() {
                 map().setId(source.getWalletId());
@@ -34,17 +36,7 @@ public class MapperConfig {
         };
     }
 
-    @Bean
-    public PropertyMap<FlushedTx, TransactionDTO> flushedTxTransactionDTOPropertyMap(){
-        return new PropertyMap<FlushedTx, TransactionDTO>() {
-            @Override
-            protected void configure() {
-                map().setId(source.getTxId());
-                map().setStatus(source.getStatus());
-                map().setBlockchain(source.getBlockchain());
-            }
-        };
-    }
+
 
     @Bean
     public PropertyMap<MasterWalletBalance, MasterWalletBalanceDTO> masterWalletBalanceMasterWalletBalanceDTOPropertyMap(){
@@ -64,15 +56,27 @@ public class MapperConfig {
     }
 
     @Bean
+    public PropertyMap<Transaction, TransferCoinDTO> transactionTransactionDTOPropertyMap(){
+        return new PropertyMap<Transaction, TransferCoinDTO>() {
+            @Override
+            protected void configure() {
+                map().setTxId(source.getId());
+                map().setBlockchain(source.getBlockchain());
+                map().setStatus(source.getStatus());
+            }
+        };
+    }
+
+    @Bean
     public ModelMapper modelMapper(
-            PropertyMap<UserWallet,UserWalletDTO> userWalletUserWalletDTOPropertyMap,
+            PropertyMap<UserWallet, CreateWalletDTO> userWalletUserWalletDTOPropertyMap,
             PropertyMap<MasterWalletBalance, MasterWalletBalanceDTO> masterWalletBalanceMasterWalletBalanceDTOPropertyMap,
-            PropertyMap<FlushedTx, TransactionDTO> flushedTxTransactionDTOPropertyMap
+            PropertyMap<Transaction, TransferCoinDTO> transactionTransactionDTOPropertyMap
     ){
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addMappings(userWalletUserWalletDTOPropertyMap);
         modelMapper.addMappings(masterWalletBalanceMasterWalletBalanceDTOPropertyMap);
-        modelMapper.addMappings(flushedTxTransactionDTOPropertyMap);
+        modelMapper.addMappings(transactionTransactionDTOPropertyMap);
         return modelMapper;
     }
 }

@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.infra.dto;
+package io.haechi.henesis.assignment.domain.arguments;
 
 import lombok.*;
 
@@ -7,6 +7,6 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MasterWalletBalanceRequest {
+public class GetBalanceArguments {
     private String symbol;
 }

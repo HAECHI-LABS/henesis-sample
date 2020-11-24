@@ -1,9 +1,9 @@
 package io.haechi.henesis.assignment.infra;
 
-import io.haechi.henesis.assignment.application.dto.CreateUserWalletDTO;
-import io.haechi.henesis.assignment.application.dto.TransferDTO;
+import io.haechi.henesis.assignment.domain.arguments.CreateUserArguments;
 import io.haechi.henesis.assignment.domain.MasterWalletBalance;
 import io.haechi.henesis.assignment.domain.Transaction;
+import io.haechi.henesis.assignment.domain.arguments.TransferArguments;
 import io.haechi.henesis.assignment.infra.dto.*;
 import io.haechi.henesis.assignment.domain.UserWallet;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,15 +33,15 @@ public class HenesisApiCallService {
         this.walletPassphrase = walletPassphrase;
     }
 
-    public UserWallet createUserWallet(CreateUserWalletDTO request){
+    public UserWallet createUserWallet(CreateUserArguments request){
 
-        UserWalletDTO response = masterWalletRestTemplate.postForEntity(
+        UserWalletJsonObject response = masterWalletRestTemplate.postForEntity(
                 "/user-wallets",
-                CreateUserWalletRequest.builder()
-                        .name(request.getWalletName().trim())
+                CreateUserArguments.builder()
+                        .name(request.getName().trim())
                         .passphrase(request.getPassphrase().trim())
                         .build(),
-                UserWalletDTO.class).getBody();
+                UserWalletJsonObject.class).getBody();
         System.out.println("Create Wallet Response : "+response);
 
 
@@ -55,17 +55,14 @@ public class HenesisApiCallService {
                 .build();
 
     }
-    public Transaction transfer(TransferDTO request) {
+    public Transaction transfer(TransferArguments request) {
 
-        TransactionDTO response = masterWalletRestTemplate.postForEntity(
+        System.out.println("Amount : "+request.getAmount());
+
+        TransactionJsonObject response = masterWalletRestTemplate.postForEntity(
                 "/transfer",
-                TransferRequest.builder()
-                        .ticker(request.getTicker())
-                        .to(request.getTo())
-                        .amount(request.getAmount())
-                        .passphrase(request.getPassphrase())
-                        .build(),
-                TransactionDTO.class).getBody();
+                request,
+                TransactionJsonObject.class).getBody();
         System.out.println("Transfer Response : "+response);
 
         return Transaction.builder()
@@ -78,12 +75,12 @@ public class HenesisApiCallService {
     }
     public Optional<MasterWalletBalance> getMasterWalletBalance(String ticker){
 
-        List<MasterWalletBalanceDTO> masterWalletBalanceDTOS = Arrays.asList(masterWalletRestTemplate.getForEntity(
+        List<MasterWalletBalanceJsonObject> masterWalletBalanceJsonObjects = Arrays.asList(masterWalletRestTemplate.getForEntity(
                 "/balance",
-                MasterWalletBalanceDTO[].class).getBody()
+                MasterWalletBalanceJsonObject[].class).getBody()
         );
 
-        return masterWalletBalanceDTOS.stream().filter(symbol -> symbol.getSymbol().equals(ticker))
+        return masterWalletBalanceJsonObjects.stream().filter(symbol -> symbol.getSymbol().equals(ticker))
                 .map(response ->
                     MasterWalletBalance.builder()
                         .coinId(response.getCoinId())
@@ -91,7 +88,6 @@ public class HenesisApiCallService {
                         .amount(response.getAmount())
                         .decimals(response.getDecimals())
                         .spendableAmount(response.getSpendableAmount())
-                        .aggregatedAmount(response.getAggregatedAmount())
                         .name(response.getName())
                         .symbol(response.getSymbol())
                         .build())

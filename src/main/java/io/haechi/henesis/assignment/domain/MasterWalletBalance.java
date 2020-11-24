@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.domain;
 
+import io.haechi.henesis.assignment.domain.util.Converter;
 import lombok.*;
 
 import java.math.BigInteger;
@@ -9,13 +10,26 @@ import java.math.BigInteger;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MasterWalletBalance {
+public class MasterWalletBalance extends Converter {
     private String coinId;
     private String coinType;
-    private BigInteger amount;
     private Integer decimals;
-    private BigInteger spendableAmount;
-    private BigInteger aggregatedAmount;
+    private String amount;
+    private String spendableAmount;
     private String name;
     private String symbol;
+
+
+    /*
+    public MasterWalletBalance(String coinId, String coinType, Integer decimals, String amount, String spendableAmount, String aggregatedAmount, String name, String symbol){
+        this.coinId = coinId;
+        this.coinType = coinType;
+        this.decimals = decimals;
+        this.amount = hexStringToBigInteger(amount, decimals);
+        this.spendableAmount = hexStringToBigInteger(spendableAmount, decimals);
+        this.aggregatedAmount = hexStringToBigInteger(aggregatedAmount, decimals);
+        this.name = name;
+        this.symbol = symbol;
+    }
+    */
 }

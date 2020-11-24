@@ -8,11 +8,11 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PaginationDTO {
-    @JsonProperty("nextUrl")
-    private String nextUrl;
-    @JsonProperty("previousUrl")
-    private String previousUrl;
-    @JsonProperty("totalCount")
-    private int totalCount;
+public class SignedMultiSigPayloadJsonObject {
+
+    @JsonProperty("signature")
+    private String signature;
+    @JsonProperty("multiSigPayload")
+    private MultiSigPayloadJsonObject multiSigPayloadJsonObject;
+
 }

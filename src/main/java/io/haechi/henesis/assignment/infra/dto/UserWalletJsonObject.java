@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserWalletDTO {
+public class UserWalletJsonObject {
 
     @JsonProperty("id")
     private String id;

@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TransferCoinDTO {
+public class TransferResponseDTO {
     private String txId;
     private String blockchain;
     private String status;

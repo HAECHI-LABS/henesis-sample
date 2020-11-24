@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RawTransactionDTO {
+public class RawTransactionJsonObject {
 
     @JsonProperty("nonce")
     private String nonce;

@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TransactionDTO {
+public class TransactionJsonObject {
 
     @JsonProperty("id")
     private String id;
@@ -29,9 +29,9 @@ public class TransactionDTO {
 
 
     @JsonProperty("signedMultiSigPayload")
-    private SignedMultiSigPayloadDTO signedMultiSigPayloadDTO;
+    private SignedMultiSigPayloadJsonObject signedMultiSigPayloadJsonObject;
     @JsonProperty("rawTransaction")
-    private RawTransactionDTO rawTransactionDTO;
+    private RawTransactionJsonObject rawTransactionJsonObject;
 
 
 

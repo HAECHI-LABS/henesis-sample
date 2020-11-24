@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ResultsDTO {
+public class ResultsJsonObject {
     @JsonProperty("id")
     private int id;
     @JsonProperty("from")

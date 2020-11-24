@@ -1,18 +1,18 @@
-package io.haechi.henesis.assignment.infra.dto;
+package io.haechi.henesis.assignment.domain.arguments;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.math.BigInteger;
 
+
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TransferRequest {
+@Builder
+public class TransferArguments {
     private String ticker;
     private String to;
-    private BigInteger amount;
+    private String amount;
     private String passphrase;
 }

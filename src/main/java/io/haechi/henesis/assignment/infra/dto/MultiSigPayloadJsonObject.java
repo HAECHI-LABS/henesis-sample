@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MultiSigPayloadDTO {
+public class MultiSigPayloadJsonObject {
 
     @JsonProperty("value")
     private String value;

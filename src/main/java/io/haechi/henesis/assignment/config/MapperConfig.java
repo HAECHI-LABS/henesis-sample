@@ -1,11 +1,9 @@
 package io.haechi.henesis.assignment.config;
 
 import io.haechi.henesis.assignment.application.dto.MasterWalletBalanceDTO;
-import io.haechi.henesis.assignment.application.dto.TransferCoinDTO;
+import io.haechi.henesis.assignment.application.dto.TransferResponseDTO;
 import io.haechi.henesis.assignment.domain.Transaction;
-import io.haechi.henesis.assignment.infra.dto.TransactionDTO;
-import io.haechi.henesis.assignment.application.dto.CreateWalletDTO;
-import io.haechi.henesis.assignment.domain.FlushedTx;
+import io.haechi.henesis.assignment.application.dto.CreateWalletResponseDTO;
 import io.haechi.henesis.assignment.domain.MasterWalletBalance;
 import io.haechi.henesis.assignment.domain.UserWallet;
 import org.modelmapper.ModelMapper;
@@ -21,8 +19,8 @@ public class MapperConfig {
 
 
     @Bean
-    public PropertyMap<UserWallet, CreateWalletDTO> userWalletUserWalletDTOPropertyMap(){
-        return new PropertyMap<UserWallet, CreateWalletDTO>() {
+    public PropertyMap<UserWallet, CreateWalletResponseDTO> userWalletUserWalletDTOPropertyMap(){
+        return new PropertyMap<UserWallet, CreateWalletResponseDTO>() {
             @Override
             protected void configure() {
                 map().setId(source.getWalletId());
@@ -36,28 +34,9 @@ public class MapperConfig {
         };
     }
 
-
-
     @Bean
-    public PropertyMap<MasterWalletBalance, MasterWalletBalanceDTO> masterWalletBalanceMasterWalletBalanceDTOPropertyMap(){
-        return new PropertyMap<MasterWalletBalance, MasterWalletBalanceDTO>() {
-            @Override
-            protected void configure() {
-                map().setCoinId(source.getCoinId());
-                map().setCoinType(source.getCoinType());
-                map().setAmount(source.getAmount());
-                map().setDecimals(source.getDecimals());
-                map().setSpendableAmount(source.getSpendableAmount());
-                map().setAggregatedAmount(source.getAggregatedAmount());
-                map().setName(source.getName());
-                map().setSymbol(source.getSymbol());
-            }
-        };
-    }
-
-    @Bean
-    public PropertyMap<Transaction, TransferCoinDTO> transactionTransactionDTOPropertyMap(){
-        return new PropertyMap<Transaction, TransferCoinDTO>() {
+    public PropertyMap<Transaction, TransferResponseDTO> transactionTransactionDTOPropertyMap(){
+        return new PropertyMap<Transaction, TransferResponseDTO>() {
             @Override
             protected void configure() {
                 map().setTxId(source.getId());
@@ -69,13 +48,11 @@ public class MapperConfig {
 
     @Bean
     public ModelMapper modelMapper(
-            PropertyMap<UserWallet, CreateWalletDTO> userWalletUserWalletDTOPropertyMap,
-            PropertyMap<MasterWalletBalance, MasterWalletBalanceDTO> masterWalletBalanceMasterWalletBalanceDTOPropertyMap,
-            PropertyMap<Transaction, TransferCoinDTO> transactionTransactionDTOPropertyMap
+            PropertyMap<UserWallet, CreateWalletResponseDTO> userWalletUserWalletDTOPropertyMap,
+            PropertyMap<Transaction, TransferResponseDTO> transactionTransactionDTOPropertyMap
     ){
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addMappings(userWalletUserWalletDTOPropertyMap);
-        modelMapper.addMappings(masterWalletBalanceMasterWalletBalanceDTOPropertyMap);
         modelMapper.addMappings(transactionTransactionDTOPropertyMap);
         return modelMapper;
     }

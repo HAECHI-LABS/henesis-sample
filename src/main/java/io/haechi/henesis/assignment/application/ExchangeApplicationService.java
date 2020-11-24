@@ -2,8 +2,9 @@ package io.haechi.henesis.assignment.application;
 
 import io.haechi.henesis.assignment.application.dto.*;
 import io.haechi.henesis.assignment.domain.*;
-import io.haechi.henesis.assignment.application.dto.CreateUserWalletDTO;
-import io.haechi.henesis.assignment.infra.dto.TransactionDTO;
+import io.haechi.henesis.assignment.application.dto.CreateWalletDTO;
+import io.haechi.henesis.assignment.domain.arguments.CreateUserArguments;
+import io.haechi.henesis.assignment.domain.arguments.TransferArguments;
 import io.haechi.henesis.assignment.application.dto.TransferDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -20,30 +21,32 @@ public class ExchangeApplicationService {
 
 
     // 지갑 생성하기
-    public CreateWalletDTO createUserWallet(CreateUserWalletDTO createUserWalletDTO){
-        UserWallet userWallet = exchangeService.createUserWallet(createUserWalletDTO);
-        return modelMapper.map(userWallet, CreateWalletDTO.class);
+    public CreateWalletResponseDTO createUserWallet(CreateWalletDTO createWalletDTO){
+        CreateUserArguments createUserArguments = CreateUserArguments.builder()
+                .name(createWalletDTO.getWalletName())
+                .passphrase(createWalletDTO.getPassphrase())
+                .build();
+        UserWallet userWallet = exchangeService.createUserWallet(createUserArguments);
+        return modelMapper.map(userWallet, CreateWalletResponseDTO.class);
     }
 
     // 출금 하기
-    public TransferCoinDTO transferCoin(TransferDTO transferDTO) {
-        Transaction transaction = exchangeService.transferCoin(transferDTO);
-        return modelMapper.map(transaction, TransferCoinDTO.class);
+    public TransferResponseDTO transferCoin(TransferDTO transferDTO) {
+
+        TransferArguments transferArguments = TransferArguments.builder()
+                .ticker(transferDTO.getTicker())
+                .to(transferDTO.getTo())
+                .amount(transferDTO.getAmount())
+                .passphrase(transferDTO.getPassphrase())
+                .build();
+
+        Transaction transaction = exchangeService.transfer(transferDTO.getUserWalletId(),
+                transferDTO.getAmount(),
+                transferDTO.getTo(),
+                transferDTO.getTicker(),
+                transferDTO.getPassphrase()
+                );
+        return modelMapper.map(transaction, TransferResponseDTO.class);
     }
-
-
-    //사용자 지갑 잔고 조회
-    public CreateWalletDTO findUserWalletByWalletId(String walletId){
-        UserWallet userWallet = exchangeService.findUserWalletByWalletId(walletId);
-        return modelMapper.map(userWallet, CreateWalletDTO.class);
-    }
-
-
-    // FLUSH 된 트랜잭션 조회
-    public TransactionDTO findFlushedTxByTxId(String txId){
-        FlushedTx flushedTx = exchangeService.findFlushedTxByTxId(txId);
-        return modelMapper.map(flushedTx, TransactionDTO.class);
-    }
-
 
 }

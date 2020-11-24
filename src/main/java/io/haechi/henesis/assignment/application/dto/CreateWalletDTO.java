@@ -1,33 +1,23 @@
 package io.haechi.henesis.assignment.application.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.*;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreateWalletDTO {
 
-    @JsonProperty("id")
-    private String id;
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("address")
-    private String address;
-    @JsonProperty("blockchain")
-    private String blockchain;
-    @JsonProperty("status")
-    private String status;
-    @JsonProperty("error")
-    private String error;
-    @JsonProperty("transactionId")
-    private String transactionId;
-    @JsonProperty("createdAt")
-    private String createdAt;
-    @JsonProperty("updatedAt")
-    private String updatedAt;
+    @NotNull(message = "walletName must be not null")
+    @NotEmpty(message = "walletName must be not empty")
+    private String walletName;
 
+    @NotNull(message = "passphrase must be not null")
+    @NotEmpty(message = "passphrase must be not empty")
+    private String passphrase;
 }

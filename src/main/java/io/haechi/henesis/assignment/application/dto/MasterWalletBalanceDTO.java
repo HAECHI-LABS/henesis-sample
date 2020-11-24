@@ -1,8 +1,7 @@
 package io.haechi.henesis.assignment.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.haechi.henesis.assignment.config.util.BigIntegerToHexString;
+
 import lombok.*;
 
 import java.math.BigInteger;
@@ -16,17 +15,12 @@ public class MasterWalletBalanceDTO {
     private String coinId;
     @JsonProperty("coinType")
     private String coinType;
-    @JsonSerialize(using = BigIntegerToHexString.class)
     @JsonProperty("amount")
     private BigInteger amount;
     @JsonProperty("decimals")
     private Integer decimals;
-    @JsonSerialize(using = BigIntegerToHexString.class)
     @JsonProperty("spendableAmount")
     private BigInteger spendableAmount;
-    @JsonSerialize(using = BigIntegerToHexString.class)
-    @JsonProperty("aggregatedAmount")
-    private BigInteger aggregatedAmount;
     @JsonProperty("name")
     private String name;
     @JsonProperty("symbol")

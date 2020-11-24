@@ -3,7 +3,7 @@ package io.haechi.henesis.assignment.web;
 import io.haechi.henesis.assignment.application.ExchangeApplicationService;
 import io.haechi.henesis.assignment.application.dto.*;
 import io.haechi.henesis.assignment.domain.repository.UserWalletRepository;
-import io.haechi.henesis.assignment.application.dto.CreateUserWalletDTO;
+import io.haechi.henesis.assignment.application.dto.CreateWalletDTO;
 import io.haechi.henesis.assignment.application.dto.TransferDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -24,14 +24,14 @@ public class ExchangeController {
     // 사용자 지갑 생성
     @PostMapping("/create-user-wallet")
     @ResponseStatus(value = HttpStatus.OK)
-    public CreateWalletDTO createUserWallet(@RequestBody CreateUserWalletDTO createUserWalletDTO){
-        return exchangeApplicationService.createUserWallet(createUserWalletDTO);
+    public CreateWalletResponseDTO createUserWallet(@RequestBody CreateWalletDTO createWalletDTO){
+        return exchangeApplicationService.createUserWallet(createWalletDTO);
     }
 
     // 출금하기
     @PostMapping("/transfer")
     @ResponseStatus(value = HttpStatus.OK)
-    public TransferCoinDTO transferCoin(@RequestBody TransferDTO transferDTO){
+    public TransferResponseDTO transferCoin(@RequestBody TransferDTO transferDTO){
         return exchangeApplicationService.transferCoin(transferDTO);
     }
 

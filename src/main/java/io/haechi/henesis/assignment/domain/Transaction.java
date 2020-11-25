@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Transaction {
-    private String id;
+    private String txId;
     private String blockchain;
     private String status;
     private String createdAt;

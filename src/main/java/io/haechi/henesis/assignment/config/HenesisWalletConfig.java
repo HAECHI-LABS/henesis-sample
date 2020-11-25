@@ -37,8 +37,8 @@ public class HenesisWalletConfig {
     }
 
     @Bean
-    @Qualifier("walletPassphrase")
-    public String walletPassphrase(HenesisWalletProperties henesisWalletProperties){
+    @Qualifier("passphrase")
+    public String passphrase(HenesisWalletProperties henesisWalletProperties){
         return henesisWalletProperties.getPassphrase();
     }
 }

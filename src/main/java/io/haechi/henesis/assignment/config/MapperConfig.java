@@ -1,6 +1,6 @@
 package io.haechi.henesis.assignment.config;
 
-import io.haechi.henesis.assignment.application.dto.MasterWalletBalanceDTO;
+import io.haechi.henesis.assignment.application.dto.FlushResponseDTO;
 import io.haechi.henesis.assignment.application.dto.TransferResponseDTO;
 import io.haechi.henesis.assignment.domain.Transaction;
 import io.haechi.henesis.assignment.application.dto.CreateWalletResponseDTO;
@@ -39,7 +39,19 @@ public class MapperConfig {
         return new PropertyMap<Transaction, TransferResponseDTO>() {
             @Override
             protected void configure() {
-                map().setTxId(source.getId());
+                map().setTxId(source.getTxId());
+                map().setBlockchain(source.getBlockchain());
+                map().setStatus(source.getStatus());
+            }
+        };
+    }
+
+    @Bean
+    public PropertyMap<Transaction, FlushResponseDTO> transactionFlushResponseDTOPropertyMap(){
+        return new PropertyMap<Transaction, FlushResponseDTO>() {
+            @Override
+            protected void configure() {
+                map().setTxId(source.getTxId());
                 map().setBlockchain(source.getBlockchain());
                 map().setStatus(source.getStatus());
             }
@@ -49,11 +61,13 @@ public class MapperConfig {
     @Bean
     public ModelMapper modelMapper(
             PropertyMap<UserWallet, CreateWalletResponseDTO> userWalletUserWalletDTOPropertyMap,
-            PropertyMap<Transaction, TransferResponseDTO> transactionTransactionDTOPropertyMap
+            PropertyMap<Transaction, TransferResponseDTO> transactionTransactionDTOPropertyMap,
+            PropertyMap<Transaction, FlushResponseDTO> transactionFlushResponseDTOPropertyMap
     ){
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addMappings(userWalletUserWalletDTOPropertyMap);
         modelMapper.addMappings(transactionTransactionDTOPropertyMap);
+        modelMapper.addMappings(transactionFlushResponseDTOPropertyMap);
         return modelMapper;
     }
 }

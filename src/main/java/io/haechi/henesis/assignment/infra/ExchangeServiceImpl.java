@@ -2,25 +2,32 @@ package io.haechi.henesis.assignment.infra;
 
 import io.haechi.henesis.assignment.domain.*;
 import io.haechi.henesis.assignment.domain.arguments.CreateUserArguments;
+import io.haechi.henesis.assignment.domain.arguments.FlushArguments;
 import io.haechi.henesis.assignment.domain.arguments.TransferArguments;
+import io.haechi.henesis.assignment.domain.repository.FlushedTxRepository;
 import io.haechi.henesis.assignment.domain.repository.UserWalletRepository;
 import io.haechi.henesis.assignment.domain.util.Converter;
+import io.haechi.henesis.assignment.infra.dto.UserWalletJsonObject;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ExchangeServiceImpl implements ExchangeService {
 
     private final HenesisApiCallService henesisApiCallService;
     private final UserWalletRepository userWalletRepository;
+    private final FlushedTxRepository flushedTxRepository;
 
     public ExchangeServiceImpl(HenesisApiCallService henesisApiCallService,
-                               UserWalletRepository userWalletRepository){
+                               UserWalletRepository userWalletRepository,
+                               FlushedTxRepository flushedTxRepository){
         this.henesisApiCallService = henesisApiCallService;
         this.userWalletRepository = userWalletRepository;
+        this.flushedTxRepository = flushedTxRepository;
     }
 
 
@@ -51,56 +58,53 @@ public class ExchangeServiceImpl implements ExchangeService {
         Double convertedSpendableAmount = Converter.hexStringToDouble(masterWalletBalance.get().getSpendableAmount());
         Double convertedUserWalletBalance = Converter.hexStringToDouble(userWallet.getWalletBalance());
 
-        System.out.println("userWallet Name : "+userWallet.getWalletName());
-        System.out.println("userWallet Balance : "+userWallet.getWalletBalance());
-        System.out.println("Converted userWallet Balance : "+convertedUserWalletBalance);
-
-
-        System.out.println("Amount : "+ amount);
-        System.out.println("Converted Amount : "+ convertedAmount);
-
-        System.out.println("MasterWallet Spendable Balance : "+masterWalletBalance.get().getSpendableAmount());
-        System.out.println("Converted MasterWallet Spendable Balance : "+convertedSpendableAmount);
 
         if (convertedSpendableAmount.compareTo(convertedAmount)<0
         && convertedUserWalletBalance.compareTo(convertedAmount)<0){
             throw new IllegalStateException("NO MONEY!!!!");
         }else{
-            System.out.println("Before Wallet Balance : "+Converter.hexStringToDouble(userWallet.getWalletBalance()));
 
-            userWallet.setWalletBalance(Converter.DoubleToHexString(convertedUserWalletBalance-convertedAmount));
-
-            System.out.println("After Wallet Balance : "+Converter.hexStringToDouble(userWallet.getWalletBalance()));
-
-            userWalletRepository.save(userWallet);
-
-            TransferArguments transferArguments = TransferArguments.builder()
+            Transaction transaction = henesisApiCallService.transfer(TransferArguments.builder()
                     .amount(amount)
                     .to(to)
                     .ticker(ticker)
                     .passphrase(passphrase)
-                    .build();
+                    .build()
+            );
 
-            return henesisApiCallService.transfer(transferArguments);
+            // 잔고 차감
+            userWallet.setWalletBalance(Converter.DoubleToHexString(convertedUserWalletBalance-convertedAmount));
+            userWalletRepository.save(userWallet);
+
+            return transaction;
         }
 
     }
 
-
     @Override
-    public UserWallet findUserWalletByWalletId(String walletId) {
-        return null;
-    }
+    @Transactional
+    public Transaction flush(String ticker, String passphrase) {
 
-    @Override
-    public MasterWalletBalance findMasterWalletBalanceById(String masterWalletId) {
-        return null;
-    }
+        List<UserWalletJsonObject> userWallets = henesisApiCallService.getAllUserWallet().getResults();
 
-    @Override
-    public FlushedTx findFlushedTxByTxId(String txId) {
-        return null;
-    }
+        List<String> userWalletIds = userWallets.stream()
+                .map(UserWalletJsonObject::getId)
+                .collect(Collectors.toList());
 
+        System.out.println("Get All User Wallet Id : "+userWalletIds);
+
+
+        Transaction transaction = henesisApiCallService.flush(FlushArguments.builder()
+                .ticker(ticker)
+                .userWalletIds(userWalletIds)
+                .passphrase(passphrase)
+                .build()
+        );
+
+        FlushedTx flushedTx = new FlushedTx(transaction);
+
+        flushedTxRepository.save(flushedTx);
+        return transaction;
+    }
 
 }

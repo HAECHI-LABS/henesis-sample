@@ -18,4 +18,12 @@ public class FlushedTx {
     private String txId;
     private String blockchain;
     private String status;
+    private String createdAt;
+
+    public FlushedTx(Transaction transaction) {
+        this.txId = transaction.getTxId();
+        this.blockchain = transaction.getBlockchain();
+        this.status = transaction.getStatus();
+        this.createdAt = transaction.getCreatedAt();
+    }
 }

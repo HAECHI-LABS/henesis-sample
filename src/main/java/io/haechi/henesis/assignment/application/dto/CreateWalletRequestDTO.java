@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CreateWalletDTO {
+public class CreateWalletRequestDTO {
 
     @NotNull(message = "walletName must be not null")
     @NotEmpty(message = "walletName must be not empty")

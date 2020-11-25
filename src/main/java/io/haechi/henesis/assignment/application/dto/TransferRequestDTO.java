@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TransferDTO {
+public class TransferRequestDTO {
 
     @JsonProperty("userWalletId")
     private String userWalletId;

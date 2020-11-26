@@ -13,12 +13,9 @@ import org.springframework.web.bind.annotation.*;
 public class ExchangeController {
 
     private final ExchangeApplicationService exchangeApplicationService;
-    private final UserWalletRepository userWalletRepository;
 
-    public ExchangeController(ExchangeApplicationService exchangeApplicationService,
-                              UserWalletRepository userWalletRepository){
+    public ExchangeController(ExchangeApplicationService exchangeApplicationService){
         this.exchangeApplicationService = exchangeApplicationService;
-        this.userWalletRepository = userWalletRepository;
     }
 
     // 사용자 지갑 생성

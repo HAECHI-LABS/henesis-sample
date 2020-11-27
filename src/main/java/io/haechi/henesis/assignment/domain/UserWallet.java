@@ -4,7 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigInteger;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -23,7 +22,7 @@ public class UserWallet {
     private String status;
     private String createdAt;
     private String updatedAt;
-    private String walletBalance;
+    private BigInteger walletBalance;
     private String masterWalletId;
 
     @Builder
@@ -33,12 +32,12 @@ public class UserWallet {
                       String masterWalletId,
                       String blockchain,
                       String status,
-                      String walletBalance){
+                      BigInteger walletBalance) {
         this.walletId = walletId;
         this.walletName = walletName;
         this.walletAddress = walletAddress;
         this.masterWalletId = masterWalletId;
-        this.blockchain= blockchain;
+        this.blockchain = blockchain;
         this.status = status;
         this.walletBalance = walletBalance;
     }

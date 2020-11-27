@@ -10,35 +10,37 @@ import org.springframework.context.annotation.Configuration;
 public class HenesisWalletConfig {
 
     @Bean
-    public HenesisWalletProperties henesisWalletProperties(){return new HenesisWalletProperties();}
+    public HenesisWalletProperties henesisWalletProperties() {
+        return new HenesisWalletProperties();
+    }
 
     @Bean
     @Qualifier("walletUrl")
-    public String url(HenesisWalletProperties henesisWalletProperties){
+    public String url(HenesisWalletProperties henesisWalletProperties) {
         return henesisWalletProperties.getUrl();
     }
 
     @Bean
     @Qualifier("walletApiSecret")
-    public String apiSecret(HenesisWalletProperties henesisWalletProperties){
+    public String apiSecret(HenesisWalletProperties henesisWalletProperties) {
         return henesisWalletProperties.getApiSecret();
     }
 
     @Bean
     @Qualifier("walletAccessToken")
-    public String accessToken(HenesisWalletProperties henesisWalletProperties){
+    public String accessToken(HenesisWalletProperties henesisWalletProperties) {
         return henesisWalletProperties.getAccessToken();
     }
 
     @Bean
     @Qualifier("masterWalletId")
-    public String masterWalletId(HenesisWalletProperties henesisWalletProperties){
+    public String masterWalletId(HenesisWalletProperties henesisWalletProperties) {
         return henesisWalletProperties.getMasterWalletId();
     }
 
     @Bean
     @Qualifier("passphrase")
-    public String passphrase(HenesisWalletProperties henesisWalletProperties){
+    public String passphrase(HenesisWalletProperties henesisWalletProperties) {
         return henesisWalletProperties.getPassphrase();
     }
 }

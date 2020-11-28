@@ -3,71 +3,78 @@ package io.haechi.henesis.assignment.domain;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 
 @Embeddable
 @NoArgsConstructor
 public class Amount {
-    private BigInteger amount;
-
-
-    public Amount(BigInteger amount) {
-        this.amount = amount;
-    }
-
-    public Amount(String amount){
-        this.amount = new BigInteger(amount.substring(2), 16);
-    }
+    private BigInteger value;
 
     public static Amount of(String amount){
         return new Amount(amount);
     }
+    private Amount(String amount){
+        this.value = new BigInteger(amount.substring(2), 16);
+    }
 
+    public static Amount of(BigInteger amount){return new Amount(amount);}
+    private Amount(BigInteger amount){
+        this.value = amount;
+    }
+
+    public static Amount of(Double amount){return new Amount(amount);}
+    private Amount(Double amount){
+        this.value = BigDecimal.valueOf(amount*Math.pow(10,18)).toBigInteger();
+    }
+
+    public String toHexString() {
+        return "0x"+this.value.toString(16);
+    }
 
     public void changeAmount(BigInteger amount) {
-        this.amount = amount;
+        this.value = amount;
     }
 
     public void add(BigInteger amount) {
-        this.amount = this.amount.add(amount);
+        this.value = this.value.add(amount);
     }
 
-    public void subtract(BigInteger amount) {
-        if (this.amount.compareTo(amount) < 0) {
+    public void subtract(Amount amount) {
+        if (this.value.compareTo(amount.value) < 0) {
             throw new IllegalStateException(
                     "balance cannot be negative."
             );
         }
-        this.amount = this.amount.subtract(amount);
+        this.value = this.value.subtract(amount.value);
     }
 
-    public void mul(BigInteger amount) {
-        if (amount.compareTo(BigInteger.ZERO) < 0) {
+    public void mul(Amount amount) {
+        if (value.compareTo(BigInteger.ZERO) < 0) {
             throw new IllegalStateException(
                     "cannot multiply by negative value."
             );
         }
-        this.amount = this.amount.multiply(amount);
+        this.value = this.value.multiply(amount.value);
     }
 
-    public void div(BigInteger amount) {
-        if (amount.compareTo(BigInteger.ZERO) <= 0) {
+    public void div(Amount amount) {
+        if (value.compareTo(BigInteger.ZERO) <= 0) {
             throw new IllegalStateException(
                     "cannot divide by non-positive value."
             );
         }
-        this.amount = this.amount.divide(amount);
+        this.value = this.value.divide(amount.value);
     }
 
-    public int compareTo(BigInteger amount) {
-        return this.amount.compareTo(amount);
+    public int compareTo(Amount amount) {
+
+        return this.value.compareTo(amount.value);
     }
 
 
-//    public static String bigIntegerToHexString(BigInteger amount) {
-//        return "0x"+amount.toString(16);
-//    }
+
 
 
 

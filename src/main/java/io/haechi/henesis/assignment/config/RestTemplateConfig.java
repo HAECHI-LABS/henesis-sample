@@ -56,10 +56,10 @@ public class RestTemplateConfig {
 
     @Bean
     @Qualifier("walletClient")
-    public RestTemplate walletRestTemplate(){
+    public RestTemplate walletRestTemplate() {
         RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(
-                String.format("%s/api/v2/eth",walletUrl)
+                String.format("%s/api/v2/eth", walletUrl)
         ));
         restTemplate.setInterceptors(
                 Collections.singletonList(new HeaderInterceptor())
@@ -69,10 +69,10 @@ public class RestTemplateConfig {
 
     @Bean
     @Qualifier("masterWalletClient")
-    public RestTemplate masterWalletRestTemplate(){
+    public RestTemplate masterWalletRestTemplate() {
         RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(
-                String.format("%s/api/v2/eth/wallets/%s",walletUrl,masterWalletId)
+                String.format("%s/api/v2/eth/wallets/%s", walletUrl, masterWalletId)
         ));
         restTemplate.setInterceptors(
                 Collections.singletonList(new HeaderInterceptor())
@@ -80,7 +80,7 @@ public class RestTemplateConfig {
         return restTemplate;
     }
 
-    private ClientHttpRequestFactory clientHttpRequestFactory(){
+    private ClientHttpRequestFactory clientHttpRequestFactory() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setReadTimeout(READ_TIMEOUT);
         factory.setConnectTimeout(CONNECT_TIMEOUT);
@@ -94,18 +94,17 @@ public class RestTemplateConfig {
     }
 
 
-    private class HeaderInterceptor implements ClientHttpRequestInterceptor{
+    private class HeaderInterceptor implements ClientHttpRequestInterceptor {
 
         @Override
         public ClientHttpResponse intercept(org.springframework.http.HttpRequest request, byte[] body,
                                             ClientHttpRequestExecution execution) throws IOException {
             HttpHeaders headers = request.getHeaders();
             headers.add("X-Henesis-Secret", walletApiSecret);
-            headers.add("Authorization","Bearer "+ walletAccessToken);
+            headers.add("Authorization", "Bearer " + walletAccessToken);
             return execution.execute(request, body);
         }
     }
-
 
 
 }

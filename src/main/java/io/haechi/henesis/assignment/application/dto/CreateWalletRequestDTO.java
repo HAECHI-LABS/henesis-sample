@@ -17,7 +17,4 @@ public class CreateWalletRequestDTO {
     @NotEmpty(message = "walletName must be not empty")
     private String walletName;
 
-    @NotNull(message = "passphrase must be not null")
-    @NotEmpty(message = "passphrase must be not empty")
-    private String passphrase;
 }

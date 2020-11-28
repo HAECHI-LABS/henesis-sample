@@ -10,12 +10,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableAsync
 @EnableScheduling
-@EnableJpaRepositories
 @Slf4j
 public class AssignmentApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AssignmentApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AssignmentApplication.class, args);
+    }
 
 }

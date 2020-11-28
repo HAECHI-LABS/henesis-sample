@@ -1,8 +1,10 @@
 package io.haechi.henesis.assignment.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import io.haechi.henesis.assignment.domain.Amount;
 import lombok.*;
+
+import java.math.BigInteger;
 
 
 @Getter
@@ -19,7 +21,5 @@ public class TransferRequestDTO {
     @JsonProperty("to")
     private String to;
     @JsonProperty("amount")
-    private String amount;
-    @JsonProperty("passphrase")
-    private String passphrase;
+    private Amount amount;
 }

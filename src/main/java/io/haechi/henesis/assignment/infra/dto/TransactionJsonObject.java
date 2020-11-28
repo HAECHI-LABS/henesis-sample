@@ -34,9 +34,4 @@ public class TransactionJsonObject {
     private RawTransactionJsonObject rawTransactionJsonObject;
 
 
-
-
-
-
-
 }

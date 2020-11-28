@@ -17,7 +17,7 @@ app:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/ethaniumDB
+    url: jdbc:postgresql://localhost:5432/EthaniumDB
     username: postgres
     password: 1234
     platform: postgres

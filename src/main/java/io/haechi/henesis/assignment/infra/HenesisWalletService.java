@@ -70,13 +70,13 @@ public class HenesisWalletService implements WalletService {
      * @return Transaction
      */
     @Override
-    public Transaction transfer(BigInteger amount,
+    public Transaction transfer(Amount amount,
                                 String to,
                                 String ticker) {
 
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
-        param.add("amount","0x"+amount.toString(16));
+        param.add("amount", amount.toHexString());
         param.add("to",to);
         param.add("ticker",ticker);
         param.add("passphrase",passphrase);

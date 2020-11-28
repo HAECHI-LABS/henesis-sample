@@ -23,6 +23,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.apache.httpcomponents:httpclient:4.5'
 	runtimeOnly 'com.h2database:h2'
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -34,8 +35,8 @@ dependencies {
 	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.3.4'
 	// https://mvnrepository.com/artifact/javax.validation/validation-api
 	compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
-	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper
-	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.2'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+	compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.4.0'
 
 }
 

@@ -11,7 +11,4 @@ public class FlushRequestDTO {
     @JsonProperty("ticker")
     private String ticker;
 
-    @JsonProperty("passphrase")
-    private String passphrase;
-
 }

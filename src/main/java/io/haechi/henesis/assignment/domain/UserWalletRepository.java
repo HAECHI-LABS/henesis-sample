@@ -2,6 +2,7 @@ package io.haechi.henesis.assignment.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,10 @@ public interface UserWalletRepository extends JpaRepository<UserWallet, String>,
     */
 
     Optional<UserWallet> findByWalletId(String walletId);
+
+    @Modifying
+    @Query("UPDATE UserWallet u SET u.walletBalance= :walletBalaance, u.updatedAt = :status  WHERE u.walletId = :walletId")
+    void updateUserWalletBalanceByWalletId(@Param("walletBalance") String walletBalance, @Param("status") String status, @Param("walletId") String walletId);
 
 
 }

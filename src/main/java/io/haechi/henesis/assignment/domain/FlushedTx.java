@@ -20,10 +20,30 @@ public class FlushedTx {
     private String status;
     private String createdAt;
 
-    public FlushedTx(Transaction transaction) {
-        this.txId = transaction.getTxId();
-        this.blockchain = transaction.getBlockchain();
-        this.status = transaction.getStatus();
-        this.createdAt = transaction.getCreatedAt();
+    private FlushedTx(
+            String txId,
+            String blockchain,
+            String status,
+            String createdAt
+    ){
+        this.txId=txId;
+        this.blockchain=blockchain;
+        this.status=status;
+        this.createdAt=createdAt;
     }
+
+    public static FlushedTx of(
+            String txId,
+            String blockchain,
+            String status,
+            String createdAt
+    ){
+        return new FlushedTx(
+                txId,
+                blockchain,
+                status,
+                createdAt
+        );
+    }
+
 }

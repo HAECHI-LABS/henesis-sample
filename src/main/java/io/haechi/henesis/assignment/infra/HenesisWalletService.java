@@ -1,9 +1,6 @@
 package io.haechi.henesis.assignment.infra;
 
-import io.haechi.henesis.assignment.domain.Amount;
-import io.haechi.henesis.assignment.domain.Transaction;
-import io.haechi.henesis.assignment.domain.UserWallet;
-import io.haechi.henesis.assignment.domain.WalletService;
+import io.haechi.henesis.assignment.domain.*;
 import io.haechi.henesis.assignment.infra.dto.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -11,7 +8,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,6 +30,50 @@ public class HenesisWalletService implements WalletService {
         this.passphrase = passphrase;
     }
 
+
+    /**
+     * 입출금 내역 조회하기
+     * @return
+     */
+    @Override
+    public List<Transaction> getValueTransferEvents(){
+        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+        param.add("size","50");
+        param.add("updatedAtGte","");
+        param.add("masterWalletId",masterWalletId);
+
+        ValueTransferEventsJsonObject response = restTemplate.getForEntity(
+                "value-transfer-events",
+                ValueTransferEventsJsonObject.class,
+                param
+        ).getBody();
+
+        assert response != null;
+
+        System.out.println("Monitoring....");
+
+        return response.getResults().stream().map(t ->
+                        Transaction.of(
+                                t.getId(),
+                                t.getFrom(),
+                                t.getTo(),
+                                t.getAmount(),
+                                t.getBlockchain(),
+                                t.getStatus(),
+                                t.getTransactionId(),
+                                t.getTransactionHash(),
+                                t.getCoinSymbol(),
+                                t.getConfirmation(),
+                                t.getTransferType(),
+                                t.getCreatedAt(),
+                                t.getUpdatedAt(),
+                                t.getWalletId(),
+                                t.getWalletName()
+                        )
+                ).collect(Collectors.toList());
+    }
+
+
     /**
      * 사용자 지갑 생성하기 API Call
      *
@@ -49,7 +89,8 @@ public class HenesisWalletService implements WalletService {
         UserWalletJsonObject response = masterWalletRestTemplate.postForEntity(
                 "/user-wallets",
                 param,
-                UserWalletJsonObject.class).getBody();
+                UserWalletJsonObject.class
+        ).getBody();
 
 
         return UserWallet.builder()
@@ -64,15 +105,12 @@ public class HenesisWalletService implements WalletService {
     }
 
     /**
-     * 코인/토큰 조회하기 API Call
+     * 코인/토큰 전송하 API Call
      *
      * @param
-     * @return Transaction
      */
     @Override
-    public Transaction transfer(Amount amount,
-                                String to,
-                                String ticker) {
+    public Transaction transfer(Amount amount, String to, String ticker) {
 
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
@@ -84,28 +122,37 @@ public class HenesisWalletService implements WalletService {
         TransactionJsonObject response = masterWalletRestTemplate.postForEntity(
                 "/transfer",
                 param,
-                TransactionJsonObject.class).getBody();
+                TransactionJsonObject.class
+        ).getBody();
 
-        return Transaction.builder()
-                .txId(response.getId())
-                .blockchain(response.getBlockchain())
-                .status(response.getStatus())
-                .createdAt(response.getCreatedAt())
-                .build();
+        return Transaction.newInstanceOf(
+                response.getId(),
+                response.getBlockchain(),
+                response.getStatus(),
+                response.getCreatedAt()
+        );
 
     }
 
+
+    /**
+     * 마스터 지갑에 속한 UserWallet ID 모두 가져오
+     * @return
+     */
     @Override
     public List<String> getUserWalletIds() {
 
         List<UserWalletJsonObject> getAllUserWallet =  Objects.requireNonNull(masterWalletRestTemplate.getForEntity(
                 "/user-wallets",
-                GetAllUserWalletJsonObject.class).getBody()).getResults();
+                GetAllUserWalletJsonObject.class
+        ).getBody()).getResults();
 
         return getAllUserWallet.stream()
                 .map(UserWalletJsonObject::getId)
                 .collect(Collectors.toList());
     }
+
+
 
     /**
      * 사용자 지갑 잔액을 모두 끌어오기 API Call
@@ -113,7 +160,6 @@ public class HenesisWalletService implements WalletService {
      * @param
      * @return Transaction
      */
-
     @Override
     public Transaction flushAll(String ticker, List<String> userWalletIds) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
@@ -125,15 +171,18 @@ public class HenesisWalletService implements WalletService {
         TransactionJsonObject response = masterWalletRestTemplate.postForEntity(
                 "/flush",
                 param,
-                TransactionJsonObject.class).getBody();
+                TransactionJsonObject.class
+        ).getBody();
 
-        return Transaction.builder()
-                .txId(response.getId())
-                .blockchain(response.getBlockchain())
-                .status(response.getStatus())
-                .createdAt(response.getCreatedAt())
-                .build();
+        return Transaction.newInstanceOf(
+                response.getId(),
+                response.getBlockchain(),
+                response.getStatus(),
+                response.getCreatedAt()
+        );
     }
+
+
 
     /**
      * 마스터 지갑 잔고 조회하기 API Call
@@ -142,35 +191,20 @@ public class HenesisWalletService implements WalletService {
      * @param ticker
      * @return Optional<MasterWalletBalance>
      */
-
-
     @Override
     public Amount getMasterWalletBalance(String ticker) {
 
-        List<MasterWalletBalanceJsonObject> masterWalletBalanceJsonObjects = Arrays.asList(
+        List<MasterWalletBalanceJsonObject> response = Arrays.asList(
                 Objects.requireNonNull(masterWalletRestTemplate.getForEntity(
                         "/balance",
-                        MasterWalletBalanceJsonObject[].class).getBody())
+                        MasterWalletBalanceJsonObject[].class
+                ).getBody())
         );
 
-        return Amount.of(masterWalletBalanceJsonObjects.stream()
+        return Amount.of(response.stream()
                 .filter(symbol -> symbol.getSymbol().equals(ticker)).findFirst().get().getSpendableAmount()
         );
     }
 
-
-
-
-    public ValueTransferEventsJsonObject valueTransferEvent() {
-        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
-
-        ValueTransferEventsJsonObject response = restTemplate.getForEntity(
-                "/value-transfer-events",
-                ValueTransferEventsJsonObject.class,
-                param).getBody();
-
-        System.out.println("Monitoring....");
-        return response;
-    }
 
 }

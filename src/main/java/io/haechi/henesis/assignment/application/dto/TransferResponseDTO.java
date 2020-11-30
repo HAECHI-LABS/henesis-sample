@@ -3,29 +3,37 @@ package io.haechi.henesis.assignment.application.dto;
 import io.haechi.henesis.assignment.domain.Amount;
 import lombok.*;
 
-import java.math.BigInteger;
 
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TransferResponseDTO {
     private String walletName;
-    private Amount walletBalance;
-    private Amount amount;
+    private Double amount;
+    private Double walletBalance;
 
-    @Builder
-    public TransferResponseDTO(
+
+    private TransferResponseDTO(
             String walletName,
-            Amount walletBalance,
-            Amount amount
+            Amount amount,
+            Amount walletBalance
     ){
         this.walletName = walletName;
-        this.walletBalance = walletBalance;
-        this.amount = amount;
+        this.amount = amount.toDouble();
+        this.walletBalance = walletBalance.toDouble();
+    }
+
+    public static TransferResponseDTO of(
+            String walletName,
+            Amount amount,
+            Amount walletBalance
+    ){
+        return new TransferResponseDTO(
+                walletName,
+                amount,
+                walletBalance
+        );
     }
 
 
-    private static Double toDouble(BigInteger amount){
-        return amount.divide(BigInteger.TEN.pow(18)).doubleValue();
-    }
 }

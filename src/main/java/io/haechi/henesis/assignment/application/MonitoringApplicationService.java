@@ -65,23 +65,4 @@ public class MonitoringApplicationService {
         actionActionSupplier.supply(situation).updateBalanceBy(transaction);
 
     }
-    /*
-                                    Transaction.of(
-                                    tx.getDetailId(),
-                                    tx.getFrom(),
-                                    tx.getTo(),
-                                    tx.getAmount(),
-                                    tx.getBlockchain(),
-                                    tx.getStatus(),
-                                    tx.getTransferType(),
-                                    tx.getCoinSymbol(),
-                                    tx.getConfirmation(),
-                                    tx.getTransactionId(),
-                                    tx.getTransactionHash(),
-                                    tx.getCreatedAt(),
-                                    tx.getUpdatedAt(),
-                                    tx.getWalletId(),
-                                    tx.getWalletName()
-                                ).situation()
-     */
 }

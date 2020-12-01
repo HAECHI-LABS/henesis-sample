@@ -51,8 +51,6 @@ public class HenesisWalletService implements WalletService {
 
         assert response != null;
 
-        System.out.println("Monitoring....");
-
         return response.getResults().stream().map(t ->
                         Transaction.of(
                                 t.getId(),

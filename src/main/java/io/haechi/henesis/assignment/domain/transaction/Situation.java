@@ -6,9 +6,6 @@ public enum Situation {
     ROLLBACK("rollback"),
     UPDATE_STATUS("updated_status");
 
-    private final String situation;
-
     Situation(String situation){
-        this.situation = situation;
     }
 }

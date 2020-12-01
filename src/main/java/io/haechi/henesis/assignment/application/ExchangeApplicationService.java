@@ -76,7 +76,6 @@ public class ExchangeApplicationService {
     public FlushResponseDTO flush(FlushRequestDTO request) {
 
         List<String> userWalletIds = walletService.getUserWalletIds();
-        System.out.println("Get All User Wallet Id : " + userWalletIds);
 
         Transaction transaction = walletService.flushAll(
                 request.getTicker(),

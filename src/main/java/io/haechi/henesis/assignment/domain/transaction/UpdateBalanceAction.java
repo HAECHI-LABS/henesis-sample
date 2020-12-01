@@ -6,7 +6,7 @@ import io.haechi.henesis.assignment.domain.UserWalletRepository;
 public class UpdateBalanceAction implements Action {
 
 
-    private UserWalletRepository userWalletRepository;
+    private final UserWalletRepository userWalletRepository;
 
     public UpdateBalanceAction(UserWalletRepository userWalletRepository){
         this.userWalletRepository = userWalletRepository;

@@ -12,7 +12,7 @@ public class ActionSupplier<T> {
     public T supply(Situation situation){
         T action = s.get(situation);
         if (action == null) {
-            throw new IllegalArgumentException(String.format("'%s' is not supported blockchain service type", action));
+            throw new IllegalArgumentException(String.format("'%s' is not matched this Situation", situation));
         }
         return action;
     }

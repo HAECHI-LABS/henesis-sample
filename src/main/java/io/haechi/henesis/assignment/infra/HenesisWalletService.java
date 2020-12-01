@@ -1,6 +1,7 @@
 package io.haechi.henesis.assignment.infra;
 
 import io.haechi.henesis.assignment.domain.*;
+import io.haechi.henesis.assignment.domain.transaction.Transaction;
 import io.haechi.henesis.assignment.infra.dto.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -93,14 +94,16 @@ public class HenesisWalletService implements WalletService {
         ).getBody();
 
 
-        return UserWallet.builder()
-                .walletId(response.getId())
-                .walletAddress(response.getAddress())
-                .walletName(response.getName())
-                .masterWalletId(masterWalletId)
-                .blockchain(response.getBlockchain())
-                .status(response.getStatus())
-                .build();
+        return UserWallet.of(
+                response.getId(),
+                response.getName(),
+                response.getAddress(),
+                response.getBlockchain(),
+                response.getStatus(),
+                Amount.of(0.0),
+                masterWalletId,
+                response.getCreatedAt()
+        );
 
     }
 

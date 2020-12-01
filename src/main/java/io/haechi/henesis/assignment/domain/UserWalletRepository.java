@@ -24,9 +24,10 @@ public interface UserWalletRepository extends JpaRepository<UserWallet, String>,
     */
 
     Optional<UserWallet> findByWalletId(String walletId);
+    Optional<UserWallet> findAllByWalletId(String walletId);
 
     @Modifying
-    @Query("UPDATE UserWallet u SET u.walletBalance= :walletBalaance, u.updatedAt = :status  WHERE u.walletId = :walletId")
+    @Query("UPDATE UserWallet u SET u.balance= :walletBalaance, u.updatedAt = :status  WHERE u.walletId = :walletId")
     void updateUserWalletBalanceByWalletId(@Param("walletBalance") String walletBalance, @Param("status") String status, @Param("walletId") String walletId);
 
 

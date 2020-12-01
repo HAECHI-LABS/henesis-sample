@@ -1,9 +1,9 @@
-package io.haechi.henesis.assignment.domain;
+package io.haechi.henesis.assignment.domain.transaction;
 
+import io.haechi.henesis.assignment.domain.Amount;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Arrays;
 
 @Entity
 @Getter
@@ -55,7 +55,7 @@ public class Transaction {
         this.to=to;
         this.amount= amount;
         this.blockchain=blockchain;
-        this.status=status;
+        this.status= status;
         this.transactionId=transactionId;
         this.transactionHash=transactionHash;
         this.coinSymbol=coinSymbol;
@@ -102,6 +102,41 @@ public class Transaction {
                 walletId
                 );
     }
+    public static Transaction of(
+            int detailId,
+            String from,
+            String to,
+            Amount amount,
+            String blockchain,
+            String status,
+            String transactionId,
+            String transactionHash,
+            String coinSymbol,
+            String confirmation,
+            String transferType,
+            String createdAt,
+            String updatedAt,
+            String walletName,
+            String walletId
+    ) {
+        return new Transaction(
+                detailId,
+                from,
+                to,
+                amount,
+                blockchain,
+                status,
+                transactionId,
+                transactionHash,
+                coinSymbol,
+                confirmation,
+                transferType,
+                createdAt,
+                updatedAt,
+                walletName,
+                walletId
+        );
+    }
 
     private Transaction(
             String transactionId,
@@ -130,19 +165,40 @@ public class Transaction {
 
     }
 
+    public boolean canRollback(){
+        return this.isWithdrawal()&&(this.isReverted()||this.isFailed());
+    }
+
+    public boolean canDeposit(){
+        return this.isDeposit()||this.isConfirmed();
+    }
+
+    public boolean isDeposit(){
+        return this.transferType.equals("DEPOSIT");
+    }
+
+    public boolean isWithdrawal(){
+        return this.transferType.equals("WITHDRAWAL");
+    }
+
     public boolean isConfirmed(){
-        return this.status.contains("CONFIRMED");
+        return this.status.equals("CONFIRMED");
     }
     public boolean isReverted(){
-        return this.status.contains("REVERTED");
+        return this.status.equals("REVERTED");
     }
     public boolean isFailed(){
-        return this.status.contains("FAILED");
+        return this.status.equals("FAILED");
     }
-    public boolean isDeposit(){
-        return this.transferType.contains("DEPOSIT");
+
+    public Situation situation(){
+        if (this.isDeposit()&&this.isConfirmed())
+            return Situation.DEPOSIT_CONFIRMED;
+
+        if (this.isWithdrawal()&&this.isReverted()||this.isFailed())
+            return Situation.ROLLBACK;
+
+        return Situation.UPDATE_STATUS;
     }
-    public boolean isWithdrawal(){
-        return this.transferType.contains("WITHDRAWAL");
-    }
+
 }

@@ -40,8 +40,9 @@ public class Amount {
         this.value = amount;
     }
 
-    public void add(BigInteger amount) {
-        this.value = this.value.add(amount);
+
+    public void add(Amount amount) {
+        this.value = this.value.add(amount.value);
     }
 
     public void subtract(Amount amount) {

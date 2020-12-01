@@ -2,11 +2,11 @@ package io.haechi.henesis.assignment.application;
 
 import io.haechi.henesis.assignment.application.dto.*;
 import io.haechi.henesis.assignment.domain.*;
+import io.haechi.henesis.assignment.domain.transaction.Transaction;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ExchangeApplicationService {
@@ -31,10 +31,10 @@ public class ExchangeApplicationService {
         userWalletRepository.save(userWallet);
 
         return CreateWalletResponseDTO.builder()
-                .name(userWallet.getWalletName())
+                .name(userWallet.getName())
                 .createdAt(userWallet.getCreatedAt())
                 .blockchain(userWallet.getBlockchain())
-                .address(userWallet.getWalletAddress())
+                .address(userWallet.getAddress())
                 .id(userWallet.getWalletId())
                 .build();
     }
@@ -42,15 +42,11 @@ public class ExchangeApplicationService {
     @Transactional
     public TransferResponseDTO transfer(TransferRequestDTO request) {
 
-        Optional<UserWallet> userWallet = userWalletRepository.findByWalletId(request.getUserWalletId());
-
-        if (userWallet.isEmpty()) {
-            throw new IllegalStateException(String.format("Can't find Wallet(ID : %s)",request.getUserWalletId()));
-        }
-
+        UserWallet userWallet = userWalletRepository.findByWalletId(request.getUserWalletId())
+                .orElseThrow(()-> new IllegalArgumentException(String.format("Can Not Found User wallet %s", request.getUserWalletId())));
 
         Amount spendableAmount = walletService.getMasterWalletBalance(request.getTicker());
-        Amount walletBalance = userWallet.get().getWalletBalance();
+        Amount walletBalance = userWallet.getBalance();
         Amount amount = request.getAmount();
 
 
@@ -66,9 +62,8 @@ public class ExchangeApplicationService {
         );
 
 
-
         walletBalance.subtract(amount);
-        userWalletRepository.save(userWallet.get());
+        userWalletRepository.save(userWallet);
 
         return TransferResponseDTO.of(
                 transaction.getWalletName(),

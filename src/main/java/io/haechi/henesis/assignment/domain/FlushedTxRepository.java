@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface FlushedTxRepository extends JpaRepository<FlushedTx, String> {
     Optional<FlushedTx> findByTxId(String txId);
+    Optional<FlushedTx> findAllByTxId(String txId);
 }

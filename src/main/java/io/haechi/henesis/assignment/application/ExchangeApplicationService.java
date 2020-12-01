@@ -11,14 +11,14 @@ import java.util.List;
 @Service
 public class ExchangeApplicationService {
 
-    private final WalletService walletService;
+    private final Exchange exchange;
     private final UserWalletRepository userWalletRepository;
     private final FlushedTxRepository flushedTxRepository;
 
-    public ExchangeApplicationService(WalletService walletService,
+    public ExchangeApplicationService(Exchange exchange,
                                       UserWalletRepository userWalletRepository,
                                       FlushedTxRepository flushedTxRepository) {
-        this.walletService = walletService;
+        this.exchange = exchange;
         this.userWalletRepository = userWalletRepository;
         this.flushedTxRepository = flushedTxRepository;
     }
@@ -27,7 +27,7 @@ public class ExchangeApplicationService {
     @Transactional
     public CreateWalletResponseDTO createUserWallet(CreateWalletRequestDTO request) {
 
-        UserWallet userWallet = walletService.createUserWallet(request.getWalletName());
+        UserWallet userWallet = exchange.createUserWallet(request.getWalletName());
         userWalletRepository.save(userWallet);
 
         return CreateWalletResponseDTO.builder()
@@ -45,7 +45,7 @@ public class ExchangeApplicationService {
         UserWallet userWallet = userWalletRepository.findByWalletId(request.getUserWalletId())
                 .orElseThrow(()-> new IllegalArgumentException(String.format("Can Not Found User wallet %s", request.getUserWalletId())));
 
-        Amount spendableAmount = walletService.getMasterWalletBalance(request.getTicker());
+        Amount spendableAmount = exchange.getMasterWalletBalance(request.getTicker());
         Amount walletBalance = userWallet.getBalance();
         Amount amount = request.getAmount();
 
@@ -55,7 +55,7 @@ public class ExchangeApplicationService {
             throw new IllegalStateException("Not Enough Money..!");
         }
 
-        Transaction transaction = walletService.transfer(
+        Transaction transaction = exchange.transfer(
                 request.getAmount(),
                 request.getTo(),
                 request.getTicker()
@@ -75,9 +75,9 @@ public class ExchangeApplicationService {
     @Transactional
     public FlushResponseDTO flush(FlushRequestDTO request) {
 
-        List<String> userWalletIds = walletService.getUserWalletIds();
+        List<String> userWalletIds = exchange.getUserWalletIds();
 
-        Transaction transaction = walletService.flushAll(
+        Transaction transaction = exchange.flushAll(
                 request.getTicker(),
                 userWalletIds
         );

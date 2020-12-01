@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class HenesisWalletService implements WalletService {
+public class HenesisWalletService implements Exchange {
     private final RestTemplate masterWalletRestTemplate;
     private final RestTemplate restTemplate;
     private final String masterWalletId;

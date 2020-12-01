@@ -5,7 +5,7 @@ import io.haechi.henesis.assignment.domain.transaction.Transaction;
 
 import java.util.List;
 
-public interface WalletService {
+public interface Exchange {
 
     UserWallet createUserWallet(String walletName);
 

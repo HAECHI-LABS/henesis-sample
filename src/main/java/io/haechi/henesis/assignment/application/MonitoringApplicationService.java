@@ -1,6 +1,5 @@
 package io.haechi.henesis.assignment.application;
 
-import io.haechi.henesis.assignment.application.dto.TransactionDTO;
 import io.haechi.henesis.assignment.domain.*;
 import io.haechi.henesis.assignment.domain.transaction.*;
 import org.springframework.stereotype.Service;
@@ -10,18 +9,18 @@ import java.util.List;
 @Service
 public class MonitoringApplicationService {
 
-    private final WalletService walletService;
+    private final Exchange exchange;
     private final UserWalletRepository userWalletRepository;
     private final FlushedTxRepository flushedTxRepository;
     private final TransactionRepository transactionRepository;
     private final ActionSupplier<Action> actionActionSupplier;
 
-    public MonitoringApplicationService(WalletService walletService,
+    public MonitoringApplicationService(Exchange exchange,
                                         UserWalletRepository userWalletRepository,
                                         FlushedTxRepository flushedTxRepository,
                                         TransactionRepository transactionRepository,
                                         ActionSupplier<Action> actionActionSupplier) {
-        this.walletService = walletService;
+        this.exchange = exchange;
         this.userWalletRepository = userWalletRepository;
         this.flushedTxRepository = flushedTxRepository;
         this.transactionRepository = transactionRepository;
@@ -32,7 +31,7 @@ public class MonitoringApplicationService {
     public void getValueTransferEvents(){
 
         // API 호출
-        List<Transaction> transactions = walletService.getValueTransferEvents();
+        List<Transaction> transactions = exchange.getValueTransferEvents();
 
         // 트랜잭션 상태, 타입별 Situation <-> Action Mapping 후 Update Balance
         transactions.forEach(tx->

@@ -17,7 +17,9 @@ public class Transaction {
     private int id;
 
     private int detailId;
+    @Column(name="from_address")
     private String from;
+    @Column(name="to_address")
     private String to;
     private Amount amount;
     private String blockchain;

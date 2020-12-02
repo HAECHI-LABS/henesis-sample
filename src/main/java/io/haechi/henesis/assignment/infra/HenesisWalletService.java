@@ -44,7 +44,7 @@ public class HenesisWalletService implements Exchange {
         param.add("masterWalletId",masterWalletId);
 
         ValueTransferEventsJsonObject response = restTemplate.getForEntity(
-                "value-transfer-events",
+                "/value-transfer-events",
                 ValueTransferEventsJsonObject.class,
                 param
         ).getBody();

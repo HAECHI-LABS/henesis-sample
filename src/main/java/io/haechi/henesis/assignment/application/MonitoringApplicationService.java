@@ -19,12 +19,12 @@ public class MonitoringApplicationService {
                                         UserWalletRepository userWalletRepository,
                                         FlushedTxRepository flushedTxRepository,
                                         TransactionRepository transactionRepository,
-                                        ActionSupplier<Action> actionActionSupplier) {
+                                        ActionSupplier<Action> actionSupplier) {
         this.exchange = exchange;
         this.userWalletRepository = userWalletRepository;
         this.flushedTxRepository = flushedTxRepository;
         this.transactionRepository = transactionRepository;
-        this.actionActionSupplier = actionActionSupplier;
+        this.actionActionSupplier = actionSupplier;
     }
 
 
@@ -61,7 +61,7 @@ public class MonitoringApplicationService {
 
     public void updateBalanceBy(Transaction transaction ,Situation situation){
         // 상황에 따른 액션 맵핑
-        actionActionSupplier.supply(situation).updateBalanceBy(transaction);
+        actionActionSupplier.supply(situation).doAction(transaction);
 
     }
 }

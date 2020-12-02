@@ -2,5 +2,6 @@ package io.haechi.henesis.assignment.domain.transaction;
 
 public interface Action {
 
-    void updateBalanceBy(Transaction transaction);
+    void doAction(Transaction transaction);
+
 }

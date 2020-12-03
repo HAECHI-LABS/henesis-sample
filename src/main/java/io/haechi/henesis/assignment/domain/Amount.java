@@ -33,7 +33,7 @@ public class Amount {
         return "0x"+this.value.toString(16);
     }
     public Double toDouble(){
-        return this.value.divide(BigInteger.TEN.pow(18)).doubleValue();
+        return this.value.doubleValue()/(BigInteger.TEN.pow(18)).doubleValue();
     }
 
     public void changeAmount(BigInteger amount) {

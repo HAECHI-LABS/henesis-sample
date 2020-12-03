@@ -42,7 +42,8 @@ public class UserWallet {
             String status,
             Amount balance,
             String masterWalletId,
-            String createdAt
+            String createdAt,
+            String updatedAt
             ) {
         this.walletId = walletId;
         this.name = name;
@@ -52,6 +53,7 @@ public class UserWallet {
         this.balance = balance;
         this.masterWalletId =masterWalletId;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public static UserWallet of(
@@ -62,7 +64,8 @@ public class UserWallet {
             String status,
             Amount balance,
             String masterWalletId,
-            String createdAt
+            String createdAt,
+            String updatedAt
             ){
         return new UserWallet(
                 walletId,
@@ -72,16 +75,53 @@ public class UserWallet {
                 status,
                 balance,
                 masterWalletId,
-                createdAt
+                createdAt,
+                updatedAt
                 );
     }
+
+    private UserWallet(
+            String walletId,
+            String name,
+            String address,
+            String blockchain,
+            String status,
+            String createdAt,
+            String updatedAt
+    ) {
+        this.walletId = walletId;
+        this.name = name;
+        this.address = address;
+        this.blockchain = blockchain;
+        this.status = status;
+        this.createdAt =createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public static UserWallet of(
+            String walletId,
+            String name,
+            String address,
+            String blockchain,
+            String status,
+            String createdAt,
+            String updatedAt
+    ){
+        return new UserWallet(
+                walletId,
+                name,
+                address,
+                blockchain,
+                status,
+                createdAt,
+                updatedAt
+        );
+    }
+
 
     public void increaseBalanceBy(Amount amount) {
         this.balance.add(amount);
     }
 
-    public void updateBalance(Amount amount) {
-        this.balance = amount;
-    }
 
 }

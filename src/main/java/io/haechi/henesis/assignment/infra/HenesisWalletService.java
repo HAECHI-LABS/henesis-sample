@@ -37,10 +37,10 @@ public class HenesisWalletService implements Exchange {
      * @return
      */
     @Override
-    public List<Transaction> getValueTransferEvents(){
+    public List<Transaction> getValueTransferEvents(String updatedAt){
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
         param.add("size","50");
-        param.add("updatedAtGte","");
+        param.add("updatedAtGte",updatedAt);
         param.add("masterWalletId",masterWalletId);
 
         ValueTransferEventsJsonObject response = restTemplate.getForEntity(
@@ -100,7 +100,8 @@ public class HenesisWalletService implements Exchange {
                 response.getStatus(),
                 Amount.of(0.0),
                 masterWalletId,
-                response.getCreatedAt()
+                response.getCreatedAt(),
+                response.getUpdatedAt()
         );
 
     }
@@ -137,7 +138,7 @@ public class HenesisWalletService implements Exchange {
 
 
     /**
-     * 마스터 지갑에 속한 UserWallet ID 모두 가져오
+     * 마스터 지갑에 속한 UserWallet ID 모두 가져오기
      * @return
      */
     @Override
@@ -153,6 +154,26 @@ public class HenesisWalletService implements Exchange {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<UserWallet> getAllUserWallet() {
+
+        List<UserWalletJsonObject> response =  Objects.requireNonNull(masterWalletRestTemplate.getForEntity(
+                "/user-wallets",
+                GetAllUserWalletJsonObject.class
+        ).getBody()).getResults();
+
+        return response.stream().map(u ->
+                UserWallet.of(
+                        u.getId(),
+                        u.getName(),
+                        u.getAddress(),
+                        u.getBlockchain(),
+                        u.getStatus(),
+                        u.getCreatedAt(),
+                        u.getUpdatedAt()
+                )
+        ).collect(Collectors.toList());
+    }
 
 
     /**

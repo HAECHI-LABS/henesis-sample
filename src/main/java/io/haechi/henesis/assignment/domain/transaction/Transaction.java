@@ -49,8 +49,8 @@ public class Transaction {
             String transferType,
             String createdAt,
             String updatedAt,
-            String walletName,
-            String walletId
+            String walletId,
+            String walletName
     ){
         this.detailId=detailId;
         this.from=from;
@@ -83,8 +83,8 @@ public class Transaction {
             String transferType,
             String createdAt,
             String updatedAt,
-            String walletName,
-            String walletId
+            String walletId,
+            String walletName
     ) {
         return new Transaction(
                 detailId,
@@ -100,8 +100,8 @@ public class Transaction {
                 transferType,
                 createdAt,
                 updatedAt,
-                walletName,
-                walletId
+                walletId,
+                walletName
                 );
     }
     public static Transaction of(
@@ -118,8 +118,8 @@ public class Transaction {
             String transferType,
             String createdAt,
             String updatedAt,
-            String walletName,
-            String walletId
+            String walletId,
+            String walletName
     ) {
         return new Transaction(
                 detailId,
@@ -135,8 +135,8 @@ public class Transaction {
                 transferType,
                 createdAt,
                 updatedAt,
-                walletName,
-                walletId
+                walletId,
+                walletName
         );
     }
 

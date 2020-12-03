@@ -14,9 +14,14 @@ public class MonitoringController {
         this.monitoringApplicationService = monitoringApplicationService;
     }
 
-    @PostMapping("/")
+    @PostMapping("/transactions")
     @ResponseStatus(value = HttpStatus.OK)
     public void getValueTransferEvents() {
         monitoringApplicationService.getValueTransferEvents();
     }
+
+    @PostMapping("/user-wallets")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void getAllUserWalletInfo(){monitoringApplicationService.getUserWalletInfo();}
+
 }

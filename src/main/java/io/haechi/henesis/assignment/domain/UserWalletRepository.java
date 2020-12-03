@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -24,12 +25,17 @@ public interface UserWalletRepository extends JpaRepository<UserWallet, String>,
     */
 
     Optional<UserWallet> findByWalletId(String walletId);
-    Optional<UserWallet> findAllByWalletId(String walletId);
+    boolean existsUserWalletByWalletIdAndStatus(String walletId, String status);
 
-    /*
+    @Transactional
     @Modifying
-    @Query("UPDATE UserWallet u SET u.balance= :balance, u.updatedAt = :status  WHERE u.walletId = :walletId")
-    void updat(@Param("walletBalance") String balance, @Param("status") String status, @Param("walletId") String walletId);
-*/
+    @Query("UPDATE UserWallet u SET u.balance = :balance WHERE u.walletId = :walletId")
+    void updateWalletBalance(@Param("balance") Amount balance, @Param("walletId") String walletId);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE UserWallet u SET u.status = :status, u.updatedAt = :updatedAt  WHERE u.walletId = :walletId")
+    void updateWalletInfo(@Param("status") String status, @Param("updatedAt") String updatedAt, @Param("walletId") String walletId);
+
 
 }

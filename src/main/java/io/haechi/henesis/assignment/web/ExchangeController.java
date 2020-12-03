@@ -36,4 +36,19 @@ public class ExchangeController {
     public FlushResponseDTO flush(@RequestBody FlushRequestDTO flushRequestDTO) {
         return exchangeApplicationService.flush(flushRequestDTO);
     }
+
+
+
+    @PostMapping("/updateTransactionList")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void updateTransactionList() {
+        exchangeApplicationService.updateTransactionList();
+    }
+
+
+    @PostMapping("/updateUserWalletList")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void updateWalletList() {
+        exchangeApplicationService.updateWalletList();
+    }
 }

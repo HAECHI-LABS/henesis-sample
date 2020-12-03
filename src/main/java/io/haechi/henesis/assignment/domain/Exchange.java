@@ -17,6 +17,8 @@ public interface Exchange {
 
     Transaction flushAll(String ticker, List<String> userWalletIds);
 
-    List<Transaction> getValueTransferEvents();
+    List<Transaction> getValueTransferEvents(String updatedAt);
+
+    List<UserWallet> getAllUserWallet();
 
 }

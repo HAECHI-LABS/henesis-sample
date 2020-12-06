@@ -46,7 +46,7 @@ public class ExchangeController {
     }
 
 
-    @PostMapping("/updateUserWalletList")
+    @PostMapping("/updateWalletList")
     @ResponseStatus(value = HttpStatus.OK)
     public void updateWalletList() {
         exchangeApplicationService.updateWalletList();

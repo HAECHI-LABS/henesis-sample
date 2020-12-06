@@ -1,7 +1,7 @@
 restTemplate:
   factory:
-    readTimeout: 3000
-    connectTimeout: 2000
+    readTimeout: 8000
+    connectTimeout: 5000
   httpClient:
     maxConnTotal: 100
     maxConnPerRoute: 5
@@ -12,7 +12,7 @@ app:
     url: http://localhost:3000
     api-secret: XP0SZ8TY/6O6hlMAfjcAtmESj/ihFlVed/nkNTDHrmo=
     access-token: eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6ImptZWVmMDgwMkBnbWFpbC5jb20iLCJpZCI6IjI2ZTQyMjliOTQ0ZWZlNjNiYWU4MThlZDMyYTY0YTkxIiwidHlwZSI6IkxPTkciLCJsb25nVHlwZSI6dHJ1ZSwiaXNzIjoiaGVuZXNpcy13YWxsZXQtaWRlbnRpdHktcHJvZC10ZXN0bmV0IiwiaWF0IjoxNjA1NjY4Mzg5LCJleHAiOjE5MjEwMjgzODl9.6d1HBljaYYaDB0xkI8zZ7wiUcGrDgx7K-PcfGUE1JPwOuZnng7QQWcvHrLM98C6-m8PENLNKr7m8-N7uIriqAw
-    masterWalletId: a8aec27b3e8dfeb24fdde89ec4f3b891
+    masterWalletId: 412c293557de5d5cdd052167fb3fdf43
     passphrase: passphrase
 
 spring:
@@ -33,7 +33,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false

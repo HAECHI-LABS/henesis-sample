@@ -1,23 +1,15 @@
 package io.haechi.henesis.assignment.domain;
 
-import io.haechi.henesis.assignment.domain.transaction.Action;
-import io.haechi.henesis.assignment.domain.transaction.ActionSupplier;
-import io.haechi.henesis.assignment.domain.transaction.Situation;
-import io.haechi.henesis.assignment.domain.transaction.Transaction;
 import lombok.*;
 
 import javax.persistence.*;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserWallet {
+public class Wallet {
     @Id
     @Column(updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +26,7 @@ public class UserWallet {
     private String updatedAt;
 
 
-    private UserWallet(
+    private Wallet(
             String walletId,
             String name,
             String address,
@@ -56,7 +48,7 @@ public class UserWallet {
         this.updatedAt = updatedAt;
     }
 
-    public static UserWallet of(
+    public static Wallet of(
             String walletId,
             String name,
             String address,
@@ -67,7 +59,7 @@ public class UserWallet {
             String createdAt,
             String updatedAt
             ){
-        return new UserWallet(
+        return new Wallet(
                 walletId,
                 name,
                 address,
@@ -80,10 +72,11 @@ public class UserWallet {
                 );
     }
 
-    private UserWallet(
+    private Wallet(
             String walletId,
             String name,
             String address,
+            Amount balance,
             String blockchain,
             String status,
             String createdAt,
@@ -92,25 +85,28 @@ public class UserWallet {
         this.walletId = walletId;
         this.name = name;
         this.address = address;
+        this.balance = balance;
         this.blockchain = blockchain;
         this.status = status;
         this.createdAt =createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public static UserWallet of(
+    public static Wallet of(
             String walletId,
             String name,
             String address,
+            Amount balance,
             String blockchain,
             String status,
             String createdAt,
             String updatedAt
     ){
-        return new UserWallet(
+        return new Wallet(
                 walletId,
                 name,
                 address,
+                balance,
                 blockchain,
                 status,
                 createdAt,

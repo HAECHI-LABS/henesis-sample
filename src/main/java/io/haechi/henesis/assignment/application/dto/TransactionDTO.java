@@ -1,7 +1,10 @@
 package io.haechi.henesis.assignment.application.dto;
 
 import io.haechi.henesis.assignment.domain.Amount;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

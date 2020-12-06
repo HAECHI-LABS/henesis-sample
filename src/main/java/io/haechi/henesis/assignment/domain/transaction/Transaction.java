@@ -167,13 +167,6 @@ public class Transaction {
 
     }
 
-    public boolean canRollback(){
-        return this.isWithdrawal()&&(this.isReverted()||this.isFailed());
-    }
-
-    public boolean canDeposit(){
-        return this.isDeposit()||this.isConfirmed();
-    }
 
     public boolean isDeposit(){
         return this.transferType.equals("DEPOSIT");

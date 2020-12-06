@@ -2,8 +2,6 @@ package io.haechi.henesis.assignment.application;
 
 import io.haechi.henesis.assignment.application.dto.*;
 import io.haechi.henesis.assignment.domain.*;
-import io.haechi.henesis.assignment.domain.FlushedTx;
-import io.haechi.henesis.assignment.domain.FlushedTxRepository;
 import io.haechi.henesis.assignment.domain.transaction.Transaction;
 import io.haechi.henesis.assignment.domain.transaction.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;

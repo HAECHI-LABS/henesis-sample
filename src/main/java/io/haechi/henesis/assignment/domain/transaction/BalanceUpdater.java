@@ -1,9 +1,8 @@
 package io.haechi.henesis.assignment.domain.transaction;
 
-import io.haechi.henesis.assignment.domain.FlushedTx;
 import io.haechi.henesis.assignment.domain.FlushedTxRepository;
-import io.haechi.henesis.assignment.domain.Wallet;
 import io.haechi.henesis.assignment.domain.UserWalletRepository;
+import io.haechi.henesis.assignment.domain.Wallet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

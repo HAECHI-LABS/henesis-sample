@@ -1,6 +1,8 @@
 package io.haechi.henesis.assignment.application.dto;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Getter

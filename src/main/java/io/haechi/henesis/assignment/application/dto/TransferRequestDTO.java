@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.haechi.henesis.assignment.domain.Amount;
 import lombok.*;
 
-import java.math.BigInteger;
-
 
 @Getter
 @Setter

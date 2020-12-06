@@ -12,13 +12,13 @@ public class MonitoringConfig {
 
     @Bean
     public ActionSupplier<Action> actionSupplier(
-            UpdateBalanceAction updateBalanceAction,
-            UpdateStatusAction updateStatusAction
+            BalanceUpdater balanceUpdater,
+            TxStatusUpdater txStatusUpdater
     ) {
         Map<Situation, Action> s = new HashMap<>();
-        s.put(Situation.DEPOSIT_CONFIRMED, updateBalanceAction);
-        s.put(Situation.ROLLBACK, updateBalanceAction);
-        s.put(Situation.UPDATE_STATUS, updateStatusAction);
+        s.put(Situation.DEPOSIT_CONFIRMED, balanceUpdater);
+        s.put(Situation.ROLLBACK, balanceUpdater);
+        s.put(Situation.UPDATE_STATUS, txStatusUpdater);
 
         return new ActionSupplier<>(s);
     }

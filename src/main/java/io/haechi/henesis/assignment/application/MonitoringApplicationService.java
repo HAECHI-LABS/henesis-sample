@@ -2,6 +2,7 @@ package io.haechi.henesis.assignment.application;
 
 import io.haechi.henesis.assignment.domain.*;
 import io.haechi.henesis.assignment.domain.transaction.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class MonitoringApplicationService {
 
@@ -17,6 +19,8 @@ public class MonitoringApplicationService {
     private final FlushedTxRepository flushedTxRepository;
     private final TransactionRepository transactionRepository;
     private final ActionSupplier<Action> actionActionSupplier;
+
+    private String updatedAt = Long.toString(System.currentTimeMillis());
 
     public MonitoringApplicationService(Exchange exchange,
                                         UserWalletRepository userWalletRepository,
@@ -31,32 +35,35 @@ public class MonitoringApplicationService {
     }
 
 
-    @Scheduled(fixedRate = 1000, initialDelay = 2000)
+    @Scheduled(fixedRate = 2000, initialDelay = 2000)
     public void getValueTransferEvents(){
 
-        String updatedAt = transactionRepository.findTopByOrderByUpdatedAtDesc().getUpdatedAt();
-
-        // Value Transfer Events API 를 호출합니다.
+        // Call Wallet API (Value Transfer Events)
+        // Not flushed Tx
         List<Transaction> transactions = exchange.getValueTransferEvents(updatedAt).stream()
                 .filter(t -> t.getStatus().contains("CONFIRMED")
                         || t.getStatus().contains("REVERTED")
                         || t.getStatus().contains("FAILED"))
                 .collect(Collectors.toList());
 
+
         // 잔고 업데이트, 상태 업데이트 상황 별 액션 서플라이어 입니다.
         // 트랜잭션 상태, 타입별 Situation <-> Action Mapping 후 Update Balance
         transactions.forEach(tx-> mappingActionBy(tx,tx.situation()));
 
 
-        // 집금되지 않은 새로운 트랜잭션만 저장합니다.
+
+        // Save only New and Not Flushed Transactions
         List<Transaction> newTx = transactions.stream()
-                .filter(tx -> !transactionRepository.existsTransactionByDetailId(tx.getDetailId()))
-                .filter(tx -> !flushedTxRepository.existsAllByTxId(tx.getTransactionId()))
+                .filter(tx -> transactionRepository.findTransactionByDetailId(tx.getDetailId()).isEmpty())
+                .filter(tx -> flushedTxRepository.findByTxId(tx.getTransactionId()).isEmpty())
                 .collect(Collectors.toList());
 
-        newTx.forEach(tx->System.out.println("new : "+tx.getTransactionId()+" "+tx.getWalletName()+" "+tx.getTransferType()+" "+tx.getStatus()));
-
         transactionRepository.saveAll(newTx);
+
+
+        if (transactionRepository.findTopBy().isPresent())
+            updatedAt = transactionRepository.findTopByOrderByUpdatedAtDesc().getUpdatedAt();
     }
 
 
@@ -66,14 +73,13 @@ public class MonitoringApplicationService {
     public void getUserWalletInfo(){
 
         // 모든 사용자 지갑
-        List<UserWallet> userWallets = exchange.getAllUserWallet().stream()
+        List<Wallet> wallets = exchange.getAllUserWallet().stream()
                 .filter(u->!userWalletRepository.existsUserWalletByWalletIdAndStatus(u.getWalletId(), u.getStatus()))
                 .collect(Collectors.toList());
-        userWallets.forEach(u->
+        wallets.forEach(u->
                 userWalletRepository.updateWalletInfo(u.getStatus(),u.getUpdatedAt(),u.getWalletId())
         );
     }
-
 
 
 

@@ -13,7 +13,7 @@ public class FlushedTx {
     @Id
     @Column(updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private int id;
 
     private String txId;
     private String blockchain;

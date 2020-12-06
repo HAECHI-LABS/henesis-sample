@@ -2,14 +2,18 @@ package io.haechi.henesis.assignment.application;
 
 import io.haechi.henesis.assignment.application.dto.*;
 import io.haechi.henesis.assignment.domain.*;
+import io.haechi.henesis.assignment.domain.FlushedTx;
+import io.haechi.henesis.assignment.domain.FlushedTxRepository;
 import io.haechi.henesis.assignment.domain.transaction.Transaction;
 import io.haechi.henesis.assignment.domain.transaction.TransactionRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ExchangeApplicationService {
 
@@ -32,37 +36,42 @@ public class ExchangeApplicationService {
     @Transactional
     public CreateWalletResponseDTO createUserWallet(CreateWalletRequestDTO request) {
 
-        UserWallet userWallet = exchange.createUserWallet(request.getWalletName());
-        userWalletRepository.save(userWallet);
-
+        Wallet wallet = exchange.createUserWallet(request.getWalletName());
+        userWalletRepository.save(wallet);
+        log.info(String.format("Creating UserWallet (%s)",request.getWalletName()));
         return CreateWalletResponseDTO.of(
-                userWallet.getWalletId(),
-                userWallet.getName(),
-                userWallet.getAddress(),
-                userWallet.getBlockchain(),
-                userWallet.getStatus(),
-                userWallet.getCreatedAt(),
-                userWallet.getUpdatedAt()
+                wallet.getWalletId(),
+                wallet.getName(),
+                wallet.getAddress(),
+                wallet.getBlockchain(),
+                wallet.getStatus(),
+                wallet.getCreatedAt(),
+                wallet.getUpdatedAt()
         );
     }
 
     @Transactional
     public TransferResponseDTO transfer(TransferRequestDTO request) {
 
-        // 보내는 사용자 지갑 조회
-        UserWallet userWallet = userWalletRepository.findByWalletId(request.getUserWalletId())
+        // 보내는 사용자 지갑 조회 for check and update User Wallet Balance
+        Wallet wallet = userWalletRepository.findByWalletId(request.getUserWalletId())
                 .orElseThrow(()-> new IllegalArgumentException(String.format("Can Not Found User wallet %s", request.getUserWalletId())));
 
         // 해당 사용자 지갑이 속한 마스터지갑 잔고 조회
         Amount spendableAmount = exchange.getMasterWalletBalance(request.getTicker());
 
+        Amount balance = wallet.getBalance();
+        Amount amount = request.getAmount();
 
         // 출금 가능 여부 판단
-        Amount walletBalance = userWallet.getBalance();
-        Amount amount = request.getAmount();
-        if (spendableAmount.compareTo(walletBalance) < 0
-                && spendableAmount.compareTo(request.getAmount()) < 0) {
-            throw new IllegalStateException("Not Enough Money..!");
+        if (!wallet.getStatus().contains("ACTIVE")){
+            throw new IllegalStateException("User Wallet is NOT ACTIVE Status");
+        }
+        if (balance.compareTo(request.getAmount()) < 0) {
+            throw new IllegalStateException("Not Enough User Wallet Balance..!");
+        }
+        if (spendableAmount.compareTo(balance)<0){
+            throw new IllegalStateException("Not Enough Master Wallet Balance..!");
         }
 
         // 마스터 지갑에서 코인/토큰 전송하기 API 호출
@@ -73,14 +82,15 @@ public class ExchangeApplicationService {
         );
 
         // 사용자 지갑 잔고 차감
-        walletBalance.subtract(amount);
-        userWalletRepository.updateWalletBalance(walletBalance, request.getUserWalletId());
+        balance.subtract(amount);
+        userWalletRepository.updateWalletBalance(balance, request.getUserWalletId());
+        log.info(String.format("UserWallet(%s) Balance : %f",wallet.getName(),balance.toDouble()));
 
 
         return TransferResponseDTO.of(
                 transaction.getWalletName(),
                 request.getAmount(),
-                walletBalance
+                balance
         );
     }
 
@@ -102,31 +112,42 @@ public class ExchangeApplicationService {
                     transaction.getCreatedAt()
                 )
         );
+        log.info(String.format("%s Flush..!",transaction.getStatus()));
 
         return FlushResponseDTO.builder()
                 .txId(transaction.getTransactionId())
                 .blockchain(transaction.getBlockchain())
+                .status(transaction.getStatus())
                 .build();
     }
 
 
+
+
     /**
-     *  테스트용 모든 지갑 채워넣기
+     *  테스트용 모든 지갑, 트랜잭션 채워넣기 (싱크 맞출 때 사용해도 좋을 듯?)
      */
 
     @Transactional
     public void updateWalletList() {
-        List<UserWallet> userWallets = exchange.getAllUserWallet().stream()
+        List<Wallet> wallets = exchange.getAllUserWallet().stream()
                 .filter(u->!userWalletRepository.existsUserWalletByWalletIdAndStatus(u.getWalletId(), u.getStatus()))
 
                 .collect(Collectors.toList());
-        userWalletRepository.saveAll(userWallets);
+        userWalletRepository.saveAll(wallets);
+
+        List<Wallet> masterWallets = exchange.getAllMasterWallet().stream()
+                .filter(m->!userWalletRepository.existsUserWalletByWalletIdAndStatus(m.getWalletId(), m.getStatus()))
+                .collect(Collectors.toList());
+
+        userWalletRepository.saveAll(masterWallets);
+
     }
 
     @Transactional
     public void updateTransactionList() {
         List<Transaction> transactions = exchange.getValueTransferEvents("").stream()
-                .filter(t->!transactionRepository.existsTransactionByDetailId(t.getDetailId()))
+                .filter(t-> transactionRepository.findTransactionByDetailId(t.getDetailId()).isPresent())
                 .collect(Collectors.toList());
 
         transactionRepository.saveAll(transactions);

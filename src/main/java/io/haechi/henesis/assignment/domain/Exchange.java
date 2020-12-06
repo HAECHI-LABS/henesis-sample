@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface Exchange {
 
-    UserWallet createUserWallet(String walletName);
+    Wallet createUserWallet(String walletName);
 
     Amount getMasterWalletBalance(String ticker);
 
@@ -19,6 +19,8 @@ public interface Exchange {
 
     List<Transaction> getValueTransferEvents(String updatedAt);
 
-    List<UserWallet> getAllUserWallet();
+    List<Wallet> getAllUserWallet();
+
+    List<Wallet> getAllMasterWallet();
 
 }

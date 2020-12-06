@@ -1,33 +1,33 @@
 package io.haechi.henesis.assignment.domain.transaction;
 
 
-import io.haechi.henesis.assignment.domain.UserWallet;
-import io.haechi.henesis.assignment.domain.transaction.Transaction;
+import io.haechi.henesis.assignment.domain.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction, String>, JpaSpecificationExecutor<UserWallet> {
-
-    /*
-    @Transactional
-    @Query("SELECT u from UserWallet u WHERE u.walletId = :walletId")
-    Optional<UserWallet> getUserWalletsByWalletId(@Param("walletId")final String walletId);
-    @Transactional
-    UserWallet findUserWalletByWalletIdIsNotNull(final String walletId);
-    */
-
-    //Optional<Transaction> findByTransactionId(String txId);
-
-    Optional<Transaction> findByTransactionIdAndStatusAndTransferType(String transactionId, String status, String transferType);
+public interface TransactionRepository extends JpaRepository<Transaction, String>, JpaSpecificationExecutor<Wallet> {
 
     boolean existsTransactionByDetailId(int detailId);
+    Optional<Transaction> findTransactionByDetailId(int detailsId);
 
-    boolean existsTransactionByDetailIdAndStatusAndTransferType(int detailId, String status, String transferType);
+
+    Optional<Transaction> findTransactionByDetailIdAndStatus(int detailId, String status);
 
     Transaction findTopByOrderByUpdatedAtDesc();
+
+    Optional<Transaction> findTopBy();
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Transaction t SET t.status = :status, t.updatedAt = :updatedAt  WHERE t.detailId = :detailId")
+    void updateTxInfo(@Param("status") String status, @Param("updatedAt") String updatedAt, @Param("detailId") int detailId);
+
 }

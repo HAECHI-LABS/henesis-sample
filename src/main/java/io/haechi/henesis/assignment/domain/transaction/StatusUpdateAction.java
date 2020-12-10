@@ -1,19 +1,19 @@
 package io.haechi.henesis.assignment.domain.transaction;
 
-import io.haechi.henesis.assignment.domain.FlushedTxRepository;
+import io.haechi.henesis.assignment.domain.FlushedTransactionRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TxStatusUpdater implements Action{
+public class StatusUpdateAction implements UpdateAction {
 
 
     private final TransactionRepository transactionRepository;
-    private final FlushedTxRepository flushedTxRepository;
+    private final FlushedTransactionRepository flushedTransactionRepository;
 
-    public TxStatusUpdater(TransactionRepository transactionRepository,
-                           FlushedTxRepository flushedTxRepository){
+    public StatusUpdateAction(TransactionRepository transactionRepository,
+                              FlushedTransactionRepository flushedTransactionRepository){
         this.transactionRepository = transactionRepository;
-        this.flushedTxRepository = flushedTxRepository;
+        this.flushedTransactionRepository = flushedTransactionRepository;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class TxStatusUpdater implements Action{
         if (transactionRepository.findTransactionByDetailIdAndStatus(
                 transaction.getDetailId(),
                 transaction.getStatus()).isPresent()
-            ||flushedTxRepository.findByTxIdAndStatus(
+            || flushedTransactionRepository.findByTxIdAndStatus(
                 transaction.getTransactionId(),
                 transaction.getStatus()).isPresent()){
             return;
@@ -34,7 +34,7 @@ public class TxStatusUpdater implements Action{
                 transaction.getUpdatedAt(),
                 transaction.getDetailId());
 
-        flushedTxRepository.updateFlushedTxInfo(
+        flushedTransactionRepository.updateFlushedTxInfo(
                 transaction.getStatus(),
                 transaction.getId());
     }

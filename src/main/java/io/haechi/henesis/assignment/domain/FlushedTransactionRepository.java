@@ -10,13 +10,13 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface FlushedTxRepository extends JpaRepository<FlushedTx, String> {
+public interface FlushedTransactionRepository extends JpaRepository<FlushedTransaction, String> {
 
-    Optional<FlushedTx> findByTxId(String txId);
-    Optional<FlushedTx> findByTxIdAndStatus(String txId, String status);
+    Optional<FlushedTransaction> findByTxId(String txId);
+    Optional<FlushedTransaction> findByTxIdAndStatus(String txId, String status);
     @Transactional
     @Modifying
-    @Query("UPDATE FlushedTx f SET f.status = :status WHERE f.id = :id")
+    @Query("UPDATE FlushedTransaction f SET f.status = :status WHERE f.id = :id")
     void updateFlushedTxInfo(@Param("status") String status, @Param("id") int id);
 
 }

@@ -15,26 +15,26 @@ import java.util.stream.Collectors;
 @Service
 public class ExchangeApplicationService {
 
-    private final Exchange exchange;
+    private final EthKlayHenesisWalletClient ethKlayHenesisWalletClient;
     private final UserWalletRepository userWalletRepository;
     private final TransactionRepository transactionRepository;
-    private final FlushedTxRepository flushedTxRepository;
+    private final FlushedTransactionRepository flushedTransactionRepository;
 
-    public ExchangeApplicationService(Exchange exchange,
+    public ExchangeApplicationService(EthKlayHenesisWalletClient ethKlayHenesisWalletClient,
                                       UserWalletRepository userWalletRepository,
                                       TransactionRepository transactionRepository,
-                                      FlushedTxRepository flushedTxRepository) {
-        this.exchange = exchange;
+                                      FlushedTransactionRepository flushedTransactionRepository) {
+        this.ethKlayHenesisWalletClient = ethKlayHenesisWalletClient;
         this.userWalletRepository = userWalletRepository;
         this.transactionRepository =transactionRepository;
-        this.flushedTxRepository = flushedTxRepository;
+        this.flushedTransactionRepository = flushedTransactionRepository;
     }
 
 
     @Transactional
     public CreateWalletResponseDTO createUserWallet(CreateWalletRequestDTO request) {
 
-        Wallet wallet = exchange.createUserWallet(request.getWalletName());
+        Wallet wallet = ethKlayHenesisWalletClient.createUserWallet(request.getWalletName());
         userWalletRepository.save(wallet);
         log.info(String.format("Creating UserWallet (%s)",request.getWalletName()));
         return CreateWalletResponseDTO.of(
@@ -55,16 +55,17 @@ public class ExchangeApplicationService {
         Wallet wallet = userWalletRepository.findByWalletId(request.getUserWalletId())
                 .orElseThrow(()-> new IllegalArgumentException(String.format("Can Not Found User wallet %s", request.getUserWalletId())));
 
-        // 해당 사용자 지갑이 속한 마스터지갑 잔고 조회
-        Amount spendableAmount = exchange.getMasterWalletBalance(request.getTicker());
+        // 사용자 지갑 상태가 ACTIVE 가 아닌 경우 에러 발생
+        if (!wallet.getStatus().contains("ACTIVE")){
+            throw new IllegalStateException("User Wallet is NOT ACTIVE Status");
+        }
 
+        // 해당 사용자 지갑이 속한 마스터지갑 잔고 조회
+        Amount spendableAmount = ethKlayHenesisWalletClient.getMasterWalletBalance(request.getTicker());
         Amount balance = wallet.getBalance();
         Amount amount = request.getAmount();
 
         // 출금 가능 여부 판단
-        if (!wallet.getStatus().contains("ACTIVE")){
-            throw new IllegalStateException("User Wallet is NOT ACTIVE Status");
-        }
         if (balance.compareTo(request.getAmount()) < 0) {
             throw new IllegalStateException("Not Enough User Wallet Balance..!");
         }
@@ -72,8 +73,9 @@ public class ExchangeApplicationService {
             throw new IllegalStateException("Not Enough Master Wallet Balance..!");
         }
 
+
         // 마스터 지갑에서 코인/토큰 전송하기 API 호출
-        Transaction transaction = exchange.transfer(
+        Transaction transaction = ethKlayHenesisWalletClient.transfer(
                 request.getAmount(),
                 request.getTo(),
                 request.getTicker()
@@ -95,15 +97,15 @@ public class ExchangeApplicationService {
     @Transactional
     public FlushResponseDTO flush(FlushRequestDTO request) {
 
-        List<String> userWalletIds = exchange.getUserWalletIds();
+        List<String> userWalletIds = ethKlayHenesisWalletClient.getUserWalletIds();
 
-        Transaction transaction = exchange.flushAll(
+        Transaction transaction = ethKlayHenesisWalletClient.flushAll(
                 request.getTicker(),
                 userWalletIds
         );
 
-        flushedTxRepository.save(
-                FlushedTx.of(
+        flushedTransactionRepository.save(
+                FlushedTransaction.of(
                     transaction.getTransactionId(),
                     transaction.getBlockchain(),
                     transaction.getStatus(),
@@ -128,13 +130,13 @@ public class ExchangeApplicationService {
 
     @Transactional
     public void updateWalletList() {
-        List<Wallet> wallets = exchange.getAllUserWallet().stream()
+        List<Wallet> wallets = ethKlayHenesisWalletClient.getAllUserWallet().stream()
                 .filter(u->!userWalletRepository.existsUserWalletByWalletIdAndStatus(u.getWalletId(), u.getStatus()))
 
                 .collect(Collectors.toList());
         userWalletRepository.saveAll(wallets);
 
-        List<Wallet> masterWallets = exchange.getAllMasterWallet().stream()
+        List<Wallet> masterWallets = ethKlayHenesisWalletClient.getAllMasterWallet().stream()
                 .filter(m->!userWalletRepository.existsUserWalletByWalletIdAndStatus(m.getWalletId(), m.getStatus()))
                 .collect(Collectors.toList());
 
@@ -144,7 +146,7 @@ public class ExchangeApplicationService {
 
     @Transactional
     public void updateTransactionList() {
-        List<Transaction> transactions = exchange.getValueTransferEvents("").stream()
+        List<Transaction> transactions = ethKlayHenesisWalletClient.getValueTransferEvents("").stream()
                 .filter(t-> transactionRepository.findTransactionByDetailId(t.getDetailId()).isPresent())
                 .collect(Collectors.toList());
 

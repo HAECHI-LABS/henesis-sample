@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FlushedTx {
+public class FlushedTransaction {
     @Id
     @Column(updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +20,7 @@ public class FlushedTx {
     private String status;
     private String createdAt;
 
-    private FlushedTx(
+    private FlushedTransaction(
             String txId,
             String blockchain,
             String status,
@@ -32,13 +32,13 @@ public class FlushedTx {
         this.createdAt=createdAt;
     }
 
-    public static FlushedTx of(
+    public static FlushedTransaction of(
             String txId,
             String blockchain,
             String status,
             String createdAt
     ){
-        return new FlushedTx(
+        return new FlushedTransaction(
                 txId,
                 blockchain,
                 status,

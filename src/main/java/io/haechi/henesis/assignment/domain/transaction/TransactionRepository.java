@@ -15,7 +15,8 @@ import java.util.Optional;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, String>, JpaSpecificationExecutor<Wallet> {
 
-    boolean existsTransactionByDetailId(int detailId);
+
+
     Optional<Transaction> findTransactionByDetailId(int detailsId);
 
 

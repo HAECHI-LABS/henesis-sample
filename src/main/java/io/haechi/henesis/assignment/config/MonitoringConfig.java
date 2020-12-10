@@ -11,11 +11,11 @@ import java.util.Map;
 public class MonitoringConfig {
 
     @Bean
-    public ActionSupplier<Action> actionSupplier(
-            BalanceUpdater balanceUpdater,
-            TxStatusUpdater txStatusUpdater
+    public ActionSupplier<UpdateAction> actionSupplier(
+            BalanceUpdateAction balanceUpdater,
+            StatusUpdateAction txStatusUpdater
     ) {
-        Map<Situation, Action> s = new HashMap<>();
+        Map<Situation, UpdateAction> s = new HashMap<>();
         s.put(Situation.DEPOSIT_CONFIRMED, balanceUpdater);
         s.put(Situation.ROLLBACK, balanceUpdater);
         s.put(Situation.UPDATE_STATUS, txStatusUpdater);

@@ -1,7 +1,7 @@
 package io.haechi.henesis.assignment.application;
 
-import io.haechi.henesis.assignment.domain.Exchange;
-import io.haechi.henesis.assignment.domain.FlushedTxRepository;
+import io.haechi.henesis.assignment.domain.EthKlayHenesisWalletClient;
+import io.haechi.henesis.assignment.domain.FlushedTransactionRepository;
 import io.haechi.henesis.assignment.domain.UserWalletRepository;
 import io.haechi.henesis.assignment.domain.Wallet;
 import io.haechi.henesis.assignment.domain.transaction.*;
@@ -17,24 +17,24 @@ import java.util.stream.Collectors;
 @Service
 public class MonitoringApplicationService {
 
-    private final Exchange exchange;
+    private final EthKlayHenesisWalletClient ethKlayHenesisWalletClient;
     private final UserWalletRepository userWalletRepository;
-    private final FlushedTxRepository flushedTxRepository;
+    private final FlushedTransactionRepository flushedTransactionRepository;
     private final TransactionRepository transactionRepository;
-    private final ActionSupplier<Action> actionActionSupplier;
+    private final ActionSupplier<UpdateAction> updateActionSupplier;
 
     private String updatedAt = Long.toString(System.currentTimeMillis());
 
-    public MonitoringApplicationService(Exchange exchange,
+    public MonitoringApplicationService(EthKlayHenesisWalletClient ethKlayHenesisWalletClient,
                                         UserWalletRepository userWalletRepository,
-                                        FlushedTxRepository flushedTxRepository,
+                                        FlushedTransactionRepository flushedTransactionRepository,
                                         TransactionRepository transactionRepository,
-                                        ActionSupplier<Action> actionSupplier) {
-        this.exchange = exchange;
+                                        ActionSupplier<UpdateAction> updateActionSupplier) {
+        this.ethKlayHenesisWalletClient = ethKlayHenesisWalletClient;
         this.userWalletRepository = userWalletRepository;
-        this.flushedTxRepository = flushedTxRepository;
+        this.flushedTransactionRepository = flushedTransactionRepository;
         this.transactionRepository = transactionRepository;
-        this.actionActionSupplier = actionSupplier;
+        this.updateActionSupplier = updateActionSupplier;
     }
 
 
@@ -43,7 +43,7 @@ public class MonitoringApplicationService {
 
         // Call Wallet API (Value Transfer Events)
         // Not flushed Tx
-        List<Transaction> transactions = exchange.getValueTransferEvents(updatedAt).stream()
+        List<Transaction> transactions = ethKlayHenesisWalletClient.getValueTransferEvents(updatedAt).stream()
                 .filter(t -> t.getStatus().contains("CONFIRMED")
                         || t.getStatus().contains("REVERTED")
                         || t.getStatus().contains("FAILED"))
@@ -59,7 +59,7 @@ public class MonitoringApplicationService {
         // Save only New and Not Flushed Transactions
         List<Transaction> newTx = transactions.stream()
                 .filter(tx -> transactionRepository.findTransactionByDetailId(tx.getDetailId()).isEmpty())
-                .filter(tx -> flushedTxRepository.findByTxId(tx.getTransactionId()).isEmpty())
+                .filter(tx -> flushedTransactionRepository.findByTxId(tx.getTransactionId()).isEmpty())
                 .collect(Collectors.toList());
 
         transactionRepository.saveAll(newTx);
@@ -76,7 +76,7 @@ public class MonitoringApplicationService {
     public void getUserWalletInfo(){
 
         // 모든 사용자 지갑
-        List<Wallet> wallets = exchange.getAllUserWallet().stream()
+        List<Wallet> wallets = ethKlayHenesisWalletClient.getAllUserWallet().stream()
                 .filter(u->!userWalletRepository.existsUserWalletByWalletIdAndStatus(u.getWalletId(), u.getStatus()))
                 .collect(Collectors.toList());
         wallets.forEach(u->
@@ -88,6 +88,6 @@ public class MonitoringApplicationService {
 
     public void mappingActionBy(Transaction transaction ,Situation situation){
         // 상황에 따른 액션 맵핑
-        actionActionSupplier.supply(situation).doAction(transaction);
+        updateActionSupplier.supply(situation).doAction(transaction);
     }
 }

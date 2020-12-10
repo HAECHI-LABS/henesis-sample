@@ -1,7 +1,8 @@
 package io.haechi.henesis.assignment.infra;
 
 import io.haechi.henesis.assignment.domain.Amount;
-import io.haechi.henesis.assignment.domain.Exchange;
+import io.haechi.henesis.assignment.domain.BtcHenesisWalletClient;
+import io.haechi.henesis.assignment.domain.EthKlayHenesisWalletClient;
 import io.haechi.henesis.assignment.domain.Wallet;
 import io.haechi.henesis.assignment.domain.transaction.Transaction;
 import io.haechi.henesis.assignment.infra.dto.*;
@@ -17,21 +18,18 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-public class HenesisWalletService implements Exchange {
-    private final RestTemplate masterWalletRestTemplate;
+public class BtcHenesisWalletService implements BtcHenesisWalletClient {
     private final RestTemplate restTemplate;
     private final String masterWalletId;
     private final String passphrase;
 
-    public HenesisWalletService(
-            @Qualifier("walletClient") RestTemplate restTemplate,
-            @Qualifier("masterWalletClient") RestTemplate masterWalletRestTemplate,
-            @Qualifier("masterWalletId") String masterWalletId,
-            @Qualifier("passphrase") String passphrase
+    public BtcHenesisWalletService(
+            @Qualifier("restTemplate") RestTemplate restTemplate,
+            @Qualifier("btcWalletId") String  walletId,
+            @Qualifier("btcPassphrase") String passphrase
     ) {
         this.restTemplate = restTemplate;
-        this.masterWalletRestTemplate = masterWalletRestTemplate;
-        this.masterWalletId = masterWalletId;
+        this.masterWalletId = walletId;
         this.passphrase = passphrase;
     }
 
@@ -43,7 +41,7 @@ public class HenesisWalletService implements Exchange {
     @Override
     public List<Transaction> getValueTransferEvents(String updatedAt){
         ValueTransferEventsJsonObject response = restTemplate.getForEntity(
-                "/value-transfer-events?updatedAtGte={updatedAtGte}&size={size}",
+                "/eth/value-transfer-events?updatedAtGte={updatedAtGte}&size={size}/",
                 ValueTransferEventsJsonObject.class,
                 updatedAt,50
         ).getBody();
@@ -51,24 +49,24 @@ public class HenesisWalletService implements Exchange {
         assert response != null;
 
         return response.getResults().stream().map(t ->
-                        Transaction.of(
-                                t.getId(),
-                                t.getFrom(),
-                                t.getTo(),
-                                t.getAmount(),
-                                t.getBlockchain(),
-                                t.getStatus(),
-                                t.getTransactionId(),
-                                t.getTransactionHash(),
-                                t.getCoinSymbol(),
-                                t.getConfirmation(),
-                                t.getTransferType(),
-                                t.getCreatedAt(),
-                                t.getUpdatedAt(),
-                                t.getWalletId(),
-                                t.getWalletName()
-                        )
-                ).collect(Collectors.toList());
+                Transaction.of(
+                        t.getId(),
+                        t.getFrom(),
+                        t.getTo(),
+                        t.getAmount(),
+                        t.getBlockchain(),
+                        t.getStatus(),
+                        t.getTransactionId(),
+                        t.getTransactionHash(),
+                        t.getCoinSymbol(),
+                        t.getConfirmation(),
+                        t.getTransferType(),
+                        t.getCreatedAt(),
+                        t.getUpdatedAt(),
+                        t.getWalletId(),
+                        t.getWalletName()
+                )
+        ).collect(Collectors.toList());
     }
 
 
@@ -84,8 +82,8 @@ public class HenesisWalletService implements Exchange {
         param.add("name",name);
         param.add("passphrase",passphrase);
 
-        UserWalletJsonObject response = masterWalletRestTemplate.postForEntity(
-                "/user-wallets",
+        UserWalletJsonObject response = restTemplate.postForEntity(
+                String.format("eth/wallets/%s/user-wallets/",masterWalletId),
                 param,
                 UserWalletJsonObject.class
         ).getBody();
@@ -120,8 +118,8 @@ public class HenesisWalletService implements Exchange {
         param.add("ticker",ticker);
         param.add("passphrase",passphrase);
 
-        TransactionJsonObject response = masterWalletRestTemplate.postForEntity(
-                "/transfer",
+        TransactionJsonObject response = restTemplate.postForEntity(
+                String.format("eth/wallets/%s/transfer/",masterWalletId),
                 param,
                 TransactionJsonObject.class
         ).getBody();
@@ -143,8 +141,8 @@ public class HenesisWalletService implements Exchange {
     @Override
     public List<String> getUserWalletIds() {
 
-        List<UserWalletJsonObject> getAllUserWallet =  Objects.requireNonNull(masterWalletRestTemplate.getForEntity(
-                "/user-wallets",
+        List<UserWalletJsonObject> getAllUserWallet =  Objects.requireNonNull(restTemplate.getForEntity(
+                String.format("eth/wallets/%s/user-wallets/",masterWalletId),
                 GetAllUserWalletJsonObject.class
         ).getBody()).getResults();
 
@@ -156,8 +154,8 @@ public class HenesisWalletService implements Exchange {
     @Override
     public List<Wallet> getAllUserWallet() {
 
-        List<UserWalletJsonObject> response =  Objects.requireNonNull(masterWalletRestTemplate.getForEntity(
-                "/user-wallets",
+        List<UserWalletJsonObject> response =  Objects.requireNonNull(restTemplate.getForEntity(
+                String.format("eth/wallets/%s/user-wallets/",masterWalletId),
                 GetAllUserWalletJsonObject.class
         ).getBody()).getResults();
 
@@ -178,7 +176,7 @@ public class HenesisWalletService implements Exchange {
     @Override
     public List<Wallet> getAllMasterWallet(){
         List<MasterWalletJsonObject> response = Arrays.asList(Objects.requireNonNull(restTemplate.getForEntity(
-                "/wallets",
+                "eth/wallets/",
                 MasterWalletJsonObject[].class
         ).getBody()));
 
@@ -196,6 +194,7 @@ public class HenesisWalletService implements Exchange {
         ).collect(Collectors.toList());
     }
 
+
     /**
      * 사용자 지갑 잔액을 모두 끌어오기 API Call
      *
@@ -210,8 +209,8 @@ public class HenesisWalletService implements Exchange {
         param.add("passphrase",passphrase);
         param.addAll("userWalletIds",userWalletIds);
 
-        TransactionJsonObject response = masterWalletRestTemplate.postForEntity(
-                "/flush",
+        TransactionJsonObject response = restTemplate.postForEntity(
+                String.format("eth/wallets/%s/flush/",masterWalletId),
                 param,
                 TransactionJsonObject.class
         ).getBody();
@@ -237,8 +236,8 @@ public class HenesisWalletService implements Exchange {
     public Amount getMasterWalletBalance(String ticker) {
 
         List<MasterWalletBalanceJsonObject> response = Arrays.asList(
-                Objects.requireNonNull(masterWalletRestTemplate.getForEntity(
-                        "/balance",
+                Objects.requireNonNull(restTemplate.getForEntity(
+                        String.format("eth/wallets/%s/balance/",masterWalletId),
                         MasterWalletBalanceJsonObject[].class
                 ).getBody())
         );
@@ -247,6 +246,7 @@ public class HenesisWalletService implements Exchange {
                 .filter(symbol -> symbol.getSymbol().equals(ticker)).findFirst().get().getSpendableAmount()
         );
     }
+
 
 
 }

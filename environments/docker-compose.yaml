@@ -5,9 +5,9 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: "postgre"
+      POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "1234"
-      POSTGRES_DB: "EthaniumDB"
+      POSTGRES_DB: "Ethanium"
     logging:
       driver: "json-file"
       options:

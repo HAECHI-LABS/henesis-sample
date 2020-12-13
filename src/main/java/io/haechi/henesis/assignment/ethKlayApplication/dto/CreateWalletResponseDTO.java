@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.application.dto;
+package io.haechi.henesis.assignment.ethKlayApplication.dto;
 
 import lombok.AccessLevel;
 import lombok.Getter;

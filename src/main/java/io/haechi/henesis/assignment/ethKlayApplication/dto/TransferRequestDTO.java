@@ -1,7 +1,7 @@
-package io.haechi.henesis.assignment.application.dto;
+package io.haechi.henesis.assignment.ethKlayApplication.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.haechi.henesis.assignment.domain.Amount;
+import io.haechi.henesis.assignment.ethKlayDomain.Amount;
 import lombok.*;
 
 

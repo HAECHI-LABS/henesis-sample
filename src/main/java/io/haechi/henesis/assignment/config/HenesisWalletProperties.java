@@ -17,4 +17,5 @@ public class HenesisWalletProperties {
     private String ethMasterWalletId;
     private String klayMasterWalletId;
     private String btcWalletId;
+
 }

@@ -1,6 +1,6 @@
 package io.haechi.henesis.assignment.config;
 
-import io.haechi.henesis.assignment.domain.transaction.*;
+import io.haechi.henesis.assignment.ethKlayDomain.transaction.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

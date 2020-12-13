@@ -1,7 +1,7 @@
-package io.haechi.henesis.assignment.domain;
+package io.haechi.henesis.assignment.ethKlayDomain;
 
 
-import io.haechi.henesis.assignment.domain.transaction.Transaction;
+import io.haechi.henesis.assignment.ethKlayDomain.transaction.Transaction;
 
 import java.util.List;
 
@@ -9,13 +9,13 @@ public interface EthKlayHenesisWalletClient {
 
     Wallet createUserWallet(String walletName);
 
-    Amount getMasterWalletBalance(String ticker);
+    Amount getMasterWalletBalance();
 
-    Transaction transfer(Amount amount, String to, String ticker);
+    Transaction transfer(Amount amount, String to);
 
     List<String> getUserWalletIds();
 
-    Transaction flushAll(String ticker, List<String> userWalletIds);
+    Transaction flushAll(List<String> userWalletIds);
 
     List<Transaction> getValueTransferEvents(String updatedAt);
 

@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.application.dto;
+package io.haechi.henesis.assignment.ethKlayApplication.dto;
 
 
 import lombok.*;
@@ -16,5 +16,4 @@ public class CreateWalletRequestDTO {
     @NotNull(message = "walletName must be not null")
     @NotEmpty(message = "walletName must be not empty")
     private String walletName;
-
 }

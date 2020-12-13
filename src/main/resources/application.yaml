@@ -12,18 +12,19 @@ app:
     url: http://localhost:3000
     api-secret: XP0SZ8TY/6O6hlMAfjcAtmESj/ihFlVed/nkNTDHrmo=
     access-token: eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6ImptZWVmMDgwMkBnbWFpbC5jb20iLCJpZCI6IjI2ZTQyMjliOTQ0ZWZlNjNiYWU4MThlZDMyYTY0YTkxIiwidHlwZSI6IkxPTkciLCJsb25nVHlwZSI6dHJ1ZSwiaXNzIjoiaGVuZXNpcy13YWxsZXQtaWRlbnRpdHktcHJvZC10ZXN0bmV0IiwiaWF0IjoxNjA1NjY4Mzg5LCJleHAiOjE5MjEwMjgzODl9.6d1HBljaYYaDB0xkI8zZ7wiUcGrDgx7K-PcfGUE1JPwOuZnng7QQWcvHrLM98C6-m8PENLNKr7m8-N7uIriqAw
+
     eth-masterWalletId: 412c293557de5d5cdd052167fb3fdf43
     eth-passphrase: passphrase
 
-    btc-walletId: 412c293557de5d5cdd052167fb3fdf43
+    btc-walletId: 41113e49eeb84d4194deff7e4df71030
     btc-passphrase: passphrase
 
-    klay-masterWalletId: 412c293557de5d5cdd052167fb3fdf43
+    klay-masterWalletId: 060fc685a5f2b0c9d97a560f43536991
     klay-passphrase: passphrase
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/EthaniumDB
+    url: jdbc:postgresql://localhost:5432/Ethanium
     username: postgres
     password: 1234
     platform: postgres

@@ -1,6 +1,6 @@
-package io.haechi.henesis.assignment.domain.transaction;
+package io.haechi.henesis.assignment.ethKlayDomain.transaction;
 
-import io.haechi.henesis.assignment.domain.Amount;
+import io.haechi.henesis.assignment.ethKlayDomain.Amount;
 import lombok.*;
 
 import javax.persistence.*;
@@ -104,41 +104,6 @@ public class Transaction {
                 walletName
                 );
     }
-    public static Transaction of(
-            int detailId,
-            String from,
-            String to,
-            Amount amount,
-            String blockchain,
-            String status,
-            String transactionId,
-            String transactionHash,
-            String coinSymbol,
-            String confirmation,
-            String transferType,
-            String createdAt,
-            String updatedAt,
-            String walletId,
-            String walletName
-    ) {
-        return new Transaction(
-                detailId,
-                from,
-                to,
-                amount,
-                blockchain,
-                status,
-                transactionId,
-                transactionHash,
-                coinSymbol,
-                confirmation,
-                transferType,
-                createdAt,
-                updatedAt,
-                walletId,
-                walletName
-        );
-    }
 
     private Transaction(
             String transactionId,
@@ -184,6 +149,10 @@ public class Transaction {
     }
     public boolean isFailed(){
         return this.status.equals("FAILED");
+    }
+
+    public boolean canUpdateStatus(String status){
+        return !this.status.equals(status);
     }
 
     public Situation situation(){

@@ -1,13 +1,10 @@
 package io.haechi.henesis.assignment.infra;
 
-import io.haechi.henesis.assignment.domain.Amount;
-import io.haechi.henesis.assignment.domain.BtcHenesisWalletClient;
-import io.haechi.henesis.assignment.domain.EthKlayHenesisWalletClient;
-import io.haechi.henesis.assignment.domain.Wallet;
-import io.haechi.henesis.assignment.domain.transaction.Transaction;
+import io.haechi.henesis.assignment.ethKlayDomain.Amount;
+import io.haechi.henesis.assignment.ethKlayDomain.EthKlayHenesisWalletClient;
+import io.haechi.henesis.assignment.ethKlayDomain.Wallet;
+import io.haechi.henesis.assignment.ethKlayDomain.transaction.Transaction;
 import io.haechi.henesis.assignment.infra.dto.*;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -17,20 +14,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Service
-public class BtcHenesisWalletService implements BtcHenesisWalletClient {
+public abstract class HenesisWalletService implements EthKlayHenesisWalletClient {
     private final RestTemplate restTemplate;
     private final String masterWalletId;
     private final String passphrase;
+    private final String ticker;
 
-    public BtcHenesisWalletService(
-            @Qualifier("restTemplate") RestTemplate restTemplate,
-            @Qualifier("btcWalletId") String  walletId,
-            @Qualifier("btcPassphrase") String passphrase
+    public HenesisWalletService(
+            RestTemplate restTemplate,
+            String maseterWalletId,
+            String passphrase,
+            String ticker
     ) {
         this.restTemplate = restTemplate;
-        this.masterWalletId = walletId;
+        this.masterWalletId = maseterWalletId;
         this.passphrase = passphrase;
+        this.ticker =ticker;
     }
 
 
@@ -40,33 +39,35 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
      */
     @Override
     public List<Transaction> getValueTransferEvents(String updatedAt){
+
         ValueTransferEventsJsonObject response = restTemplate.getForEntity(
-                "/eth/value-transfer-events?updatedAtGte={updatedAtGte}&size={size}/",
+                String.format("%s/value-transfer-events?updatedAtGte={updatedAtGte}&size={size}/",ticker),
                 ValueTransferEventsJsonObject.class,
                 updatedAt,50
         ).getBody();
 
+
         assert response != null;
 
         return response.getResults().stream().map(t ->
-                Transaction.of(
-                        t.getId(),
-                        t.getFrom(),
-                        t.getTo(),
-                        t.getAmount(),
-                        t.getBlockchain(),
-                        t.getStatus(),
-                        t.getTransactionId(),
-                        t.getTransactionHash(),
-                        t.getCoinSymbol(),
-                        t.getConfirmation(),
-                        t.getTransferType(),
-                        t.getCreatedAt(),
-                        t.getUpdatedAt(),
-                        t.getWalletId(),
-                        t.getWalletName()
-                )
-        ).collect(Collectors.toList());
+                        Transaction.of(
+                                t.getId(),
+                                t.getFrom(),
+                                t.getTo(),
+                                t.getAmount(),
+                                t.getBlockchain(),
+                                t.getStatus(),
+                                t.getTransactionId(),
+                                t.getTransactionHash(),
+                                t.getCoinSymbol(),
+                                t.getConfirmation(),
+                                t.getTransferType(),
+                                t.getCreatedAt(),
+                                t.getUpdatedAt(),
+                                t.getWalletId(),
+                                t.getWalletName()
+                        )
+                ).collect(Collectors.toList());
     }
 
 
@@ -83,7 +84,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
         param.add("passphrase",passphrase);
 
         UserWalletJsonObject response = restTemplate.postForEntity(
-                String.format("eth/wallets/%s/user-wallets/",masterWalletId),
+                String.format("%s/wallets/%s/user-wallets/",ticker, masterWalletId),
                 param,
                 UserWalletJsonObject.class
         ).getBody();
@@ -95,7 +96,6 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
                 response.getAddress(),
                 response.getBlockchain(),
                 response.getStatus(),
-                Amount.of(0.0),
                 masterWalletId,
                 response.getCreatedAt(),
                 response.getUpdatedAt()
@@ -109,7 +109,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
      * @param
      */
     @Override
-    public Transaction transfer(Amount amount, String to, String ticker) {
+    public Transaction transfer(Amount amount, String to) {
 
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
@@ -119,7 +119,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
         param.add("passphrase",passphrase);
 
         TransactionJsonObject response = restTemplate.postForEntity(
-                String.format("eth/wallets/%s/transfer/",masterWalletId),
+                String.format("%s/wallets/%s/transfer/",ticker, masterWalletId),
                 param,
                 TransactionJsonObject.class
         ).getBody();
@@ -142,7 +142,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
     public List<String> getUserWalletIds() {
 
         List<UserWalletJsonObject> getAllUserWallet =  Objects.requireNonNull(restTemplate.getForEntity(
-                String.format("eth/wallets/%s/user-wallets/",masterWalletId),
+                String.format("%s/wallets/%s/user-wallets/",ticker, masterWalletId),
                 GetAllUserWalletJsonObject.class
         ).getBody()).getResults();
 
@@ -155,7 +155,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
     public List<Wallet> getAllUserWallet() {
 
         List<UserWalletJsonObject> response =  Objects.requireNonNull(restTemplate.getForEntity(
-                String.format("eth/wallets/%s/user-wallets/",masterWalletId),
+                String.format("%s/wallets/%s/user-wallets/",ticker, masterWalletId),
                 GetAllUserWalletJsonObject.class
         ).getBody()).getResults();
 
@@ -164,9 +164,9 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
                         u.getId(),
                         u.getName(),
                         u.getAddress(),
-                        Amount.of(0.0),
                         u.getBlockchain(),
                         u.getStatus(),
+                        masterWalletId,
                         u.getCreatedAt(),
                         u.getUpdatedAt()
                 )
@@ -176,7 +176,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
     @Override
     public List<Wallet> getAllMasterWallet(){
         List<MasterWalletJsonObject> response = Arrays.asList(Objects.requireNonNull(restTemplate.getForEntity(
-                "eth/wallets/",
+                String.format("%s/wallets/",ticker),
                 MasterWalletJsonObject[].class
         ).getBody()));
 
@@ -185,9 +185,9 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
                         m.getId(),
                         m.getName(),
                         m.getAddress(),
-                        Amount.of(0.0),
                         m.getBlockchain(),
                         m.getStatus(),
+                        masterWalletId,
                         m.getCreatedAt(),
                         m.getUpdatedAt()
                 )
@@ -202,7 +202,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
      * @return Transaction
      */
     @Override
-    public Transaction flushAll(String ticker, List<String> userWalletIds) {
+    public Transaction flushAll(List<String> userWalletIds) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
         param.add("ticker", ticker);
@@ -210,7 +210,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
         param.addAll("userWalletIds",userWalletIds);
 
         TransactionJsonObject response = restTemplate.postForEntity(
-                String.format("eth/wallets/%s/flush/",masterWalletId),
+                String.format("%s/wallets/%s/flush/",ticker,masterWalletId),
                 param,
                 TransactionJsonObject.class
         ).getBody();
@@ -229,15 +229,14 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
      * 마스터 지갑 잔고 조회하기 API Call
      * 요청한 ticker 에 맞는 마스터 지갑 잔고를 조회힙니다.
      *
-     * @param ticker
      * @return Optional<MasterWalletBalance>
      */
     @Override
-    public Amount getMasterWalletBalance(String ticker) {
+    public Amount getMasterWalletBalance() {
 
         List<MasterWalletBalanceJsonObject> response = Arrays.asList(
                 Objects.requireNonNull(restTemplate.getForEntity(
-                        String.format("eth/wallets/%s/balance/",masterWalletId),
+                        String.format("%s/wallets/%s/balance/",ticker, masterWalletId),
                         MasterWalletBalanceJsonObject[].class
                 ).getBody())
         );
@@ -246,7 +245,6 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
                 .filter(symbol -> symbol.getSymbol().equals(ticker)).findFirst().get().getSpendableAmount()
         );
     }
-
 
 
 }

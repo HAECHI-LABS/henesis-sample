@@ -1,6 +1,6 @@
 package io.haechi.henesis.assignment.web;
 
-import io.haechi.henesis.assignment.application.MonitoringApplicationService;
+import io.haechi.henesis.assignment.ethKlayApplication.MonitoringApplicationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +20,7 @@ public class MonitoringController {
     @PostMapping("/transactions")
     @ResponseStatus(value = HttpStatus.OK)
     public void getValueTransferEvents() {
-        monitoringApplicationService.getValueTransferEvents();
+        monitoringApplicationService.getEthValueTransferEvents();
     }
 
     @PostMapping("/user-wallets")

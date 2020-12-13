@@ -1,8 +1,9 @@
-package io.haechi.henesis.assignment.domain;
+package io.haechi.henesis.assignment.ethKlayDomain;
 
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 
 @Entity
 @Getter
@@ -54,7 +55,6 @@ public class Wallet {
             String address,
             String blockchain,
             String status,
-            Amount balance,
             String masterWalletId,
             String createdAt,
             String updatedAt
@@ -65,53 +65,11 @@ public class Wallet {
                 address,
                 blockchain,
                 status,
-                balance,
+                Amount.of(BigInteger.ZERO),
                 masterWalletId,
                 createdAt,
                 updatedAt
                 );
-    }
-
-    private Wallet(
-            String walletId,
-            String name,
-            String address,
-            Amount balance,
-            String blockchain,
-            String status,
-            String createdAt,
-            String updatedAt
-    ) {
-        this.walletId = walletId;
-        this.name = name;
-        this.address = address;
-        this.balance = balance;
-        this.blockchain = blockchain;
-        this.status = status;
-        this.createdAt =createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public static Wallet of(
-            String walletId,
-            String name,
-            String address,
-            Amount balance,
-            String blockchain,
-            String status,
-            String createdAt,
-            String updatedAt
-    ){
-        return new Wallet(
-                walletId,
-                name,
-                address,
-                balance,
-                blockchain,
-                status,
-                createdAt,
-                updatedAt
-        );
     }
 
 

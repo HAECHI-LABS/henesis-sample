@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.domain;
+package io.haechi.henesis.assignment.ethKlayDomain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -13,17 +13,12 @@ import java.util.Optional;
 
 
 @Repository
-public interface UserWalletRepository extends JpaRepository<Wallet, String>, JpaSpecificationExecutor<Wallet> {
+public interface WalletRepository extends JpaRepository<Wallet, String>, JpaSpecificationExecutor<Wallet> {
 
 
     Optional<Wallet> findByWalletId(String walletId);
 
     boolean existsUserWalletByWalletIdAndStatus(String walletId, String status);
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE Wallet u SET u.balance = :balance WHERE u.walletId = :walletId")
-    void updateWalletBalance(@Param("balance") Amount balance, @Param("walletId") String walletId);
 
     @Transactional
     @Modifying

@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.domain;
+package io.haechi.henesis.assignment.ethKlayDomain;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FlushedTransaction {
@@ -15,34 +15,39 @@ public class FlushedTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String txId;
+    private String transactionId;
     private String blockchain;
     private String status;
     private String createdAt;
+    private String updatedAt;
 
     private FlushedTransaction(
-            String txId,
+            String transactionId,
             String blockchain,
             String status,
-            String createdAt
+            String createdAt,
+            String updatedAt
     ){
-        this.txId=txId;
+        this.transactionId=transactionId;
         this.blockchain=blockchain;
         this.status=status;
         this.createdAt=createdAt;
+        this.updatedAt=updatedAt;
     }
 
     public static FlushedTransaction of(
-            String txId,
+            String transactionId,
             String blockchain,
             String status,
-            String createdAt
+            String createdAt,
+            String updatedAt
     ){
         return new FlushedTransaction(
-                txId,
+                transactionId,
                 blockchain,
                 status,
-                createdAt
+                createdAt,
+                updatedAt
         );
     }
 

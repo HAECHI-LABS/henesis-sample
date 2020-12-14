@@ -1,5 +1,7 @@
 package io.haechi.henesis.assignment.web;
 
+import io.haechi.henesis.assignment.application.btc.dto.BtcTransferRequest;
+import io.haechi.henesis.assignment.application.btc.dto.BtcTransferResponse;
 import io.haechi.henesis.assignment.application.ethklay.dto.*;
 import io.haechi.henesis.assignment.application.btc.BtcExchangeApplicationService;
 import io.haechi.henesis.assignment.application.btc.dto.CreateDepositAddressRequest;
@@ -60,6 +62,11 @@ public class ExchangeController {
         return klayExchangeApplicationService.transfer(transferRequest);
     }
 
+    @PostMapping("btc/transfer")
+    @ResponseStatus(value = HttpStatus.OK)
+    public BtcTransferResponse transferBtc(@RequestBody BtcTransferRequest btcTransferRequest) {
+        return btcExchangeApplicationService.transfer(btcTransferRequest);
+    }
 
     // 집금하기
     @PostMapping("eth/flush/")

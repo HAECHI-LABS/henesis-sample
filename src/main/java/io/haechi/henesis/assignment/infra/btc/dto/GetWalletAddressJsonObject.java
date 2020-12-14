@@ -8,10 +8,10 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GetAllWalletAddressJsonObject {
+public class GetWalletAddressJsonObject {
 
     @JsonProperty("id")
-    private int id;
+    private String id;
     @JsonProperty("name")
     private String name;
     @JsonProperty("address")

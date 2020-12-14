@@ -1,6 +1,6 @@
 package io.haechi.henesis.assignment.web;
 
-import io.haechi.henesis.assignment.ethKlayApplication.MonitoringApplicationService;
+import io.haechi.henesis.assignment.application.ethklay.MonitoringApplicationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +13,7 @@ public class MonitoringController {
 
     private final MonitoringApplicationService monitoringApplicationService;
 
-    public MonitoringController(MonitoringApplicationService monitoringApplicationService){
+    public MonitoringController(MonitoringApplicationService monitoringApplicationService) {
         this.monitoringApplicationService = monitoringApplicationService;
     }
 
@@ -25,6 +25,8 @@ public class MonitoringController {
 
     @PostMapping("/user-wallets")
     @ResponseStatus(value = HttpStatus.OK)
-    public void getAllUserWalletInfo(){monitoringApplicationService.getUserWalletInfo();}
+    public void getAllUserWalletInfo() {
+        monitoringApplicationService.getUserWalletInfo();
+    }
 
 }

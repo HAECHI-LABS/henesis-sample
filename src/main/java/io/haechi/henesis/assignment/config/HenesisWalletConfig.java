@@ -33,17 +33,18 @@ public class HenesisWalletConfig {
     }
 
 
-
     @Bean
     @Qualifier("ethMasterWalletId")
     public String ethMasterWalletId(HenesisWalletProperties henesisWalletProperties) {
         return henesisWalletProperties.getEthMasterWalletId();
     }
+
     @Bean
     @Qualifier("klayMasterWalletId")
     public String klayMasterWalletId(HenesisWalletProperties henesisWalletProperties) {
         return henesisWalletProperties.getKlayMasterWalletId();
     }
+
     @Bean
     @Qualifier("btcWalletId")
     public String btcWalletId(HenesisWalletProperties henesisWalletProperties) {
@@ -55,11 +56,13 @@ public class HenesisWalletConfig {
     public String ethPassphrase(HenesisWalletProperties henesisWalletProperties) {
         return henesisWalletProperties.getEthPassphrase();
     }
+
     @Bean
     @Qualifier("klayPassphrase")
     public String klayPassphrase(HenesisWalletProperties henesisWalletProperties) {
         return henesisWalletProperties.getKlayPassphrase();
     }
+
     @Bean
     @Qualifier("btcPassphrase")
     public String btcPassphrase(HenesisWalletProperties henesisWalletProperties) {

@@ -1,7 +1,6 @@
 package io.haechi.henesis.assignment.domain.ethklay;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
@@ -16,10 +15,5 @@ public interface FlushedTransactionRepository extends JpaRepository<FlushedTrans
     List<FlushedTransaction> findAllByTransactionId(String transactionId);
 
     Optional<FlushedTransaction> findByTransactionId(String transactionId);
-
-    boolean existsByTransactionIdAndStatus(
-            @Param("transactionId") String transactionId,
-            @Param("status") String status
-    );
 
 }

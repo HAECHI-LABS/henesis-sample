@@ -1,6 +1,5 @@
 package io.haechi.henesis.assignment.infra.btc;
 
-import io.haechi.henesis.assignment.domain.ethklay.Amount;
 import io.haechi.henesis.assignment.domain.Transaction;
 import io.haechi.henesis.assignment.domain.btc.*;
 import io.haechi.henesis.assignment.infra.btc.dto.*;
@@ -55,9 +54,9 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
     }
 
     @Override
-    public BtcAmount getEstimatedFee(){
+    public BtcAmount getEstimatedFee() {
         GetEstimatedFeeJsonObject response = restTemplate.getForEntity(
-                String.format("/btc/wallets/%s/estimated-fee",walletId),
+                String.format("/btc/wallets/%s/estimated-fee", walletId),
                 GetEstimatedFeeJsonObject.class
         ).getBody();
 
@@ -78,9 +77,9 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
 
 
     @Override
-    public Wallet getWalletInfo(){
+    public Wallet getWalletInfo() {
         GetWalletAddressJsonObject response = restTemplate.getForEntity(
-                String.format("/btc/wallets/%s/",walletId),
+                String.format("/btc/wallets/%s/", walletId),
                 GetWalletAddressJsonObject.class
         ).getBody();
 
@@ -106,7 +105,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
 
         param.add("amount", amount.toHexString());
         param.add("to", to);
-        param.add("passphrase",passphrase);
+        param.add("passphrase", passphrase);
 
         BtcTransactionJsonObject response = restTemplate.postForEntity(
                 String.format("btc/wallets/%s/transfer/", walletId),

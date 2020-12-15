@@ -1,10 +1,6 @@
 package io.haechi.henesis.assignment.domain;
 
-import io.haechi.henesis.assignment.domain.ethklay.FlushedTransactionRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service

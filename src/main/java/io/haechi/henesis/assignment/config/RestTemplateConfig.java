@@ -17,33 +17,27 @@ import java.util.Collections;
 @Configuration
 public class RestTemplateConfig {
 
-    @Value("${restTemplate.factory.readTimeout}")
-    private int READ_TIMEOUT;
-
-    @Value("${restTemplate.factory.connectTimeout}")
-    private int CONNECT_TIMEOUT;
-
-    @Value("${restTemplate.httpClient.maxConnTotal}")
-    private int MAX_CONN_TOTAL;
-
-    @Value("${restTemplate.httpClient.maxConnPerRoute}")
-    private int MAX_CONN_PER_ROUTE;
-
     private final String walletAccessToken;
     private final String walletApiSecret;
     private final String walletUrl;
-    private final String masterWalletId;
+    @Value("${restTemplate.factory.readTimeout}")
+    private int READ_TIMEOUT;
+    @Value("${restTemplate.factory.connectTimeout}")
+    private int CONNECT_TIMEOUT;
+    @Value("${restTemplate.httpClient.maxConnTotal}")
+    private int MAX_CONN_TOTAL;
+    @Value("${restTemplate.httpClient.maxConnPerRoute}")
+    private int MAX_CONN_PER_ROUTE;
+
 
     public RestTemplateConfig(
             @Qualifier("walletApiSecret") String walletApiSecret,
             @Qualifier("walletAccessToken") String walletAccessToken,
-            @Qualifier("walletUrl") String walletUrl,
-            @Qualifier("masterWalletId") String masterWalletId
+            @Qualifier("walletUrl") String walletUrl
     ) {
         this.walletApiSecret = walletApiSecret;
         this.walletAccessToken = walletAccessToken;
         this.walletUrl = walletUrl;
-        this.masterWalletId = masterWalletId;
     }
 
     @Bean
@@ -55,11 +49,11 @@ public class RestTemplateConfig {
 
 
     @Bean
-    @Qualifier("walletClient")
-    public RestTemplate walletRestTemplate() {
+    @Qualifier("restTemplate")
+    public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(
-                String.format("%s/api/v2/eth", walletUrl)
+                String.format("%s/api/v2/", walletUrl)
         ));
         restTemplate.setInterceptors(
                 Collections.singletonList(new HeaderInterceptor())
@@ -67,18 +61,6 @@ public class RestTemplateConfig {
         return restTemplate;
     }
 
-    @Bean
-    @Qualifier("masterWalletClient")
-    public RestTemplate masterWalletRestTemplate() {
-        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
-        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(
-                String.format("%s/api/v2/eth/wallets/%s", walletUrl, masterWalletId)
-        ));
-        restTemplate.setInterceptors(
-                Collections.singletonList(new HeaderInterceptor())
-        );
-        return restTemplate;
-    }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();

@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
 @Configuration
 @EnableConfigurationProperties({HenesisWalletProperties.class})
 public class HenesisWalletConfig {
@@ -32,15 +33,41 @@ public class HenesisWalletConfig {
         return henesisWalletProperties.getAccessToken();
     }
 
+
     @Bean
-    @Qualifier("masterWalletId")
-    public String masterWalletId(HenesisWalletProperties henesisWalletProperties) {
-        return henesisWalletProperties.getMasterWalletId();
+    @Qualifier("ethMasterWalletId")
+    public String ethMasterWalletId(HenesisWalletProperties henesisWalletProperties) {
+        return henesisWalletProperties.getEthMasterWalletId();
     }
 
     @Bean
-    @Qualifier("passphrase")
-    public String passphrase(HenesisWalletProperties henesisWalletProperties) {
-        return henesisWalletProperties.getPassphrase();
+    @Qualifier("klayMasterWalletId")
+    public String klayMasterWalletId(HenesisWalletProperties henesisWalletProperties) {
+        return henesisWalletProperties.getKlayMasterWalletId();
     }
+
+    @Bean
+    @Qualifier("btcWalletId")
+    public String btcWalletId(HenesisWalletProperties henesisWalletProperties) {
+        return henesisWalletProperties.getBtcWalletId();
+    }
+
+    @Bean
+    @Qualifier("ethPassphrase")
+    public String ethPassphrase(HenesisWalletProperties henesisWalletProperties) {
+        return henesisWalletProperties.getEthPassphrase();
+    }
+
+    @Bean
+    @Qualifier("klayPassphrase")
+    public String klayPassphrase(HenesisWalletProperties henesisWalletProperties) {
+        return henesisWalletProperties.getKlayPassphrase();
+    }
+
+    @Bean
+    @Qualifier("btcPassphrase")
+    public String btcPassphrase(HenesisWalletProperties henesisWalletProperties) {
+        return henesisWalletProperties.getBtcPassphrase();
+    }
+
 }

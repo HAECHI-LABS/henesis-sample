@@ -9,6 +9,13 @@ public class HenesisWalletProperties {
     private String url;
     private String apiSecret;
     private String accessToken;
-    private String passphrase;
-    private String masterWalletId;
+
+    private String ethPassphrase;
+    private String klayPassphrase;
+    private String btcPassphrase;
+
+    private String ethMasterWalletId;
+    private String klayMasterWalletId;
+    private String btcWalletId;
+
 }

@@ -1,6 +1,5 @@
 package io.haechi.henesis.assignment.domain.ethklay;
 
-import io.haechi.henesis.assignment.domain.Amount;
 import lombok.*;
 
 import javax.persistence.*;

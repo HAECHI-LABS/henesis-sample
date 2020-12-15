@@ -1,7 +1,4 @@
 package io.haechi.henesis.assignment.domain.btc;
-
-import io.haechi.henesis.assignment.domain.Amount;
-import io.haechi.henesis.assignment.domain.ethklay.Wallet;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,7 +18,7 @@ public class DepositAddress {
     private String depositAddressId;
     private String name;
     private String address;
-    private Amount balance;
+    private BtcAmount balance;
     private String pub;
     private String createdAt;
 
@@ -29,7 +26,7 @@ public class DepositAddress {
             String depositAddressId,
             String name,
             String address,
-            Amount balance,
+            BtcAmount balance,
             String pub,
             String createdAt
     ) {
@@ -52,14 +49,14 @@ public class DepositAddress {
                 depositAddressId,
                 name,
                 address,
-                Amount.of(BigInteger.ZERO),
+                BtcAmount.of(BigInteger.ZERO),
                 pub,
                 createdAt
         );
     }
 
 
-    public void increaseBalanceBy(Amount amount) {
+    public void increaseBalanceBy(BtcAmount amount) {
         this.balance.add(amount);
     }
 

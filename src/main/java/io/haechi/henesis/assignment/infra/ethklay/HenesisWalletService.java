@@ -1,9 +1,11 @@
 package io.haechi.henesis.assignment.infra.ethklay;
 
-import io.haechi.henesis.assignment.domain.Amount;
-import io.haechi.henesis.assignment.domain.ethklay.EthKlayHenesisWalletClient;
+import io.haechi.henesis.assignment.domain.ethklay.Amount;
+import io.haechi.henesis.assignment.domain.ethklay.EthKlayWalletService;
 import io.haechi.henesis.assignment.domain.ethklay.Wallet;
 import io.haechi.henesis.assignment.domain.Transaction;
+import io.haechi.henesis.assignment.domain.exception.ErrorCode;
+import io.haechi.henesis.assignment.domain.exception.InternalServerException;
 import io.haechi.henesis.assignment.infra.ethklay.dto.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -14,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class HenesisWalletService implements EthKlayHenesisWalletClient {
+public abstract class HenesisWalletService implements EthKlayWalletService {
     private final RestTemplate restTemplate;
     private final String masterWalletId;
     private final String passphrase;
@@ -39,16 +41,14 @@ public abstract class HenesisWalletService implements EthKlayHenesisWalletClient
      * @return
      */
     @Override
-    public List<Transaction> getValueTransferEvents(String updatedAt) {
+    public List<Transaction> getTransactions(String updatedAt) {
 
         ValueTransferEventsJsonObject response = restTemplate.getForEntity(
                 String.format("%s/value-transfer-events?updatedAtGte={updatedAtGte}&size={size}/", ticker),
                 ValueTransferEventsJsonObject.class,
-                updatedAt, 50
+                updatedAt, 100
         ).getBody();
 
-
-        assert response != null;
 
         return response.getResults().stream().map(t ->
                 Transaction.of(
@@ -246,6 +246,5 @@ public abstract class HenesisWalletService implements EthKlayHenesisWalletClient
                 .filter(symbol -> symbol.getSymbol().equals(ticker)).findFirst().get().getSpendableAmount()
         );
     }
-
 
 }

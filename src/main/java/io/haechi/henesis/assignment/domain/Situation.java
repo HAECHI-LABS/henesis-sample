@@ -4,7 +4,7 @@ public enum Situation {
 
     DEPOSIT_CONFIRMED("deposit_confirmed"),
     ROLLBACK("rollback"),
-    UPDATE_STATUS("updated_status");
+    WITHDRAWAL_CONFIRMED("withdrawal_confirmed");
 
     Situation(String situation) {
     }

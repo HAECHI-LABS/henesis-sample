@@ -34,14 +34,14 @@ public class ExchangeController {
     // 사용자 지갑 생성
     @PostMapping("eth/create-user-wallet/")
     @ResponseStatus(value = HttpStatus.OK)
-    public CreateWalletResponse createEthWallet(@RequestBody CreateWalletRequest createWalletRequest) {
-        return ethExchangeApplicationService.createUserWallet(createWalletRequest);
+    public void createEthWallet(@RequestBody CreateWalletRequest createWalletRequest) {
+        ethExchangeApplicationService.createUserWallet(createWalletRequest);
     }
 
     @PostMapping("klay/create-user-wallet/")
     @ResponseStatus(value = HttpStatus.OK)
-    public CreateWalletResponse createKlayWallet(@RequestBody CreateWalletRequest createWalletRequest) {
-        return klayExchangeApplicationService.createUserWallet(createWalletRequest);
+    public void createKlayWallet(@RequestBody CreateWalletRequest createWalletRequest) {
+        klayExchangeApplicationService.createUserWallet(createWalletRequest);
     }
 
     @PostMapping("btc/create-deposit-address/")
@@ -62,7 +62,7 @@ public class ExchangeController {
         return klayExchangeApplicationService.transfer(transferRequest);
     }
 
-    @PostMapping("btc/transfer")
+    @PostMapping("btc/transfer/")
     @ResponseStatus(value = HttpStatus.OK)
     public BtcTransferResponse transferBtc(@RequestBody BtcTransferRequest btcTransferRequest) {
         return btcExchangeApplicationService.transfer(btcTransferRequest);
@@ -71,15 +71,15 @@ public class ExchangeController {
     // 집금하기
     @PostMapping("eth/flush/")
     @ResponseStatus(value = HttpStatus.OK)
-    public FlushResponse flushEth(@RequestBody FlushRequest flushRequest) {
-        return ethExchangeApplicationService.flush(flushRequest);
+    public void flushEth(@RequestBody FlushRequest flushRequest) {
+        ethExchangeApplicationService.flush(flushRequest);
     }
 
     // 집금하기
     @PostMapping("klay/flush/")
     @ResponseStatus(value = HttpStatus.OK)
-    public FlushResponse flushKlay(@RequestBody FlushRequest flushRequest) {
-        return klayExchangeApplicationService.flush(flushRequest);
+    public void flushKlay(@RequestBody FlushRequest flushRequest) {
+        klayExchangeApplicationService.flush(flushRequest);
     }
 
 
@@ -95,5 +95,4 @@ public class ExchangeController {
     public void updateKlayWalletList() {
         klayExchangeApplicationService.updateWalletList();
     }
-
 }

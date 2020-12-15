@@ -1,7 +1,10 @@
 package io.haechi.henesis.assignment.application.ethklay;
 
-import io.haechi.henesis.assignment.domain.*;
-import io.haechi.henesis.assignment.domain.ethklay.EthKlayHenesisWalletClient;
+import io.haechi.henesis.assignment.domain.ActionSupplier;
+import io.haechi.henesis.assignment.domain.Transaction;
+import io.haechi.henesis.assignment.domain.TransactionRepository;
+import io.haechi.henesis.assignment.domain.UpdateAction;
+import io.haechi.henesis.assignment.domain.ethklay.EthKlayWalletService;
 import io.haechi.henesis.assignment.domain.ethklay.FlushedTransactionRepository;
 import io.haechi.henesis.assignment.domain.ethklay.Wallet;
 import io.haechi.henesis.assignment.domain.ethklay.WalletRepository;
@@ -19,8 +22,8 @@ import java.util.stream.Collectors;
 @Service
 public class MonitoringApplicationService {
 
-    private final EthKlayHenesisWalletClient ethHenesisWalletClient;
-    private final EthKlayHenesisWalletClient klayHenesisWalletClient;
+    private final EthKlayWalletService ethHenesisWalletService;
+    private final EthKlayWalletService klayHenesisWalletService;
     private final WalletRepository walletRepository;
     private final FlushedTransactionRepository flushedTransactionRepository;
     private final TransactionRepository transactionRepository;
@@ -28,14 +31,16 @@ public class MonitoringApplicationService {
 
     private String updatedAt = Long.toString(System.currentTimeMillis());
 
-    public MonitoringApplicationService(@Qualifier("ethHenesisWalletService") EthKlayHenesisWalletClient ethHenesisWalletClient,
-                                        @Qualifier("klayHenesisWalletService") EthKlayHenesisWalletClient klayHenesisWalletClient,
-                                        WalletRepository walletRepository,
-                                        FlushedTransactionRepository flushedTransactionRepository,
-                                        TransactionRepository transactionRepository,
-                                        ActionSupplier<UpdateAction> updateActionSupplier) {
-        this.ethHenesisWalletClient = ethHenesisWalletClient;
-        this.klayHenesisWalletClient = klayHenesisWalletClient;
+    public MonitoringApplicationService(
+            @Qualifier("ethHenesisWalletService") EthKlayWalletService ethHenesisWalletService,
+            @Qualifier("klayHenesisWalletService") EthKlayWalletService klayHenesisWalletService,
+            WalletRepository walletRepository,
+            FlushedTransactionRepository flushedTransactionRepository,
+            TransactionRepository transactionRepository,
+            ActionSupplier<UpdateAction> updateActionSupplier
+    ) {
+        this.ethHenesisWalletService = ethHenesisWalletService;
+        this.klayHenesisWalletService = klayHenesisWalletService;
         this.walletRepository = walletRepository;
         this.flushedTransactionRepository = flushedTransactionRepository;
         this.transactionRepository = transactionRepository;
@@ -43,38 +48,31 @@ public class MonitoringApplicationService {
     }
 
 
-    @Scheduled(fixedRate = 2000, initialDelay = 2000)
-    public void getEthValueTransferEvents() {
-
-        // Call Wallet API (Value Transfer Events)
-        // Not flushed Tx
-        List<Transaction> ethTransactions = ethHenesisWalletClient.getValueTransferEvents(updatedAt).stream()
-                .filter(t -> t.getStatus().contains("CONFIRMED")
-                        || t.getStatus().contains("REVERTED")
-                        || t.getStatus().contains("FAILED"))
-                .collect(Collectors.toList());
-
-        List<Transaction> klayTransactions = klayHenesisWalletClient.getValueTransferEvents(updatedAt).stream()
-                .filter(t -> t.getStatus().contains("CONFIRMED")
-                        || t.getStatus().contains("REVERTED")
-                        || t.getStatus().contains("FAILED"))
-                .collect(Collectors.toList());
+    @Scheduled(fixedRate = 2000, initialDelay = 500)
+    public void updateTransactions() {
         List<Transaction> transactions = new ArrayList<>();
-        transactions.addAll(ethTransactions);
-        transactions.addAll(klayTransactions);
+        transactions.addAll(
+                ethHenesisWalletService.getTransactions(updatedAt).stream()
+                        .filter(Transaction::isDesired)
+                        .collect(Collectors.toList())
+        );
+        transactions.addAll(
+                klayHenesisWalletService.getTransactions(updatedAt).stream()
+                        .filter(Transaction::isDesired)
+                        .collect(Collectors.toList())
+        );
+        try {
+            List<Transaction> newTransaction = transactions.stream()
+                    .filter(tx -> transactionRepository.findAllByDetailId(tx.getDetailId()).isEmpty())
+                    .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
+                    .collect(Collectors.toList());
+            transactionRepository.saveAll(newTransaction);
 
-        // 잔고 업데이트, 상태 업데이트 상황 별 액션 서플라이어 입니다.
-        // 트랜잭션 상태, 타입별 Situation <-> Action Mapping 후 Update Balance
-        transactions.forEach(tx -> mappingActionBy(tx, tx.situation()));
+        } catch (Exception e) {
+            log.info("ERROR : Fail To Save New Transaction.");
+        }
 
-
-        // Save only New and Not Flushed Transactions
-        List<Transaction> newTransaction = transactions.stream()
-                .filter(tx -> transactionRepository.findAllByDetailIdAndStatus(tx.getDetailId(), tx.getStatus()).isEmpty())
-                .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
-                .collect(Collectors.toList());
-
-        transactionRepository.saveAll(newTransaction);
+        transactions.forEach(tx -> updateActionSupplier.supply(tx.situation()).doAction(tx));
 
         transactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(u -> {
             this.updatedAt = u.getUpdatedAt();
@@ -83,32 +81,51 @@ public class MonitoringApplicationService {
     }
 
 
-    //지갑 상태 업데이트 (CREATING -> ACTIVE or INACTIVE)
+    //지갑 상태 업데이트 (CREATING, ACTIVE, INACTIVE)
     @Async
-    @Scheduled(fixedRate = 1000, initialDelay = 2000)
-    public void getUserWalletInfo() {
-
-
+    @Scheduled(fixedRate = 6000, initialDelay = 2000)
+    public void updateWalletStatus() {
         // 모든 사용자 지갑
-        List<Wallet> ethWallets = ethHenesisWalletClient.getAllUserWallet().stream()
-                .filter(u -> !walletRepository.existsUserWalletByWalletIdAndStatus(u.getWalletId(), u.getStatus()))
-                .collect(Collectors.toList());
-        List<Wallet> klayWallets = klayHenesisWalletClient.getAllUserWallet().stream()
-                .filter(u -> !walletRepository.existsUserWalletByWalletIdAndStatus(u.getWalletId(), u.getStatus()))
-                .collect(Collectors.toList());
-
         List<Wallet> wallets = new ArrayList<>();
-        wallets.addAll(ethWallets);
-        wallets.addAll(klayWallets);
-
-        wallets.forEach(u ->
-                walletRepository.updateWalletInfo(u.getStatus(), u.getUpdatedAt(), u.getWalletId())
+        wallets.addAll(ethHenesisWalletService.getAllUserWallet().stream()
+                .filter(e -> walletRepository.findByWalletId(e.getWalletId()).isEmpty()).collect(Collectors.toList())
+        );
+        wallets.addAll(klayHenesisWalletService.getAllUserWallet().stream()
+                .filter(k -> walletRepository.findByWalletId(k.getWalletId()).isEmpty())
+                .collect(Collectors.toList())
+        );
+        wallets.forEach(wallet ->
+                walletRepository.findByWalletId(wallet.getWalletId())
+                        .ifPresent(e ->{
+                            e.setStatus(wallet.getStatus());
+                            e.setUpdatedAt(wallet.getUpdatedAt());
+                            walletRepository.save(e);
+                        })
         );
     }
 
+    @Async
+    @Scheduled(fixedRate = 5000, initialDelay = 1000)
+    public void updateFlushedTransactionStatus() {
+        List<Transaction> transactions = new ArrayList<>();
+        transactions.addAll(
+                ethHenesisWalletService.getTransactions(updatedAt).stream()
+                        .filter(Transaction::isDesired)
+                        .collect(Collectors.toList())
+        );
+        transactions.addAll(
+                klayHenesisWalletService.getTransactions(updatedAt).stream()
+                        .filter(Transaction::isDesired)
+                        .collect(Collectors.toList())
+        );
 
-    public void mappingActionBy(Transaction transaction, Situation situation) {
-        // 상황에 따른 액션 맵핑
-        updateActionSupplier.supply(situation).doAction(transaction);
+        transactions.forEach(tx ->{
+            flushedTransactionRepository.findByTransactionId(tx.getTransactionId())
+                    .ifPresent(f ->{
+                        f.setStatus(tx.getStatus());
+                        f.setUpdatedAt(tx.getUpdatedAt());
+                        flushedTransactionRepository.save(f);
+                    });
+        });
     }
 }

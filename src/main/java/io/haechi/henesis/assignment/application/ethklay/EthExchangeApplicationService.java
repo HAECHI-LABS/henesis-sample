@@ -1,6 +1,6 @@
 package io.haechi.henesis.assignment.application.ethklay;
 
-import io.haechi.henesis.assignment.domain.ethklay.EthKlayHenesisWalletClient;
+import io.haechi.henesis.assignment.domain.ethklay.EthKlayWalletService;
 import io.haechi.henesis.assignment.domain.ethklay.FlushedTransactionRepository;
 import io.haechi.henesis.assignment.domain.ethklay.WalletRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,10 +12,10 @@ public class EthExchangeApplicationService extends ExchangeApplicationService {
 
 
     public EthExchangeApplicationService(
-            @Qualifier("ethHenesisWalletService") EthKlayHenesisWalletClient ethKlayHenesisWalletClient,
+            @Qualifier("ethHenesisWalletService") EthKlayWalletService ethHenesisWalletClient,
             WalletRepository walletRepository,
             FlushedTransactionRepository flushedTransactionRepository
     ) {
-        super(ethKlayHenesisWalletClient, walletRepository, flushedTransactionRepository);
+        super(ethHenesisWalletClient, walletRepository, flushedTransactionRepository);
     }
 }

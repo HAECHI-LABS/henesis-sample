@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
-
 @Repository
+@Transactional
 public interface WalletRepository extends JpaRepository<Wallet, String>, JpaSpecificationExecutor<Wallet> {
 
 
@@ -23,6 +23,7 @@ public interface WalletRepository extends JpaRepository<Wallet, String>, JpaSpec
     @Modifying
     @Query("UPDATE Wallet u SET u.status = :status, u.updatedAt = :updatedAt  WHERE u.walletId = :walletId")
     void updateWalletInfo(@Param("status") String status, @Param("updatedAt") String updatedAt, @Param("walletId") String walletId);
+
 
 
 }

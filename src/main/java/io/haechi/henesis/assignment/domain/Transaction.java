@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.domain;
 
+import io.haechi.henesis.assignment.domain.ethklay.Amount;
 import lombok.*;
 
 import javax.persistence.*;
@@ -30,8 +31,6 @@ public class Transaction {
     private String transactionHash;
     private String createdAt;
     private String updatedAt;
-
-    private Amount feeAmount;
 
     private String walletId;
     private String walletName;
@@ -134,6 +133,9 @@ public class Transaction {
     }
 
 
+    public boolean isDesired(){
+        return this.isConfirmed()||this.isReverted()||this.isFailed();
+    }
     public boolean isDeposit() {
         return this.transferType.equals("DEPOSIT");
     }
@@ -158,14 +160,17 @@ public class Transaction {
         return !this.status.equals(status);
     }
 
+
+
     public Situation situation() {
-        if (this.isDeposit() && this.isConfirmed())
+        if (this.isDeposit() && this.isConfirmed()) {
             return Situation.DEPOSIT_CONFIRMED;
-
-        if (this.isWithdrawal() && this.isReverted() || this.isFailed())
+        }
+        if (this.isWithdrawal() && this.isReverted() || this.isFailed()) {
             return Situation.ROLLBACK;
+        }
 
-        return Situation.UPDATE_STATUS;
+        return Situation.WITHDRAWAL_CONFIRMED;
     }
 
 }

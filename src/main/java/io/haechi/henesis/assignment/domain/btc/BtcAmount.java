@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.domain;
+package io.haechi.henesis.assignment.domain.btc;
 
 import lombok.NoArgsConstructor;
 
@@ -9,39 +9,39 @@ import java.math.BigInteger;
 
 @Embeddable
 @NoArgsConstructor
-public class Amount {
+public class BtcAmount {
     private BigInteger amount;
 
-    private Amount(String value) {
+    private BtcAmount(String value) {
         this.amount = new BigInteger(value.substring(2), 16);
     }
 
-    private Amount(BigInteger value) {
+    private BtcAmount(BigInteger value) {
         this.amount = value;
     }
 
-    private Amount(Amount value) {
+    private BtcAmount(BtcAmount value) {
         this.amount = value.amount;
     }
 
-    private Amount(Double amount) {
-        this.amount = BigDecimal.valueOf(amount * Math.pow(10, 18)).toBigInteger();
+    private BtcAmount(Double amount) {
+        this.amount = BigDecimal.valueOf(amount * Math.pow(10, 8)).toBigInteger();
     }
 
-    public static Amount of(String value) {
-        return new Amount(value);
+    public static BtcAmount of(String value) {
+        return new BtcAmount(value);
     }
 
-    public static Amount of(BigInteger value) {
-        return new Amount(value);
+    public static BtcAmount of(BigInteger value) {
+        return new BtcAmount(value);
     }
 
-    public static Amount of(Amount value) {
-        return new Amount(value);
+    public static BtcAmount of(BtcAmount value) {
+        return new BtcAmount(value);
     }
 
-    public static Amount of(Double amount) {
-        return new Amount(amount);
+    public static BtcAmount of(Double amount) {
+        return new BtcAmount(amount);
     }
 
     public String toHexString() {
@@ -49,14 +49,14 @@ public class Amount {
     }
 
     public Double toDouble() {
-        return this.amount.doubleValue() / (BigInteger.TEN.pow(18)).doubleValue();
+        return this.amount.doubleValue() / (BigInteger.TEN.pow(8)).doubleValue();
     }
 
-    public void add(Amount value) {
+    public void add(BtcAmount value) {
         this.amount = this.amount.add(value.amount);
     }
 
-    public void subtract(Amount value) {
+    public void subtract(BtcAmount value) {
         if (this.amount.compareTo(value.amount) < 0) {
             throw new IllegalStateException(
                     "balance cannot be negative."
@@ -65,7 +65,7 @@ public class Amount {
         this.amount = this.amount.subtract(value.amount);
     }
 
-    public void mul(Amount value) {
+    public void mul(BtcAmount value) {
         if (amount.compareTo(BigInteger.ZERO) < 0) {
             throw new IllegalStateException(
                     "cannot multiply by negative value."
@@ -74,7 +74,7 @@ public class Amount {
         this.amount = this.amount.multiply(value.amount);
     }
 
-    public void div(Amount value) {
+    public void div(BtcAmount value) {
         if (amount.compareTo(BigInteger.ZERO) <= 0) {
             throw new IllegalStateException(
                     "cannot divide by non-positive value."
@@ -83,7 +83,7 @@ public class Amount {
         this.amount = this.amount.divide(value.amount);
     }
 
-    public int compareTo(Amount value) {
+    public int compareTo(BtcAmount value) {
 
         return this.amount.compareTo(value.amount);
     }

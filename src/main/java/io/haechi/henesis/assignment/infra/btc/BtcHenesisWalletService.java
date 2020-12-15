@@ -1,6 +1,6 @@
 package io.haechi.henesis.assignment.infra.btc;
 
-import io.haechi.henesis.assignment.domain.Amount;
+import io.haechi.henesis.assignment.domain.ethklay.Amount;
 import io.haechi.henesis.assignment.domain.Transaction;
 import io.haechi.henesis.assignment.domain.btc.*;
 import io.haechi.henesis.assignment.infra.btc.dto.*;
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Qualifier("btcHenesisWalletService")
 public class BtcHenesisWalletService implements BtcHenesisWalletClient {
     private final RestTemplate restTemplate;
     private final String walletId;
@@ -38,17 +39,33 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
         //param.add("passphrase",passphrase);
 
         DepositAddressJsonObject response = restTemplate.postForEntity(
-                String.format("/btc/wallets/%s", walletId),
+                String.format("/btc/wallets/%s/deposit-addresses", walletId),
                 param,
                 DepositAddressJsonObject.class
         ).getBody();
 
-
-        return null;
+        assert response != null;
+        return DepositAddress.of(
+                response.getDepositAddressId(),
+                response.getName(),
+                response.getAddress(),
+                response.getPub(),
+                response.getCreatedAt()
+        );
     }
 
     @Override
-    public Amount getWalletBalance() {
+    public BtcAmount getEstimatedFee(){
+        GetEstimatedFeeJsonObject response = restTemplate.getForEntity(
+                String.format("/btc/wallets/%s/estimated-fee",walletId),
+                GetEstimatedFeeJsonObject.class
+        ).getBody();
+
+        return BtcAmount.of(response.getEstimatedFee());
+    }
+
+    @Override
+    public BtcAmount getWalletBalance() {
         List<GetWalletBalanceJsonObject> response = Arrays.asList(
                 Objects.requireNonNull(restTemplate.getForEntity(
                         String.format("/btc/wallets/%s/balance", walletId),
@@ -56,8 +73,9 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
                 ).getBody())
         );
 
-        return Amount.of(response.stream().findFirst().get().getSpendableAmount());
+        return BtcAmount.of(response.stream().findFirst().get().getSpendableAmount());
     }
+
 
     @Override
     public Wallet getWalletInfo(){
@@ -83,11 +101,12 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
     }
 
     @Override
-    public Transaction transfer(Amount amount, String to) {
+    public Transaction transfer(BtcAmount amount, String to) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
         param.add("amount", amount.toHexString());
         param.add("to", to);
+        param.add("passphrase",passphrase);
 
         BtcTransactionJsonObject response = restTemplate.postForEntity(
                 String.format("btc/wallets/%s/transfer/", walletId),

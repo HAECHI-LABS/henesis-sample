@@ -11,15 +11,9 @@ import org.springframework.stereotype.Service;
 public class BalanceUpdateAction implements UpdateAction {
 
     private final WalletRepository walletRepository;
-    private final TransactionRepository transactionRepository;
-    private final FlushedTransactionRepository flushedTransactionRepository;
 
-    public BalanceUpdateAction(WalletRepository walletRepository,
-                               TransactionRepository transactionRepository,
-                               FlushedTransactionRepository flushedTransactionRepository) {
+    public BalanceUpdateAction(WalletRepository walletRepository) {
         this.walletRepository = walletRepository;
-        this.transactionRepository = transactionRepository;
-        this.flushedTransactionRepository = flushedTransactionRepository;
     }
 
 
@@ -29,22 +23,13 @@ public class BalanceUpdateAction implements UpdateAction {
         Wallet wallet = walletRepository.findByWalletId(transaction.getWalletId()).orElseThrow(
                 () -> new IllegalArgumentException(String.format("Can Not Found UserWallet '%s','%s'", transaction.getWalletName(), transaction.getWalletId())));
 
-        // check duplicated Transaction
-
-        if (transactionRepository.existsByTransactionIdAndStatus(
-                transaction.getTransactionId(),
-                transaction.getStatus())
-                || flushedTransactionRepository.existsByTransactionIdAndStatus(
-                transaction.getTransactionId(),
-                transaction.getStatus())) {
-            return;
+        try{
+            wallet.increaseBalanceBy(transaction.getAmount());
+            walletRepository.save(wallet);
+        }catch (Exception e){
+            log.info("ERROR : Fail To Update User Wallet Balance");
         }
 
-        wallet.increaseBalanceBy(transaction.getAmount());
-        walletRepository.save(wallet);
-
-
-        //walletRepository.updateWalletBalance(wallet.getBalance(), wallet.getWalletId());
         log.info(String.format("%s : Update Balance..!", transaction.situation()));
 
     }

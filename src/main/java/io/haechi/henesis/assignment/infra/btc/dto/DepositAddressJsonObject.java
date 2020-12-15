@@ -5,12 +5,11 @@ import lombok.*;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DepositAddressJsonObject {
     @JsonProperty("id")
-    private int id;
+    private String depositAddressId;
     @JsonProperty("name")
     private String name;
     @JsonProperty("address")

@@ -133,9 +133,10 @@ public class Transaction {
     }
 
 
-    public boolean isDesired(){
-        return this.isConfirmed()||this.isReverted()||this.isFailed();
+    public boolean isDesired() {
+        return this.isConfirmed() || this.isReverted() || this.isFailed();
     }
+
     public boolean isDeposit() {
         return this.transferType.equals("DEPOSIT");
     }
@@ -156,11 +157,6 @@ public class Transaction {
         return this.status.equals("FAILED");
     }
 
-    public boolean canUpdateStatus(String status) {
-        return !this.status.equals(status);
-    }
-
-
 
     public Situation situation() {
         if (this.isDeposit() && this.isConfirmed()) {
@@ -170,7 +166,7 @@ public class Transaction {
             return Situation.ROLLBACK;
         }
 
-        return Situation.WITHDRAWAL_CONFIRMED;
+        return Situation.NOTHING_TO_DO;
     }
 
 }

@@ -1,6 +1,9 @@
 package io.haechi.henesis.assignment.application.ethklay;
 
-import io.haechi.henesis.assignment.application.ethklay.dto.*;
+import io.haechi.henesis.assignment.application.ethklay.dto.CreateWalletRequest;
+import io.haechi.henesis.assignment.application.ethklay.dto.FlushRequest;
+import io.haechi.henesis.assignment.application.ethklay.dto.TransferRequest;
+import io.haechi.henesis.assignment.application.ethklay.dto.TransferResponse;
 import io.haechi.henesis.assignment.domain.Transaction;
 import io.haechi.henesis.assignment.domain.ethklay.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +30,10 @@ public abstract class ExchangeApplicationService {
 
     @Transactional
     public void createUserWallet(CreateWalletRequest request) {
-        try{
+        try {
             Wallet wallet = ethKlayWalletService.createUserWallet(request.getWalletName());
             walletRepository.save(wallet);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.info("ERROR : Can Not Create User Wallet.");
         }
 
@@ -60,8 +63,7 @@ public abstract class ExchangeApplicationService {
         try {
             walletRepository.save(wallet);
             ethKlayWalletService.transfer(request.getAmount(), request.getTo());
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             log.info("ERROR : Can Not Transfer");
         }
 
@@ -91,15 +93,12 @@ public abstract class ExchangeApplicationService {
                     )
             );
 
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             log.info("ERROR : Can Not Flush");
         }
 
         log.info("Flush Requested..!");
     }
-
-
 
 
     /**

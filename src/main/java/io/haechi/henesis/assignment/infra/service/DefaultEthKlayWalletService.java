@@ -26,7 +26,7 @@ public class DefaultEthKlayWalletService implements EthKlayWalletService {
 
     @Override
     public Transaction transfer(Amount amount, String to) {
-        return this.walletServiceCallTemplate(()->this.transfer(amount, to));
+        return this.walletServiceCallTemplate(() -> this.transfer(amount, to));
     }
 
     @Override
@@ -36,12 +36,12 @@ public class DefaultEthKlayWalletService implements EthKlayWalletService {
 
     @Override
     public Transaction flushAll(List<String> userWalletIds) {
-        return this.walletServiceCallTemplate(()->this.flushAll(userWalletIds));
+        return this.walletServiceCallTemplate(() -> this.flushAll(userWalletIds));
     }
 
     @Override
     public List<Transaction> getTransactions(String updatedAt) {
-        return this.walletServiceCallTemplate(()->this.getTransactions(updatedAt));
+        return this.walletServiceCallTemplate(() -> this.getTransactions(updatedAt));
     }
 
     @Override
@@ -54,18 +54,16 @@ public class DefaultEthKlayWalletService implements EthKlayWalletService {
         return this.walletServiceCallTemplate(this::getAllMasterWallet);
     }
 
-
-
-    private interface WalletServiceRequestCallBack<T> {
-        T send() throws Exception;
-    }
-
     protected <T> T walletServiceCallTemplate(WalletServiceRequestCallBack<T> callback) {
         try {
             return callback.send();
         } catch (Exception e) {
             throw new InternalServerException(e.getMessage(), ErrorCode.INTERNAL_SERVER);
         }
+    }
+
+    private interface WalletServiceRequestCallBack<T> {
+        T send() throws Exception;
     }
 
 }

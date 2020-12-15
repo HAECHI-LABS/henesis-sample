@@ -96,7 +96,7 @@ public class MonitoringApplicationService {
         );
         wallets.forEach(wallet ->
                 walletRepository.findByWalletId(wallet.getWalletId())
-                        .ifPresent(e ->{
+                        .ifPresent(e -> {
                             e.setStatus(wallet.getStatus());
                             e.setUpdatedAt(wallet.getUpdatedAt());
                             walletRepository.save(e);
@@ -119,9 +119,9 @@ public class MonitoringApplicationService {
                         .collect(Collectors.toList())
         );
 
-        transactions.forEach(tx ->{
+        transactions.forEach(tx -> {
             flushedTransactionRepository.findByTransactionId(tx.getTransactionId())
-                    .ifPresent(f ->{
+                    .ifPresent(f -> {
                         f.setStatus(tx.getStatus());
                         f.setUpdatedAt(tx.getUpdatedAt());
                         flushedTransactionRepository.save(f);

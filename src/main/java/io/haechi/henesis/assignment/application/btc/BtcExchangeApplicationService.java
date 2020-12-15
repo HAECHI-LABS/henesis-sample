@@ -69,7 +69,7 @@ public class BtcExchangeApplicationService {
         }
 
         if (balance.compareTo(amount) < 0) {
-            throw new IllegalStateException(String.format("Not Enough Balance in %s..!",depositAddress.getName()));
+            throw new IllegalStateException(String.format("Not Enough Balance in %s..!", depositAddress.getName()));
         }
 
 

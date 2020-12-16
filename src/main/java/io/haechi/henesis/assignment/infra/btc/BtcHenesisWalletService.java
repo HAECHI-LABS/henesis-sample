@@ -1,6 +1,5 @@
 package io.haechi.henesis.assignment.infra.btc;
 
-import io.haechi.henesis.assignment.domain.Transaction;
 import io.haechi.henesis.assignment.domain.btc.*;
 import io.haechi.henesis.assignment.infra.btc.dto.*;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +14,7 @@ import java.util.Objects;
 
 @Service
 @Qualifier("btcHenesisWalletService")
-public class BtcHenesisWalletService implements BtcHenesisWalletClient {
+public class BtcHenesisWalletService implements BtcWalletService {
     private final RestTemplate restTemplate;
     private final String walletId;
     private final String passphrase;
@@ -43,7 +42,6 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
                 DepositAddressJsonObject.class
         ).getBody();
 
-        assert response != null;
         return DepositAddress.of(
                 response.getDepositAddressId(),
                 response.getName(),
@@ -83,7 +81,6 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
                 GetWalletAddressJsonObject.class
         ).getBody();
 
-        assert response != null;
         return Wallet.of(
                 response.getId(),
                 response.getName(),
@@ -100,7 +97,7 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
     }
 
     @Override
-    public Transaction transfer(BtcAmount amount, String to) {
+    public void transfer(BtcAmount amount, String to) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
         param.add("amount", amount.toHexString());
@@ -112,17 +109,16 @@ public class BtcHenesisWalletService implements BtcHenesisWalletClient {
                 param,
                 BtcTransactionJsonObject.class
         ).getBody();
-
-        return null;
     }
 
     @Override
-    public List<BtcTransaction> getTransfers(String updatedAt) {
+    public List<BtcTransaction> getTransactions(String updatedAt) {
         GetTransfersJsonObject response = restTemplate.getForEntity(
-                String.format("btc/transfers?updatedAtGte={updatedAtGte}&size={size}/"),
+                String.format("btc/transfers?updatedAtGte={updatedAtGte}&size={size}&page={page}/"),
                 GetTransfersJsonObject.class,
                 updatedAt, 50
         ).getBody();
+
         return null;
     }
 

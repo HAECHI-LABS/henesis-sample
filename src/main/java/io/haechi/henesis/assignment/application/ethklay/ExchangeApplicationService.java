@@ -4,7 +4,7 @@ import io.haechi.henesis.assignment.application.ethklay.dto.CreateWalletRequest;
 import io.haechi.henesis.assignment.application.ethklay.dto.FlushRequest;
 import io.haechi.henesis.assignment.application.ethklay.dto.TransferRequest;
 import io.haechi.henesis.assignment.application.ethklay.dto.TransferResponse;
-import io.haechi.henesis.assignment.domain.Transaction;
+import io.haechi.henesis.assignment.domain.ethklay.Transaction;
 import io.haechi.henesis.assignment.domain.ethklay.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,6 +58,7 @@ public abstract class ExchangeApplicationService {
                     ethKlayWalletService.getMasterWalletBalance()
             );
             walletRepository.save(wallet);
+            log.info(String.format("Update Balance (%s)", wallet.getName()));
             ethKlayWalletService.transfer(request.getAmount(), request.getTo());
             log.info(String.format("Transfer Requested..! (%s)", wallet.getName()));
         } catch (Exception e) {
@@ -85,7 +86,7 @@ public abstract class ExchangeApplicationService {
                             transaction.getUpdatedAt()
                     )
             );
-            log.info(String.format("Flush Requested..! (%s)",transaction.getBlockchain()));
+            log.info(String.format("Flush Requested..! (%s)", transaction.getBlockchain()));
         } catch (Exception e) {
             log.info("ERROR : Can Not Flush..!");
         }

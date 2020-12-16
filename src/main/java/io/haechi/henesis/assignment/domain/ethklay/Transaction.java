@@ -1,6 +1,6 @@
-package io.haechi.henesis.assignment.domain;
+package io.haechi.henesis.assignment.domain.ethklay;
 
-import io.haechi.henesis.assignment.domain.ethklay.Amount;
+import io.haechi.henesis.assignment.domain.Situation;
 import lombok.*;
 
 import javax.persistence.*;
@@ -160,10 +160,10 @@ public class Transaction {
 
     public Situation situation() {
         if (this.isDeposit() && this.isConfirmed()) {
-            return Situation.DEPOSIT_CONFIRMED;
+            return Situation.DEPOSIT_ETH_KLAY;
         }
         if (this.isWithdrawal() && this.isReverted() || this.isFailed()) {
-            return Situation.ROLLBACK;
+            return Situation.ROLLBACK_ETH_KLAY;
         }
 
         return Situation.NOTHING_TO_DO;

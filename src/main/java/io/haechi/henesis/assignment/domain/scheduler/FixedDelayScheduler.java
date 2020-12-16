@@ -2,12 +2,12 @@ package io.haechi.henesis.assignment.domain.scheduler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.stereotype.Service;
 
 
-@Service
 @Slf4j
-public class FixedDelayScheduler implements Scheduler {
+public class FixedDelayScheduler {
+
+        /**implements Scheduler {
     private final long delay;
     private final RunnerService runnerService;
 
@@ -48,4 +48,5 @@ public class FixedDelayScheduler implements Scheduler {
     public void runner() {
         this.runnerService.run();
     }
+         **/
 }

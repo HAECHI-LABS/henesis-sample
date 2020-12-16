@@ -10,9 +10,14 @@ import org.springframework.stereotype.Service;
 public class BalanceUpdateAction implements UpdateAction {
 
     private final WalletRepository walletRepository;
+    private final TransactionRepository transactionRepository;
 
-    public BalanceUpdateAction(WalletRepository walletRepository) {
+    public BalanceUpdateAction(
+            WalletRepository walletRepository,
+            TransactionRepository transactionRepository
+    ) {
         this.walletRepository = walletRepository;
+        this.transactionRepository = transactionRepository;
     }
 
 
@@ -25,11 +30,9 @@ public class BalanceUpdateAction implements UpdateAction {
         try {
             wallet.increaseBalanceBy(transaction.getAmount());
             walletRepository.save(wallet);
+            log.info(String.format("%s : Update Balance..! (%s)", transaction.situation(),transaction.getWalletName()));
         } catch (Exception e) {
             log.info("ERROR : Fail To Update User Wallet Balance");
         }
-
-        log.info(String.format("%s : Update Balance..!", transaction.situation()));
-
     }
 }

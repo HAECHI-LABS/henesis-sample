@@ -10,24 +10,19 @@ import lombok.*;
 public class BtcTransferResponse {
     private String name;
     private BtcAmount amount;
-    private BtcAmount balance;
-
 
     private BtcTransferResponse(
             String name,
-            BtcAmount amount,
-            BtcAmount balance
+            BtcAmount amount
     ){
         this.name=name;
         this.amount =amount;
-        this.balance =balance;
     }
 
-    public static BtcTransferResponse of(String name, BtcAmount amount, BtcAmount balance) {
+    public static BtcTransferResponse of(String name, BtcAmount amount) {
         return new BtcTransferResponse(
                 name,
-                amount,
-                balance
+                amount
         );
     }
 }

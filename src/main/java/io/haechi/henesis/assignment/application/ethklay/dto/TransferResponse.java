@@ -13,28 +13,22 @@ import lombok.Setter;
 public class TransferResponse {
     private String walletName;
     private Double amount;
-    private Double walletBalance;
-
 
     private TransferResponse(
             String walletName,
-            Amount amount,
-            Amount walletBalance
+            Amount amount
     ){
         this.walletName = walletName;
         this.amount = amount.toDouble();
-        this.walletBalance = walletBalance.toDouble();
     }
 
     public static TransferResponse of(
             String walletName,
-            Amount amount,
-            Amount walletBalance
+            Amount amount
     ){
         return new TransferResponse(
                 walletName,
-                amount,
-                walletBalance
+                amount
         );
     }
 

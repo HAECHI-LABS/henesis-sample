@@ -10,20 +10,12 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreateDepositAddressResponse {
     private String name;
-    private String address;
 
-    private CreateDepositAddressResponse(
-            String name,
-            String address
-    ) {
+    private CreateDepositAddressResponse(String name) {
         this.name = name;
-        this.address = address;
     }
 
-    public static CreateDepositAddressResponse of(String name, String address) {
-        return new CreateDepositAddressResponse(
-                name,
-                address
-        );
+    public static CreateDepositAddressResponse of(String name) {
+        return new CreateDepositAddressResponse(name);
     }
 }

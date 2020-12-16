@@ -57,17 +57,12 @@ public class Amount {
     }
 
 
-    public void withdrawBy(Amount value, Amount balance, Amount spendableAmount) {
-        if (this.amount.compareTo(value.amount) < 0) {
-            throw new IllegalStateException(
-                    "balance cannot be negative."
-            );
-        }
+    public void withdrawBy(Amount value, Amount spendableAmount) {
         // 출금 가능 여부 판단
-        if (balance.isLessThen(value) < 0) {
+        if (this.amount.compareTo(value.amount) < 0) {
             throw new IllegalStateException("Not Enough User Wallet Balance..!");
         }
-        if (spendableAmount.isLessThen(balance) < 0) {
+        if (spendableAmount.amount.compareTo(value.amount) < 0) {
             throw new IllegalStateException("Not Enough Master Wallet Balance..!");
         }
 

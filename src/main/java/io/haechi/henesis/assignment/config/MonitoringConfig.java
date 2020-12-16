@@ -18,7 +18,7 @@ public class MonitoringConfig {
         Map<Situation, UpdateAction> s = new HashMap<>();
         s.put(Situation.DEPOSIT_CONFIRMED, balanceUpdater);
         s.put(Situation.ROLLBACK, balanceUpdater);
-        s.put(Situation.UPDATE_STATUS, txStatusUpdater);
+        s.put(Situation.NOTHING_TO_DO, txStatusUpdater);
 
         return new ActionSupplier<>(s);
     }

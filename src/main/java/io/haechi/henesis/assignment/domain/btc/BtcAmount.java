@@ -56,6 +56,21 @@ public class BtcAmount {
         this.amount = this.amount.add(value.amount);
     }
 
+    public void withdrawBy(BtcAmount value, BtcAmount feeAmount, BtcAmount spendableAmount){
+        // 수수료 포함 금액
+        value.add(feeAmount);
+
+        if (this.amount.compareTo(value.amount) < 0) {
+            throw new IllegalStateException("Not Enough Deposit Address Balance..!");
+        }
+        if (spendableAmount.amount.compareTo(value.amount) < 0) {
+            throw new IllegalStateException("Not Enough Wallet Balance..!");
+        }
+        this.amount = this.amount.subtract(value.amount);
+    }
+
+
+
     public void subtract(BtcAmount value) {
         if (this.amount.compareTo(value.amount) < 0) {
             throw new IllegalStateException(
@@ -83,7 +98,7 @@ public class BtcAmount {
         this.amount = this.amount.divide(value.amount);
     }
 
-    public int compareTo(BtcAmount value) {
+    public int isLessThen(BtcAmount value) {
 
         return this.amount.compareTo(value.amount);
     }

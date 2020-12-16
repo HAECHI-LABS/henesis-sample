@@ -63,16 +63,19 @@ public class MonitoringApplicationService {
         );
         try {
             List<Transaction> newTransaction = transactions.stream()
-                    .filter(tx -> transactionRepository.findAllByDetailId(tx.getDetailId()).isEmpty())
+                    .filter(tx -> transactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
                     .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
                     .collect(Collectors.toList());
+            newTransaction.forEach(
+                    t->System.out.println(t.getTransactionId())
+            );
             transactionRepository.saveAll(newTransaction);
+            newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).doAction(tx));
 
         } catch (Exception e) {
             log.info("ERROR : Fail To Save New Transaction.");
         }
 
-        transactions.forEach(tx -> updateActionSupplier.supply(tx.situation()).doAction(tx));
 
         transactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(u -> {
             this.updatedAt = u.getUpdatedAt();

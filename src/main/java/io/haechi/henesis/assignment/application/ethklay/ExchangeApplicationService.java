@@ -52,28 +52,21 @@ public abstract class ExchangeApplicationService {
             throw new IllegalStateException("User Wallet Is NOT ACTIVE Status");
         }
 
-        // 해당 사용자 지갑이 속한 마스터지갑 잔고 조회
-        Amount spendableAmount = ethKlayWalletService.getMasterWalletBalance();
-        Amount balance = wallet.getBalance();
-        Amount amount = request.getAmount();
-
-        // 사용자 지갑 잔고 차감
-        balance.withdrawBy(amount, balance, spendableAmount);
-
         try {
+            wallet.getBalance().withdrawBy(
+                    request.getAmount(),
+                    ethKlayWalletService.getMasterWalletBalance()
+            );
             walletRepository.save(wallet);
             ethKlayWalletService.transfer(request.getAmount(), request.getTo());
+            log.info(String.format("Transfer Requested..! (%s)", wallet.getName()));
         } catch (Exception e) {
             log.info("ERROR : Can Not Transfer");
         }
 
-        log.info(String.format("User Wallet(%s) Balance : %s", wallet.getName(), balance.toHexString()));
-
-
         return TransferResponse.of(
                 wallet.getName(),
-                request.getAmount(),
-                balance
+                request.getAmount()
         );
     }
 
@@ -92,12 +85,11 @@ public abstract class ExchangeApplicationService {
                             transaction.getUpdatedAt()
                     )
             );
-
+            log.info(String.format("Flush Requested..! (%s)",transaction.getBlockchain()));
         } catch (Exception e) {
-            log.info("ERROR : Can Not Flush");
+            log.info("ERROR : Can Not Flush..!");
         }
 
-        log.info("Flush Requested..!");
     }
 
 

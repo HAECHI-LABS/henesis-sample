@@ -26,14 +26,14 @@ public class CreateWalletResponse {
             String status,
             String createdAt,
             String updatedAt
-    ){
-        this.id =id;
-        this.name =name;
+    ) {
+        this.id = id;
+        this.name = name;
         this.address = address;
         this.blockchain = blockchain;
-        this.status =status;
-        this.createdAt =createdAt;
-        this.updatedAt =updatedAt;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public static CreateWalletResponse of(
@@ -44,7 +44,7 @@ public class CreateWalletResponse {
             String status,
             String createdAt,
             String updatedAt
-    ){
+    ) {
         return new CreateWalletResponse(
                 id,
                 name,

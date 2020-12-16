@@ -1,8 +1,8 @@
 package io.haechi.henesis.assignment.application.ethklay;
 
 import io.haechi.henesis.assignment.domain.ActionSupplier;
-import io.haechi.henesis.assignment.domain.Transaction;
-import io.haechi.henesis.assignment.domain.TransactionRepository;
+import io.haechi.henesis.assignment.domain.ethklay.Transaction;
+import io.haechi.henesis.assignment.domain.ethklay.TransactionRepository;
 import io.haechi.henesis.assignment.domain.UpdateAction;
 import io.haechi.henesis.assignment.domain.ethklay.EthKlayWalletService;
 import io.haechi.henesis.assignment.domain.ethklay.FlushedTransactionRepository;
@@ -66,14 +66,11 @@ public class MonitoringApplicationService {
                     .filter(tx -> transactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
                     .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
                     .collect(Collectors.toList());
-            newTransaction.forEach(
-                    t->System.out.println(t.getTransactionId())
-            );
             transactionRepository.saveAll(newTransaction);
-            newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).doAction(tx));
+            newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
 
         } catch (Exception e) {
-            log.info("ERROR : Fail To Save New Transaction.");
+            log.info("ERROR : Fail To Update Transactions And Wallet");
         }
 
 

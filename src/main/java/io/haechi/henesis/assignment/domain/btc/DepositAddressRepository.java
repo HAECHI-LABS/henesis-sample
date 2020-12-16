@@ -12,4 +12,6 @@ import java.util.Optional;
 @Transactional
 public interface DepositAddressRepository extends JpaRepository<DepositAddress, String>, JpaSpecificationExecutor<DepositAddress> {
     Optional<DepositAddress> findByDepositAddressId(String depositAddressId);
+
+    Optional<DepositAddress> findByAddress(String address);
 }

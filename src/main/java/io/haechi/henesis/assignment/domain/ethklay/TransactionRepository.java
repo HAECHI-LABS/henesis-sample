@@ -1,7 +1,6 @@
-package io.haechi.henesis.assignment.domain;
+package io.haechi.henesis.assignment.domain.ethklay;
 
 
-import io.haechi.henesis.assignment.domain.ethklay.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.query.Param;
@@ -17,9 +16,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
 
     Optional<Transaction> findByDetailId(int detailId);
-
-    List<Transaction> findAllByDetailId(int detailId);
-
     List<Transaction> findAllByTransactionId(String transactionId);
 
     Optional<Transaction> findTopByOrderByUpdatedAtDesc();

@@ -4,7 +4,7 @@ import io.haechi.henesis.assignment.application.btc.dto.BtcTransferRequest;
 import io.haechi.henesis.assignment.application.btc.dto.BtcTransferResponse;
 import io.haechi.henesis.assignment.application.btc.dto.CreateDepositAddressRequest;
 import io.haechi.henesis.assignment.application.btc.dto.CreateDepositAddressResponse;
-import io.haechi.henesis.assignment.domain.btc.BtcHenesisWalletClient;
+import io.haechi.henesis.assignment.domain.btc.BtcWalletService;
 import io.haechi.henesis.assignment.domain.btc.DepositAddress;
 import io.haechi.henesis.assignment.domain.btc.DepositAddressRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +17,13 @@ import javax.transaction.Transactional;
 @Service
 public class BtcExchangeApplicationService {
 
-    private final BtcHenesisWalletClient btcHenesisWalletClient;
+    private final BtcWalletService btcWalletService;
     private final DepositAddressRepository depositAddressRepository;
 
     public BtcExchangeApplicationService(
-            @Qualifier("btcHenesisWalletService") BtcHenesisWalletClient btcHenesisWalletClient,
+            @Qualifier("btcHenesisWalletService") BtcWalletService btcWalletService,
             DepositAddressRepository depositAddressRepository) {
-        this.btcHenesisWalletClient = btcHenesisWalletClient;
+        this.btcWalletService = btcWalletService;
         this.depositAddressRepository = depositAddressRepository;
     }
 
@@ -32,7 +32,7 @@ public class BtcExchangeApplicationService {
     public CreateDepositAddressResponse createDepositAddress(CreateDepositAddressRequest request) {
 
         try {
-            DepositAddress depositAddress = btcHenesisWalletClient.createDepositAddress(request.getName());
+            DepositAddress depositAddress = btcWalletService.createDepositAddress(request.getName());
             depositAddressRepository.save(depositAddress);
             log.info(String.format("Creating Deposit Address (%s)", request.getName()));
         } catch (Exception e) {
@@ -49,20 +49,20 @@ public class BtcExchangeApplicationService {
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Can Not Found Deposit Address (%s)", request.getDepositAddressId())));
 
         // 지갑 상태가 ACTIVE 가 아닌 경우 에러 발생
-        if (!btcHenesisWalletClient.getWalletInfo().getStatus().equals("ACTIVE")) {
+        if (!btcWalletService.getWalletInfo().getStatus().equals("ACTIVE")) {
             throw new IllegalStateException("Wallet is NOT ACTIVE Status");
         }
 
         try {
             depositAddress.getBalance().withdrawBy(
                     request.getAmount(),
-                    btcHenesisWalletClient.getEstimatedFee(),
-                    btcHenesisWalletClient.getWalletBalance()
+                    btcWalletService.getEstimatedFee(),
+                    btcWalletService.getWalletBalance()
             );
             depositAddressRepository.save(depositAddress);
-            log.info("Update Balance");
+            log.info(String.format("Update Balance (%s)",depositAddress.getName()));
             // 마스터 지갑에서 코인/토큰 전송하기 API 호출
-            btcHenesisWalletClient.transfer(
+            btcWalletService.transfer(
                     request.getAmount(),
                     request.getTo()
             );

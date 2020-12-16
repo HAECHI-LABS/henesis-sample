@@ -1,11 +1,8 @@
 package io.haechi.henesis.assignment.domain.btc;
 
-
-import io.haechi.henesis.assignment.domain.Transaction;
-
 import java.util.List;
 
-public interface BtcHenesisWalletClient {
+public interface BtcWalletService {
 
 
     DepositAddress createDepositAddress(String name);
@@ -14,11 +11,11 @@ public interface BtcHenesisWalletClient {
 
     Wallet getWalletInfo();
 
-    Transaction transfer(BtcAmount amount, String to);
+    void transfer(BtcAmount amount, String to);
 
     BtcAmount getEstimatedFee();
 
-    List<BtcTransaction> getTransfers(String updatedAt);
+    List<BtcTransaction> getTransactions(String updatedAt);
 
     List<DepositAddress> getAllDepositAddress();
 

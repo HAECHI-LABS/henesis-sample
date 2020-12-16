@@ -1,6 +1,7 @@
 package io.haechi.henesis.assignment.config;
 
 import io.haechi.henesis.assignment.domain.*;
+import io.haechi.henesis.assignment.domain.UpdateBalanceAction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,13 +13,15 @@ public class MonitoringConfig {
 
     @Bean
     public ActionSupplier<UpdateAction> actionSupplier(
-            BalanceUpdateAction balanceUpdater,
-            StatusUpdateAction txStatusUpdater
+            UpdateBalanceAction updateBalanceAction
     ) {
         Map<Situation, UpdateAction> s = new HashMap<>();
-        s.put(Situation.DEPOSIT_CONFIRMED, balanceUpdater);
-        s.put(Situation.ROLLBACK, balanceUpdater);
-        s.put(Situation.NOTHING_TO_DO, txStatusUpdater);
+        s.put(Situation.DEPOSIT_ETH_KLAY, updateBalanceAction);
+        s.put(Situation.ROLLBACK_ETH_KLAY, updateBalanceAction);
+        s.put(Situation.DEPOSIT_BTC, updateBalanceAction);
+        s.put(Situation.ROLLBACK_BTC, updateBalanceAction);
+
+        s.put(Situation.NOTHING_TO_DO, null);
 
         return new ActionSupplier<>(s);
     }

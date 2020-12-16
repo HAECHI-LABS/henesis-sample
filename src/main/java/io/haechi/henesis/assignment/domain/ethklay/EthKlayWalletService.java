@@ -1,8 +1,6 @@
 package io.haechi.henesis.assignment.domain.ethklay;
 
 
-import io.haechi.henesis.assignment.domain.Transaction;
-
 import java.util.List;
 
 public interface EthKlayWalletService {

@@ -22,7 +22,7 @@ public class UpdateBalanceAction implements UpdateAction {
             DepositAddressRepository depositAddressRepository
     ) {
         this.walletRepository = walletRepository;
-        this.depositAddressRepository =depositAddressRepository;
+        this.depositAddressRepository = depositAddressRepository;
     }
 
 
@@ -35,7 +35,7 @@ public class UpdateBalanceAction implements UpdateAction {
         try {
             wallet.increaseBalanceBy(transaction.getAmount());
             walletRepository.save(wallet);
-            log.info(String.format("%s : Update Balance..! (%s)", transaction.situation(),transaction.getWalletName()));
+            log.info(String.format("%s : Update Balance..! (%s)", transaction.situation(), transaction.getWalletName()));
         } catch (Exception e) {
             log.info("ERROR : Fail To Update User Wallet Balance");
         }

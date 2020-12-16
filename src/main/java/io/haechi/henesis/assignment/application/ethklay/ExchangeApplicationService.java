@@ -4,7 +4,6 @@ import io.haechi.henesis.assignment.application.ethklay.dto.CreateWalletRequest;
 import io.haechi.henesis.assignment.application.ethklay.dto.FlushRequest;
 import io.haechi.henesis.assignment.application.ethklay.dto.TransferRequest;
 import io.haechi.henesis.assignment.application.ethklay.dto.TransferResponse;
-import io.haechi.henesis.assignment.domain.ethklay.Transaction;
 import io.haechi.henesis.assignment.domain.ethklay.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,23 +46,15 @@ public abstract class ExchangeApplicationService {
         Wallet wallet = walletRepository.findByWalletId(request.getUserWalletId())
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Can Not Found User Wallet %s", request.getUserWalletId())));
 
-        // 사용자 지갑 상태가 ACTIVE 가 아닌 경우 에러 발생
-        if (!wallet.getStatus().equals("ACTIVE")) {
-            throw new IllegalStateException("User Wallet Is NOT ACTIVE Status");
-        }
+        wallet.withdrawBy(
+                request.getAmount(),
+                ethKlayWalletService.getMasterWalletBalance()
+        );
+        walletRepository.save(wallet);
+        log.info(String.format("Update Balance (%s)", wallet.getName()));
 
-        try {
-            wallet.getBalance().withdrawBy(
-                    request.getAmount(),
-                    ethKlayWalletService.getMasterWalletBalance()
-            );
-            walletRepository.save(wallet);
-            log.info(String.format("Update Balance (%s)", wallet.getName()));
-            ethKlayWalletService.transfer(request.getAmount(), request.getTo());
-            log.info(String.format("Transfer Requested..! (%s)", wallet.getName()));
-        } catch (Exception e) {
-            log.info("ERROR : Can Not Transfer");
-        }
+        ethKlayWalletService.transfer(request.getAmount(), request.getTo());
+        log.info(String.format("Transfer Requested..! (%s)", wallet.getName()));
 
         return TransferResponse.of(
                 wallet.getName(),
@@ -75,21 +66,19 @@ public abstract class ExchangeApplicationService {
     public void flush(FlushRequest request) {
 
         List<String> userWalletIds = ethKlayWalletService.getUserWalletIds();
-        try {
-            Transaction transaction = ethKlayWalletService.flushAll(userWalletIds);
-            flushedTransactionRepository.save(
-                    FlushedTransaction.of(
-                            transaction.getTransactionId(),
-                            transaction.getBlockchain(),
-                            transaction.getStatus(),
-                            transaction.getCreatedAt(),
-                            transaction.getUpdatedAt()
-                    )
-            );
-            log.info(String.format("Flush Requested..! (%s)", transaction.getBlockchain()));
-        } catch (Exception e) {
-            log.info("ERROR : Can Not Flush..!");
-        }
+
+        Transaction transaction = ethKlayWalletService.flushAll(userWalletIds);
+        flushedTransactionRepository.save(
+                FlushedTransaction.of(
+                        transaction.getTransactionId(),
+                        transaction.getBlockchain(),
+                        transaction.getStatus(),
+                        transaction.getCreatedAt(),
+                        transaction.getUpdatedAt()
+                )
+        );
+        log.info(String.format("Flush Requested..! (%s)", transaction.getBlockchain()));
+
 
     }
 

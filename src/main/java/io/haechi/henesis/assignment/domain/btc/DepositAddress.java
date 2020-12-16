@@ -1,4 +1,5 @@
 package io.haechi.henesis.assignment.domain.btc;
+
 import lombok.*;
 
 import javax.persistence.*;
@@ -60,4 +61,7 @@ public class DepositAddress {
         this.balance.add(amount);
     }
 
+    public void withdrawBy(BtcAmount amount, BtcAmount estimatedFee, BtcAmount walletBalance) {
+        this.getBalance().subtractBy(amount, estimatedFee, walletBalance);
+    }
 }

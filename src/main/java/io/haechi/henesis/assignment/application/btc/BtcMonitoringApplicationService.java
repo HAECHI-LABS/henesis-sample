@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ public class BtcMonitoringApplicationService {
     }
 
 
+    @Transactional
     @Scheduled(fixedRate = 2000, initialDelay = 500)
     public void updateTransactions() {
 
@@ -40,17 +42,11 @@ public class BtcMonitoringApplicationService {
                 .filter(BtcTransaction::isDesired)
                 .collect(Collectors.toList());
 
-        try {
-            List<BtcTransaction> newTransaction = btcTransactions.stream()
-                    .filter(tx -> btcTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
-                    .collect(Collectors.toList());
-            btcTransactionRepository.saveAll(newTransaction);
-            newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
-
-        } catch (Exception e) {
-            log.info("ERROR : Fail To Update Transactions And Deposit Address");
-        }
-
+        List<BtcTransaction> newTransaction = btcTransactions.stream()
+                .filter(tx -> btcTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
+                .collect(Collectors.toList());
+        btcTransactionRepository.saveAll(newTransaction);
+        newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
 
         btcTransactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(u -> {
             this.updatedAt = u.getUpdatedAt();

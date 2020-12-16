@@ -29,12 +29,12 @@ public enum ErrorCode {
     private final int value;
     private final String message;
 
-    private ErrorCode(int value, String message) {
+    ErrorCode(int value, String message) {
         this.value = value;
         this.message = message;
     }
 
-    private ErrorCode(int value) {
+    ErrorCode(int value) {
         this.value = value;
         this.message = "";
     }

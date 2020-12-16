@@ -1,6 +1,8 @@
 package io.haechi.henesis.assignment.config;
 
-import io.haechi.henesis.assignment.domain.*;
+import io.haechi.henesis.assignment.domain.ActionSupplier;
+import io.haechi.henesis.assignment.domain.Situation;
+import io.haechi.henesis.assignment.domain.UpdateAction;
 import io.haechi.henesis.assignment.domain.UpdateBalanceAction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

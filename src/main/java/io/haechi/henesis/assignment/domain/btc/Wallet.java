@@ -1,6 +1,9 @@
 package io.haechi.henesis.assignment.domain.btc;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -19,7 +22,7 @@ public class Wallet {
     private String createdAt;
 
 
-    private Wallet (
+    private Wallet(
             String walletId,
             String name,
             String address,
@@ -31,9 +34,9 @@ public class Wallet {
             String status,
             boolean whitelistActivated,
             String createdAt
-    ){
+    ) {
         this.walletId = walletId;
-        this.name =name;
+        this.name = name;
         this.address = address;
         this.orgId = orgId;
         this.keyAddress = keyAddress;
@@ -57,7 +60,7 @@ public class Wallet {
             String status,
             boolean whitelistActivated,
             String createdAt
-    ){
+    ) {
         return new Wallet(
                 walletId,
                 name,

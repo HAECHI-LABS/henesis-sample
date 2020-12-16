@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +48,7 @@ public class MonitoringApplicationService {
         this.updateActionSupplier = updateActionSupplier;
     }
 
-
+    @Transactional
     @Scheduled(fixedRate = 2000, initialDelay = 500)
     public void updateTransactions() {
         List<Transaction> transactions = new ArrayList<>();
@@ -61,18 +62,13 @@ public class MonitoringApplicationService {
                         .filter(Transaction::isDesired)
                         .collect(Collectors.toList())
         );
-        try {
-            List<Transaction> newTransaction = transactions.stream()
-                    .filter(tx -> transactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
-                    .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
-                    .collect(Collectors.toList());
-            transactionRepository.saveAll(newTransaction);
-            newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
 
-        } catch (Exception e) {
-            log.info("ERROR : Fail To Update Transactions And Wallet");
-        }
-
+        List<Transaction> newTransaction = transactions.stream()
+                .filter(tx -> transactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
+                .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
+                .collect(Collectors.toList());
+        transactionRepository.saveAll(newTransaction);
+        newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
 
         transactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(u -> {
             this.updatedAt = u.getUpdatedAt();
@@ -83,6 +79,7 @@ public class MonitoringApplicationService {
 
     //지갑 상태 업데이트 (CREATING, ACTIVE, INACTIVE)
     @Async
+    @Transactional
     @Scheduled(fixedRate = 6000, initialDelay = 2000)
     public void updateWalletStatus() {
         // 모든 사용자 지갑
@@ -105,6 +102,7 @@ public class MonitoringApplicationService {
     }
 
     @Async
+    @Transactional
     @Scheduled(fixedRate = 5000, initialDelay = 1000)
     public void updateFlushedTransactionStatus() {
         List<Transaction> transactions = new ArrayList<>();

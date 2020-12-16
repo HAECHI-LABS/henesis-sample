@@ -56,7 +56,7 @@ public class BtcAmount {
         this.amount = this.amount.add(value.amount);
     }
 
-    public void withdrawBy(BtcAmount value, BtcAmount feeAmount, BtcAmount spendableAmount){
+    public void subtractBy(BtcAmount value, BtcAmount feeAmount, BtcAmount spendableAmount) {
         // 수수료 포함 금액
         value.add(feeAmount);
 
@@ -68,7 +68,6 @@ public class BtcAmount {
         }
         this.amount = this.amount.subtract(value.amount);
     }
-
 
 
     public void subtract(BtcAmount value) {

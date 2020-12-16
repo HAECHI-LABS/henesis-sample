@@ -17,7 +17,7 @@ public class TransferResponse {
     private TransferResponse(
             String walletName,
             Amount amount
-    ){
+    ) {
         this.walletName = walletName;
         this.amount = amount.toDouble();
     }
@@ -25,7 +25,7 @@ public class TransferResponse {
     public static TransferResponse of(
             String walletName,
             Amount amount
-    ){
+    ) {
         return new TransferResponse(
                 walletName,
                 amount

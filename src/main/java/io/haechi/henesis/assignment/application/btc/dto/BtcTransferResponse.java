@@ -1,8 +1,10 @@
 package io.haechi.henesis.assignment.application.btc.dto;
 
 import io.haechi.henesis.assignment.domain.btc.BtcAmount;
-import io.haechi.henesis.assignment.domain.ethklay.Amount;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -14,9 +16,9 @@ public class BtcTransferResponse {
     private BtcTransferResponse(
             String name,
             BtcAmount amount
-    ){
-        this.name=name;
-        this.amount =amount;
+    ) {
+        this.name = name;
+        this.amount = amount;
     }
 
     public static BtcTransferResponse of(String name, BtcAmount amount) {

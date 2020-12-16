@@ -54,7 +54,7 @@ public class BtcExchangeApplicationService {
                 btcWalletService.getWalletBalance()
         );
         depositAddressRepository.save(depositAddress);
-        log.info(String.format("Update Balance (%s)",depositAddress.getName()));
+        log.info(String.format("Update Balance (%s)", depositAddress.getName()));
 
         btcWalletService.transfer(request.getAmount(), request.getTo());
         log.info(String.format("Transfer Requested..! (%s)", depositAddress.getName()));

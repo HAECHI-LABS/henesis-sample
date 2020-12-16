@@ -1,4 +1,5 @@
 package io.haechi.henesis.assignment.domain.btc;
+
 import lombok.*;
 
 @Getter

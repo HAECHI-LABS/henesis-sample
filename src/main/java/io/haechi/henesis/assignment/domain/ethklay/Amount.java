@@ -57,8 +57,8 @@ public class Amount {
     }
 
 
-    public void withdrawBy(Amount value, Amount spendableAmount) {
-        // 출금 가능 여부 판단
+    public void subtractBy(Amount value, Amount spendableAmount) {
+
         if (this.amount.compareTo(value.amount) < 0) {
             throw new IllegalStateException("Not Enough User Wallet Balance..!");
         }

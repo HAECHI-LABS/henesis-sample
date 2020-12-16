@@ -78,4 +78,12 @@ public class Wallet {
     }
 
 
+    public void withdrawBy(Amount amount, Amount masterWalletBalance) {
+        // 사용자 지갑 상태가 ACTIVE 가 아닌 경우 에러 발생
+        if (!this.getStatus().equals("ACTIVE")) {
+            throw new IllegalStateException("User Wallet Is NOT ACTIVE Status");
+        }
+
+        this.getBalance().subtractBy(amount, masterWalletBalance);
+    }
 }

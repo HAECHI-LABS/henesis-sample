@@ -13,9 +13,6 @@ public class TransferRequest {
 
     @JsonProperty("userWalletId")
     private String userWalletId;
-
-    @JsonProperty("ticker")
-    private String ticker;
     @JsonProperty("to")
     private String to;
     @JsonProperty("amount")

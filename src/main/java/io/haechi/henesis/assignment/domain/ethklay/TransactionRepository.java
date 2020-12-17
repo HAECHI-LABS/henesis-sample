@@ -17,4 +17,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
     Optional<Transaction> findTopByOrderByUpdatedAtDesc();
 
+    Optional<Transaction> findTopByOrderByUpdatedAtAsc();
+
 }

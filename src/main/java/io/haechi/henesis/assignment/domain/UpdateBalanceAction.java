@@ -48,7 +48,7 @@ public class UpdateBalanceAction implements UpdateAction {
         try {
             depositAddress.increaseBalanceBy(btcTransaction.getAmount());
             depositAddressRepository.save(depositAddress);
-            log.info(String.format("Update Balance..! (%s)", depositAddress.getName()));
+            log.info(String.format("Update Balance..! (%s : %s)", depositAddress.getName(),depositAddress.getBalance().toHexString()));
         } catch (Exception e) {
             log.info("ERROR : Fail To Update Balance");
         }

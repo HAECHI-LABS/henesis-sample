@@ -15,12 +15,15 @@ app:
 
     eth-masterWalletId: 412c293557de5d5cdd052167fb3fdf43
     eth-passphrase: passphrase
+    eth-size: 500
 
     btc-walletId: 41113e49eeb84d4194deff7e4df71030
     btc-passphrase: passphrase
+    btc-size: 500
 
     klay-masterWalletId: 060fc685a5f2b0c9d97a560f43536991
     klay-passphrase: passphrase
+    klay-size: 500
 
 spring:
   datasource:

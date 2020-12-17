@@ -11,23 +11,23 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TransferResponse {
-    private String walletName;
-    private Double amount;
+    private String name;
+    private String amount;
 
     private TransferResponse(
-            String walletName,
-            Amount amount
+            String name,
+            String amount
     ) {
-        this.walletName = walletName;
-        this.amount = amount.toDouble();
+        this.name = name;
+        this.amount = amount;
     }
 
     public static TransferResponse of(
-            String walletName,
-            Amount amount
+            String name,
+            String amount
     ) {
         return new TransferResponse(
-                walletName,
+                name,
                 amount
         );
     }

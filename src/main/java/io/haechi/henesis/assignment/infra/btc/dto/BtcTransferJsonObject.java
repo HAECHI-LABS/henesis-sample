@@ -13,7 +13,7 @@ public class BtcTransferJsonObject {
     @JsonProperty("walletId")
     private String walletId;
     @JsonProperty("outputIndex")
-    private Integer outputIndex;
+    private int outputIndex;
     @JsonProperty("transaction")
     private BtcTransactionJsonObject transaction;
     @JsonProperty("receivedAt")
@@ -28,6 +28,8 @@ public class BtcTransferJsonObject {
     private String withdrawalApprovalId;
     @JsonProperty("type")
     private String type;
+    @JsonProperty("confirmation")
+    private String confirmation;
     @JsonProperty("status")
     private String status;
     @JsonProperty("createdAt")

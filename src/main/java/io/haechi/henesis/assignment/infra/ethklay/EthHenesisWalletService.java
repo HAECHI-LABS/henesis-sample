@@ -12,9 +12,10 @@ public class EthHenesisWalletService extends HenesisWalletService {
     public EthHenesisWalletService(
             @Qualifier("restTemplate") RestTemplate restTemplate,
             @Qualifier("ethMasterWalletId") String ethMasterWalletId,
-            @Qualifier("ethPassphrase") String ethPassphrase
+            @Qualifier("ethPassphrase") String ethPassphrase,
+            @Qualifier("ethSize") String ethSize
     ) {
-        super(restTemplate, ethMasterWalletId, ethPassphrase, "ETH");
+        super(restTemplate, ethMasterWalletId, ethPassphrase, "ETH", ethSize);
 
     }
 }

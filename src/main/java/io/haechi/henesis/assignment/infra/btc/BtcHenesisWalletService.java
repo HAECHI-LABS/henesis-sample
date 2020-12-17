@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Qualifier("btcHenesisWalletService")
@@ -18,15 +19,18 @@ public class BtcHenesisWalletService implements BtcWalletService {
     private final RestTemplate restTemplate;
     private final String walletId;
     private final String passphrase;
+    private final String btcSize;
 
     public BtcHenesisWalletService(
             @Qualifier("restTemplate") RestTemplate restTemplate,
             @Qualifier("btcWalletId") String btcWalletId,
-            @Qualifier("btcPassphrase") String btcPassphrase
+            @Qualifier("btcPassphrase") String btcPassphrase,
+            @Qualifier("btcSize") String btcSize
     ) {
         this.restTemplate = restTemplate;
         this.walletId = btcWalletId;
         this.passphrase = btcPassphrase;
+        this.btcSize = btcSize;
     }
 
 
@@ -73,29 +77,6 @@ public class BtcHenesisWalletService implements BtcWalletService {
         return BtcAmount.of(response.stream().findFirst().get().getSpendableAmount());
     }
 
-
-    @Override
-    public Wallet getWalletInfo() {
-        GetWalletAddressJsonObject response = restTemplate.getForEntity(
-                String.format("/btc/wallets/%s/", walletId),
-                GetWalletAddressJsonObject.class
-        ).getBody();
-
-        return Wallet.of(
-                response.getId(),
-                response.getName(),
-                response.getAddress(),
-                response.getOrgId(),
-                response.getAccountKeyJsonObject().getAddress(),
-                response.getAccountKeyJsonObject().getKeyFile(),
-                response.getAccountKeyJsonObject().getPub(),
-                response.getEncryptionKey(),
-                response.getStatus(),
-                response.isWhitelistActivated(),
-                response.getCreatedAt()
-        );
-    }
-
     @Override
     public void transfer(BtcAmount amount, String to) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
@@ -112,34 +93,27 @@ public class BtcHenesisWalletService implements BtcWalletService {
     }
 
     @Override
-    public List<BtcTransaction> getTransactions(String updatedAt) {
+    public List<BtcTransaction> getTransactions(String updatedAtGte) {
         GetTransfersJsonObject response = restTemplate.getForEntity(
-                String.format("btc/transfers?updatedAtGte={updatedAtGte}&size={size}&page={page}/"),
-                GetTransfersJsonObject.class,
-                updatedAt, 50
+                String.format("btc/transfers?updatedAtGte=%s&size=%s",updatedAtGte,btcSize),
+                GetTransfersJsonObject.class
         ).getBody();
 
-        return null;
-    }
-
-    @Override
-    public List<DepositAddress> getAllDepositAddress() {
-        List<DepositAddressJsonObject> response = Objects.requireNonNull(restTemplate.getForEntity(
-                String.format("btc/wallets/%s/deposit-addresses/", walletId),
-                GetAllDepositAddressJsonObject.class
-        ).getBody()).getResults();
-
-        return null;
-    }
-
-
-    @Override
-    public List<DepositAddress> getAllWallet() {
-        List<GetWalletAddressJsonObject> response = Arrays.asList(Objects.requireNonNull(restTemplate.getForEntity(
-                "btc/wallets/",
-                GetWalletAddressJsonObject[].class
-        ).getBody()));
-
-        return null;
+        return response.getResults().stream().map(t ->
+                        BtcTransaction.of(
+                                t.getWalletId(),
+                                t.getFeeAmount(),
+                                t.getReceivedAt(),
+                                t.getSendTo(),
+                                t.getType(),
+                                t.getStatus(),
+                                BtcAmount.of(t.getAmount()),
+                                t.getTransaction().getId(),
+                                t.getTransaction().getTransactionHash(),
+                                t.getTransaction().getCreatedAt(),
+                                t.getTransaction().getUpdatedAt()
+                        )
+                ).collect(Collectors.toList()
+        );
     }
 }

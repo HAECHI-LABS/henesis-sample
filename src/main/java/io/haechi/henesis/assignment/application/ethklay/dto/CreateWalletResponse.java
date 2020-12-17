@@ -9,50 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreateWalletResponse {
 
-    private String id;
     private String name;
-    private String address;
-    private String blockchain;
-    private String status;
-    private String createdAt;
-    private String updatedAt;
 
-
-    private CreateWalletResponse(
-            String id,
-            String name,
-            String address,
-            String blockchain,
-            String status,
-            String createdAt,
-            String updatedAt
-    ) {
-        this.id = id;
+    private CreateWalletResponse(String name) {
         this.name = name;
-        this.address = address;
-        this.blockchain = blockchain;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
-    public static CreateWalletResponse of(
-            String id,
-            String name,
-            String address,
-            String blockchain,
-            String status,
-            String createdAt,
-            String updatedAt
-    ) {
-        return new CreateWalletResponse(
-                id,
-                name,
-                address,
-                blockchain,
-                status,
-                createdAt,
-                updatedAt
-        );
+    public static CreateWalletResponse of(String name) {
+        return new CreateWalletResponse(name);
     }
 }

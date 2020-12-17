@@ -20,9 +20,8 @@ public class BtcMonitoringApplicationService {
     private final BtcHenesisWalletService btcHenesisWalletService;
     private final BtcTransactionRepository btcTransactionRepository;
     private final ActionSupplier<UpdateAction> updateActionSupplier;
-
-    private String updatedAtGte = Long.toString(System.currentTimeMillis());
     private final String updatedAtLt = "";
+    private String updatedAtGte = Long.toString(System.currentTimeMillis());
 
     public BtcMonitoringApplicationService(
             @Qualifier("btcHenesisWalletService") BtcHenesisWalletService btcHenesisWalletService,

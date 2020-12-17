@@ -12,7 +12,7 @@ import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value="Ethan")
+@Api(value = "Ethan")
 @RestController
 @RequestMapping("exchange")
 public class ExchangeController {

@@ -1,7 +1,10 @@
 package io.haechi.henesis.assignment.domain;
 
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -12,13 +15,13 @@ public class Pagination {
     private Integer totalCount;
     private Integer pageSize;
 
-    private Pagination (
+    private Pagination(
             String nextUrl,
             String previousUrl,
             Integer totalCount
-    ){
-        this.nextUrl=nextUrl;
-        this.previousUrl=previousUrl;
+    ) {
+        this.nextUrl = nextUrl;
+        this.previousUrl = previousUrl;
         this.totalCount = totalCount;
     }
 
@@ -26,7 +29,7 @@ public class Pagination {
             String nextUrl,
             String previousUrl,
             Integer totalCount
-    ){
+    ) {
         return new Pagination(
                 nextUrl,
                 previousUrl,

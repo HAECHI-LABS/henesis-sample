@@ -1,6 +1,9 @@
 package io.haechi.henesis.assignment.infra.btc;
 
-import io.haechi.henesis.assignment.domain.btc.*;
+import io.haechi.henesis.assignment.domain.btc.BtcAmount;
+import io.haechi.henesis.assignment.domain.btc.BtcTransaction;
+import io.haechi.henesis.assignment.domain.btc.BtcWalletService;
+import io.haechi.henesis.assignment.domain.btc.DepositAddress;
 import io.haechi.henesis.assignment.infra.btc.dto.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -95,25 +98,25 @@ public class BtcHenesisWalletService implements BtcWalletService {
     @Override
     public List<BtcTransaction> getTransactions(String updatedAtGte) {
         GetTransfersJsonObject response = restTemplate.getForEntity(
-                String.format("btc/transfers?updatedAtGte=%s&size=%s",updatedAtGte,btcSize),
+                String.format("btc/transfers?updatedAtGte=%s&size=%s", updatedAtGte, btcSize),
                 GetTransfersJsonObject.class
         ).getBody();
 
         return response.getResults().stream().map(t ->
-                        BtcTransaction.of(
-                                t.getWalletId(),
-                                t.getFeeAmount(),
-                                t.getReceivedAt(),
-                                t.getSendTo(),
-                                t.getType(),
-                                t.getStatus(),
-                                BtcAmount.of(t.getAmount()),
-                                t.getTransaction().getId(),
-                                t.getTransaction().getTransactionHash(),
-                                t.getTransaction().getCreatedAt(),
-                                t.getTransaction().getUpdatedAt()
-                        )
-                ).collect(Collectors.toList()
+                BtcTransaction.of(
+                        t.getWalletId(),
+                        t.getFeeAmount(),
+                        t.getReceivedAt(),
+                        t.getSendTo(),
+                        t.getType(),
+                        t.getStatus(),
+                        BtcAmount.of(t.getAmount()),
+                        t.getTransaction().getId(),
+                        t.getTransaction().getTransactionHash(),
+                        t.getTransaction().getCreatedAt(),
+                        t.getTransaction().getUpdatedAt()
+                )
+        ).collect(Collectors.toList()
         );
     }
 }

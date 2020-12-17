@@ -1,10 +1,12 @@
 package io.haechi.henesis.assignment.domain.btc;
 
 import io.haechi.henesis.assignment.domain.Pagination;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
-
 
 
 @Getter
@@ -17,22 +19,22 @@ public class BtcTransferEvent {
     private BtcTransferEvent(
             Pagination pagination,
             List<BtcTransaction> results
-    ){
-        this.pagination =pagination;
+    ) {
+        this.pagination = pagination;
         this.results = results;
     }
 
     public static BtcTransferEvent of(
             Pagination pagination,
             List<BtcTransaction> results
-    ){
+    ) {
         return new BtcTransferEvent(
                 pagination,
                 results
         );
     }
 
-    public boolean canStop(BtcTransferEvent btcTransferEvent){
+    public boolean canStop(BtcTransferEvent btcTransferEvent) {
         return btcTransferEvent.getPagination().getNextUrl() == null;
     }
 }

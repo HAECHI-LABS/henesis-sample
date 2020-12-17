@@ -1,6 +1,5 @@
 package io.haechi.henesis.assignment.application.ethklay.dto;
 
-import io.haechi.henesis.assignment.domain.ethklay.Amount;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

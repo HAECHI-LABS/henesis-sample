@@ -43,7 +43,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
     public TransferEvent getTransactions(String updatedAtGte) {
         ValueTransferEventsJsonObject response = restTemplate.getForEntity(
                 String.format("%s/value-transfer-events?updatedAtGte=%s&size=%s/"
-                        ,ticker,
+                        , ticker,
                         updatedAtGte,
                         size),
                 ValueTransferEventsJsonObject.class

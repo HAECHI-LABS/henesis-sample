@@ -28,7 +28,7 @@ public class BtcTransaction {
     private String createdAt;
     private String updatedAt;
 
-    private BtcTransaction (
+    private BtcTransaction(
             String walletId,
             String feeAmount,
             String receivedAt,
@@ -40,18 +40,18 @@ public class BtcTransaction {
             String transactionHash,
             String createdAt,
             String updatedAt
-    ){
-        this.walletId=walletId;
-        this.feeAmount=feeAmount;
-        this.receivedAt=receivedAt;
-        this.sendTo=sendTo;
-        this.type=type;
-        this.status=status;
-        this.amount=amount;
-        this.transactionId=transactionId;
-        this.transactionHash=transactionHash;
-        this.createdAt=createdAt;
-        this.updatedAt=updatedAt;
+    ) {
+        this.walletId = walletId;
+        this.feeAmount = feeAmount;
+        this.receivedAt = receivedAt;
+        this.sendTo = sendTo;
+        this.type = type;
+        this.status = status;
+        this.amount = amount;
+        this.transactionId = transactionId;
+        this.transactionHash = transactionHash;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public static BtcTransaction of(
@@ -66,7 +66,7 @@ public class BtcTransaction {
             String transactionHash,
             String createdAt,
             String updatedAt
-    ){
+    ) {
         return new BtcTransaction(
                 walletId,
                 feeAmount,

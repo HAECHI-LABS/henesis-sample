@@ -87,10 +87,11 @@ public class Wallet {
         this.getBalance().subtractBy(amount, masterWalletBalance);
     }
 
-    public boolean isActive(){
+    public boolean isActive() {
         return this.status.equals("ACTIVE");
     }
-    public boolean isNotActive(){
+
+    public boolean isNotActive() {
         return !this.status.equals("ACTIVE");
     }
 }

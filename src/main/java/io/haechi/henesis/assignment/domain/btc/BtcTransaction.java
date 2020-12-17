@@ -28,6 +28,60 @@ public class BtcTransaction {
     private String createdAt;
     private String updatedAt;
 
+    private BtcTransaction (
+            String walletId,
+            String feeAmount,
+            String receivedAt,
+            String sendTo,
+            String type,
+            String status,
+            BtcAmount amount,
+            String transactionId,
+            String transactionHash,
+            String createdAt,
+            String updatedAt
+    ){
+        this.walletId=walletId;
+        this.feeAmount=feeAmount;
+        this.receivedAt=receivedAt;
+        this.sendTo=sendTo;
+        this.type=type;
+        this.status=status;
+        this.amount=amount;
+        this.transactionId=transactionId;
+        this.transactionHash=transactionHash;
+        this.createdAt=createdAt;
+        this.updatedAt=updatedAt;
+    }
+
+    public static BtcTransaction of(
+            String walletId,
+            String feeAmount,
+            String receivedAt,
+            String sendTo,
+            String type,
+            String status,
+            BtcAmount amount,
+            String transactionId,
+            String transactionHash,
+            String createdAt,
+            String updatedAt
+    ){
+        return new BtcTransaction(
+                walletId,
+                feeAmount,
+                receivedAt,
+                sendTo,
+                type,
+                status,
+                amount,
+                transactionId,
+                transactionHash,
+                createdAt,
+                updatedAt
+        );
+    }
+
     public boolean isDesired() {
         return this.isConfirmed() || this.isReverted() || this.isFailed();
     }

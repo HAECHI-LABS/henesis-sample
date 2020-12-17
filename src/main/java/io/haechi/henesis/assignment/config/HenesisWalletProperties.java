@@ -18,4 +18,8 @@ public class HenesisWalletProperties {
     private String klayMasterWalletId;
     private String btcWalletId;
 
+    private String ethSize;
+    private String klaySize;
+    private String btcSize;
+
 }

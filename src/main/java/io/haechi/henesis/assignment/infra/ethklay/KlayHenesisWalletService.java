@@ -11,9 +11,10 @@ public class KlayHenesisWalletService extends HenesisWalletService {
     public KlayHenesisWalletService(
             @Qualifier("restTemplate") RestTemplate restTemplate,
             @Qualifier("klayMasterWalletId") String klayMasterWalletId,
-            @Qualifier("klayPassphrase") String klayPassphrase
+            @Qualifier("klayPassphrase") String klayPassphrase,
+            @Qualifier("klaySize") String klaySize
     ) {
-        super(restTemplate, klayMasterWalletId, klayPassphrase, "KLAY");
+        super(restTemplate, klayMasterWalletId, klayPassphrase, "KLAY", klaySize);
     }
 
 

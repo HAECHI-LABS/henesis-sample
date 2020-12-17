@@ -1,6 +1,5 @@
 package io.haechi.henesis.assignment.application.btc.dto;
 
-import io.haechi.henesis.assignment.domain.btc.BtcAmount;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,17 +10,17 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BtcTransferResponse {
     private String name;
-    private BtcAmount amount;
+    private String amount;
 
     private BtcTransferResponse(
             String name,
-            BtcAmount amount
+            String amount
     ) {
         this.name = name;
         this.amount = amount;
     }
 
-    public static BtcTransferResponse of(String name, BtcAmount amount) {
+    public static BtcTransferResponse of(String name, String amount) {
         return new BtcTransferResponse(
                 name,
                 amount

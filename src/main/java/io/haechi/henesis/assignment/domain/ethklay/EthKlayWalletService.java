@@ -15,7 +15,7 @@ public interface EthKlayWalletService {
 
     Transaction flushAll(List<String> userWalletIds);
 
-    List<Transaction> getTransactions(String updatedAt);
+    TransferEvent getTransactions(String updatedAtGte);
 
     List<Wallet> getAllUserWallet();
 

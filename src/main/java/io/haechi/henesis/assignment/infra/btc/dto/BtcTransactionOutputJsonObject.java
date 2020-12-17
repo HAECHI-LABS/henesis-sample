@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BtcTransactionOutputJsonObject {
     @JsonProperty("outputIndex")
-    private Integer outputIndex;
+    private int outputIndex;
     @JsonProperty("transactionId")
     private String transactionId;
     @JsonProperty("address")
@@ -18,4 +18,6 @@ public class BtcTransactionOutputJsonObject {
     private String amount;
     @JsonProperty("isChange")
     private boolean isChange;
+    @JsonProperty("scriptPubKey")
+    private String scriptPubKey;
 }

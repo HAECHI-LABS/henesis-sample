@@ -9,16 +9,9 @@ public interface BtcWalletService {
 
     BtcAmount getWalletBalance();
 
-    Wallet getWalletInfo();
-
     void transfer(BtcAmount amount, String to);
 
     BtcAmount getEstimatedFee();
 
-    List<BtcTransaction> getTransactions(String updatedAt);
-
-    List<DepositAddress> getAllDepositAddress();
-
-    List<DepositAddress> getAllWallet();
-
+    List<BtcTransaction> getTransactions(String updatedAtGte);
 }

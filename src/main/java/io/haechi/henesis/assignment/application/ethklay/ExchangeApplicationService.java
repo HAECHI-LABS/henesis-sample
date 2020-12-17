@@ -1,9 +1,6 @@
 package io.haechi.henesis.assignment.application.ethklay;
 
-import io.haechi.henesis.assignment.application.ethklay.dto.CreateWalletRequest;
-import io.haechi.henesis.assignment.application.ethklay.dto.FlushRequest;
-import io.haechi.henesis.assignment.application.ethklay.dto.TransferRequest;
-import io.haechi.henesis.assignment.application.ethklay.dto.TransferResponse;
+import io.haechi.henesis.assignment.application.ethklay.dto.*;
 import io.haechi.henesis.assignment.domain.ethklay.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,15 +25,12 @@ public abstract class ExchangeApplicationService {
 
 
     @Transactional
-    public void createUserWallet(CreateWalletRequest request) {
-        try {
-            Wallet wallet = ethKlayWalletService.createUserWallet(request.getWalletName());
-            walletRepository.save(wallet);
-        } catch (Exception e) {
-            log.info("ERROR : Can Not Create User Wallet.");
-        }
+    public CreateWalletResponse createUserWallet(CreateWalletRequest request) {
+        Wallet wallet = ethKlayWalletService.createUserWallet(request.getName());
+        walletRepository.save(wallet);
 
-        log.info(String.format("Creating User Wallet (%s)", request.getWalletName()));
+        log.info(String.format("Creating User Wallet (%s)", request.getName()));
+        return CreateWalletResponse.of(request.getName());
     }
 
     @Transactional
@@ -58,12 +52,12 @@ public abstract class ExchangeApplicationService {
 
         return TransferResponse.of(
                 wallet.getName(),
-                request.getAmount()
+                request.getAmount().toHexString()
         );
     }
 
     @Transactional
-    public void flush(FlushRequest request) {
+    public FlushResponse flush() {
 
         List<String> userWalletIds = ethKlayWalletService.getUserWalletIds();
 
@@ -79,6 +73,11 @@ public abstract class ExchangeApplicationService {
         );
         log.info(String.format("Flush Requested..! (%s)", transaction.getBlockchain()));
 
+        return FlushResponse.of(
+                transaction.getTransactionId(),
+                transaction.getBlockchain(),
+                transaction.getStatus()
+        );
 
     }
 

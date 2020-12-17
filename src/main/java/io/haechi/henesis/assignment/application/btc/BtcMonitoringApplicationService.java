@@ -21,7 +21,8 @@ public class BtcMonitoringApplicationService {
     private final BtcTransactionRepository btcTransactionRepository;
     private final ActionSupplier<UpdateAction> updateActionSupplier;
 
-    private String updatedAt = Long.toString(System.currentTimeMillis());
+    private String updatedAtGte = Long.toString(System.currentTimeMillis());
+    private final String updatedAtLt = "";
 
     public BtcMonitoringApplicationService(
             @Qualifier("btcHenesisWalletService") BtcHenesisWalletService btcHenesisWalletService,
@@ -37,20 +38,26 @@ public class BtcMonitoringApplicationService {
     @Transactional
     @Scheduled(fixedRate = 2000, initialDelay = 500)
     public void updateTransactions() {
-
-        List<BtcTransaction> btcTransactions = btcHenesisWalletService.getTransactions(updatedAt).stream()
+        btcTransactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(
+                gte -> this.updatedAtGte = gte.getUpdatedAt()
+        );
+        List<BtcTransaction> btcTransactions = btcHenesisWalletService.getTransactions(updatedAtGte).stream()
                 .filter(BtcTransaction::isDesired)
-                .collect(Collectors.toList());
-
-        List<BtcTransaction> newTransaction = btcTransactions.stream()
                 .filter(tx -> btcTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
                 .collect(Collectors.toList());
-        btcTransactionRepository.saveAll(newTransaction);
-        newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
 
-        btcTransactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(u -> {
-            this.updatedAt = u.getUpdatedAt();
-        });
+        btcTransactionRepository.saveAll(btcTransactions);
+
+        btcTransactions.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
+
+
+//        btcTransactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(
+//                lt -> this.updatedAtLt = lt.getUpdatedAt()
+//        );
+
+
+//      newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
+
 
     }
 

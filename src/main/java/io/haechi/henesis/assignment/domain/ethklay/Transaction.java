@@ -16,7 +16,6 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private int detailId;
     @Column(name = "from_address")
     private String from;
     @Column(name = "to_address")
@@ -36,7 +35,6 @@ public class Transaction {
     private String walletName;
 
     private Transaction(
-            int detailId,
             String from,
             String to,
             Amount amount,
@@ -52,7 +50,6 @@ public class Transaction {
             String walletId,
             String walletName
     ) {
-        this.detailId = detailId;
         this.from = from;
         this.to = to;
         this.amount = amount;
@@ -82,7 +79,6 @@ public class Transaction {
     }
 
     public static Transaction of(
-            int detailId,
             String from,
             String to,
             String amount,
@@ -99,7 +95,6 @@ public class Transaction {
             String walletName
     ) {
         return new Transaction(
-                detailId,
                 from,
                 to,
                 Amount.of(amount),

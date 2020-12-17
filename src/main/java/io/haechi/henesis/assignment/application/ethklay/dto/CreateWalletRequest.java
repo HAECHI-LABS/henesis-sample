@@ -15,5 +15,5 @@ public class CreateWalletRequest {
 
     @NotNull(message = "walletName must be not null")
     @NotEmpty(message = "walletName must be not empty")
-    private String walletName;
+    private String name;
 }

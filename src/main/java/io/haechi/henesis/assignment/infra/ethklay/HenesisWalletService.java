@@ -1,9 +1,7 @@
 package io.haechi.henesis.assignment.infra.ethklay;
 
-import io.haechi.henesis.assignment.domain.ethklay.Amount;
-import io.haechi.henesis.assignment.domain.ethklay.EthKlayWalletService;
-import io.haechi.henesis.assignment.domain.ethklay.Transaction;
-import io.haechi.henesis.assignment.domain.ethklay.Wallet;
+import io.haechi.henesis.assignment.domain.Pagination;
+import io.haechi.henesis.assignment.domain.ethklay.*;
 import io.haechi.henesis.assignment.infra.ethklay.dto.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -19,17 +17,20 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
     private final String masterWalletId;
     private final String passphrase;
     private final String ticker;
+    private final String size;
 
     public HenesisWalletService(
             RestTemplate restTemplate,
             String maseterWalletId,
             String passphrase,
-            String ticker
+            String ticker,
+            String size
     ) {
         this.restTemplate = restTemplate;
         this.masterWalletId = maseterWalletId;
         this.passphrase = passphrase;
         this.ticker = ticker;
+        this.size = size;
     }
 
 
@@ -39,34 +40,41 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
      * @return
      */
     @Override
-    public List<Transaction> getTransactions(String updatedAt) {
-
+    public TransferEvent getTransactions(String updatedAtGte) {
         ValueTransferEventsJsonObject response = restTemplate.getForEntity(
-                String.format("%s/value-transfer-events?updatedAtGte={updatedAtGte}&size={size}/", ticker),
-                ValueTransferEventsJsonObject.class,
-                updatedAt, 100
+                String.format("%s/value-transfer-events?updatedAtGte=%s&size=%s/"
+                        ,ticker,
+                        updatedAtGte,
+                        size),
+                ValueTransferEventsJsonObject.class
         ).getBody();
 
 
-        return response.getResults().stream().map(t ->
-                Transaction.of(
-                        t.getId(),
-                        t.getFrom(),
-                        t.getTo(),
-                        t.getAmount(),
-                        t.getBlockchain(),
-                        t.getStatus(),
-                        t.getTransactionId(),
-                        t.getTransactionHash(),
-                        t.getCoinSymbol(),
-                        t.getConfirmation(),
-                        t.getTransferType(),
-                        t.getCreatedAt(),
-                        t.getUpdatedAt(),
-                        t.getWalletId(),
-                        t.getWalletName()
-                )
-        ).collect(Collectors.toList());
+        return TransferEvent.of(
+                Pagination.of(
+                        response.getPagination().getNextUrl(),
+                        response.getPagination().getPreviousUrl(),
+                        response.getPagination().getTotalCount()
+                ),
+                response.getResults().stream().map(t ->
+                        Transaction.of(
+                                t.getFrom(),
+                                t.getTo(),
+                                t.getAmount(),
+                                t.getBlockchain(),
+                                t.getStatus(),
+                                t.getTransactionId(),
+                                t.getTransactionHash(),
+                                t.getCoinSymbol(),
+                                t.getConfirmation(),
+                                t.getTransferType(),
+                                t.getCreatedAt(),
+                                t.getUpdatedAt(),
+                                t.getWalletId(),
+                                t.getWalletName()
+                        )
+                ).collect(Collectors.toList())
+        );
     }
 
 

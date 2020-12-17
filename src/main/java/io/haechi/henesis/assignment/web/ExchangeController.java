@@ -7,13 +7,12 @@ import io.haechi.henesis.assignment.application.btc.dto.CreateDepositAddressRequ
 import io.haechi.henesis.assignment.application.btc.dto.CreateDepositAddressResponse;
 import io.haechi.henesis.assignment.application.ethklay.EthExchangeApplicationService;
 import io.haechi.henesis.assignment.application.ethklay.KlayExchangeApplicationService;
-import io.haechi.henesis.assignment.application.ethklay.dto.CreateWalletRequest;
-import io.haechi.henesis.assignment.application.ethklay.dto.FlushRequest;
-import io.haechi.henesis.assignment.application.ethklay.dto.TransferRequest;
-import io.haechi.henesis.assignment.application.ethklay.dto.TransferResponse;
+import io.haechi.henesis.assignment.application.ethklay.dto.*;
+import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+@Api(value="Ethan")
 @RestController
 @RequestMapping("exchange")
 public class ExchangeController {
@@ -37,14 +36,14 @@ public class ExchangeController {
     // 사용자 지갑 생성
     @PostMapping("eth/create-user-wallet/")
     @ResponseStatus(value = HttpStatus.OK)
-    public void createEthWallet(@RequestBody CreateWalletRequest createWalletRequest) {
-        ethExchangeApplicationService.createUserWallet(createWalletRequest);
+    public CreateWalletResponse createEthWallet(@RequestBody CreateWalletRequest createWalletRequest) {
+        return ethExchangeApplicationService.createUserWallet(createWalletRequest);
     }
 
     @PostMapping("klay/create-user-wallet/")
     @ResponseStatus(value = HttpStatus.OK)
-    public void createKlayWallet(@RequestBody CreateWalletRequest createWalletRequest) {
-        klayExchangeApplicationService.createUserWallet(createWalletRequest);
+    public CreateWalletResponse createKlayWallet(@RequestBody CreateWalletRequest createWalletRequest) {
+        return klayExchangeApplicationService.createUserWallet(createWalletRequest);
     }
 
     @PostMapping("btc/create-deposit-address/")
@@ -74,15 +73,15 @@ public class ExchangeController {
     // 집금하기
     @PostMapping("eth/flush/")
     @ResponseStatus(value = HttpStatus.OK)
-    public void flushEth(@RequestBody FlushRequest flushRequest) {
-        ethExchangeApplicationService.flush(flushRequest);
+    public FlushResponse flushEth(@RequestBody FlushRequest flushRequest) {
+        return ethExchangeApplicationService.flush();
     }
 
     // 집금하기
     @PostMapping("klay/flush/")
     @ResponseStatus(value = HttpStatus.OK)
-    public void flushKlay(@RequestBody FlushRequest flushRequest) {
-        klayExchangeApplicationService.flush(flushRequest);
+    public FlushResponse flushKlay(@RequestBody FlushRequest flushRequest) {
+        return klayExchangeApplicationService.flush();
     }
 
 

@@ -70,4 +70,21 @@ public class HenesisWalletConfig {
         return henesisWalletProperties.getBtcPassphrase();
     }
 
+    @Bean
+    @Qualifier("ethSize")
+    public String ethSize(HenesisWalletProperties henesisWalletProperties) {
+        return henesisWalletProperties.getEthSize();
+    }
+
+    @Bean
+    @Qualifier("klaySize")
+    public String klaySize(HenesisWalletProperties henesisWalletProperties) {
+        return henesisWalletProperties.getKlaySize();
+    }
+
+    @Bean
+    @Qualifier("btcSize")
+    public String btcSize(HenesisWalletProperties henesisWalletProperties) {
+        return henesisWalletProperties.getBtcSize();
+    }
 }

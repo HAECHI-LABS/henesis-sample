@@ -61,7 +61,7 @@ public class BtcExchangeApplicationService {
 
         return BtcTransferResponse.of(
                 depositAddress.getName(),
-                request.getAmount()
+                request.getAmount().toHexString()
         );
     }
 }

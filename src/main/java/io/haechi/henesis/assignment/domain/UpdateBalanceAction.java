@@ -48,7 +48,7 @@ public class UpdateBalanceAction implements UpdateAction {
             depositAddressRepository.save(depositAddress);
             log.info(String.format("%s : Update Balance..! (%s)", btcTransaction.situation(), btcTransaction.getReceivedAt()));
         } catch (Exception e) {
-            log.info(String.format("ERROR : Fail To Update Deposit Address Balance. (%s)",btcTransaction.getReceivedAt()));
+            log.info(String.format("ERROR : Fail To Update Deposit Address Balance. (%s)", btcTransaction.getReceivedAt()));
         }
     }
 }

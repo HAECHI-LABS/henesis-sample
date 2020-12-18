@@ -11,8 +11,8 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TransferRequest {
 
-    @JsonProperty("userWalletId")
-    private String userWalletId;
+    @JsonProperty("from")
+    private String from;
     @JsonProperty("to")
     private String to;
     @JsonProperty("amount")

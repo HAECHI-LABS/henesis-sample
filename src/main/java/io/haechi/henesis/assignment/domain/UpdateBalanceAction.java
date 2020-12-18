@@ -27,30 +27,28 @@ public class UpdateBalanceAction implements UpdateAction {
 
     @Override
     public void updateBalance(Transaction transaction) {
-
         Wallet wallet = walletRepository.findByWalletId(transaction.getWalletId()).orElseThrow(
-                () -> new IllegalArgumentException(String.format("Can Not Found UserWallet '%s','%s'", transaction.getWalletName(), transaction.getWalletId())));
+                () -> new IllegalArgumentException(String.format("ERROR : Not Found Wallet. (%s)", transaction.getWalletName())));
 
         try {
             wallet.increaseBalanceBy(transaction.getAmount());
             walletRepository.save(wallet);
             log.info(String.format("%s : Update Balance..! (%s)", transaction.situation(), transaction.getWalletName()));
         } catch (Exception e) {
-            log.info("ERROR : Fail To Update User Wallet Balance");
+            log.info(String.format("ERROR : Fail To Update Wallet Balance. (%s)", transaction.getWalletName()));
         }
     }
 
     @Override
     public void updateBalance(BtcTransaction btcTransaction) {
         DepositAddress depositAddress = depositAddressRepository.findByAddress(btcTransaction.getReceivedAt()).orElseThrow(
-                () -> new IllegalArgumentException(String.format("Not Found Deposit Address (%s)..!", btcTransaction.getReceivedAt())));
-
+                () -> new IllegalArgumentException(String.format("ERROR : Not Found Deposit Address (%s).", btcTransaction.getReceivedAt())));
         try {
             depositAddress.increaseBalanceBy(btcTransaction.getAmount());
             depositAddressRepository.save(depositAddress);
-            log.info(String.format("Update Balance..! (%s : %s)", depositAddress.getName(), depositAddress.getBalance().toHexString()));
+            log.info(String.format("%s : Update Balance..! (%s)", btcTransaction.situation(), btcTransaction.getReceivedAt()));
         } catch (Exception e) {
-            log.info("ERROR : Fail To Update Balance");
+            log.info(String.format("ERROR : Fail To Update Deposit Address Balance. (%s)",btcTransaction.getReceivedAt()));
         }
     }
 }

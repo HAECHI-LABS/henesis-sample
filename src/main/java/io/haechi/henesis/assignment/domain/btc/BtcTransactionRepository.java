@@ -15,10 +15,4 @@ public interface BtcTransactionRepository extends JpaRepository<BtcTransaction, 
 
     Optional<BtcTransaction> findTopByOrderByUpdatedAtDesc();
 
-    Optional<BtcTransaction> findTopByOrderByUpdatedAtAsc();
-
-    boolean existsByTransactionIdAndStatus(
-            @Param("transactionId") String transactionId,
-            @Param("status") String status
-    );
 }

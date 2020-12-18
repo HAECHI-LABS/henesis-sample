@@ -150,7 +150,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
     public List<String> getUserWalletIds() {
 
         List<UserWalletJsonObject> getAllUserWallet = Objects.requireNonNull(restTemplate.getForEntity(
-                String.format("%s/wallets/%s/user-wallets/", ticker, masterWalletId),
+                String.format("%s/wallets/%s/user-wallets?size=%s/", ticker, masterWalletId, "50"),
                 GetAllUserWalletJsonObject.class
         ).getBody()).getResults();
 
@@ -163,7 +163,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
     public List<Wallet> getAllUserWallet() {
 
         List<UserWalletJsonObject> response = Objects.requireNonNull(restTemplate.getForEntity(
-                String.format("%s/wallets/%s/user-wallets/", ticker, masterWalletId),
+                String.format("%s/wallets/%s/user-wallets?size=%s/", ticker, masterWalletId, size),
                 GetAllUserWalletJsonObject.class
         ).getBody()).getResults();
 
@@ -181,7 +181,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
         ).collect(Collectors.toList());
     }
 
-    @Override
+
     public List<Wallet> getAllMasterWallet() {
         List<MasterWalletJsonObject> response = Arrays.asList(Objects.requireNonNull(restTemplate.getForEntity(
                 String.format("%s/wallets/", ticker),

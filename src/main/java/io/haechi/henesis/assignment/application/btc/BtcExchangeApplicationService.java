@@ -31,22 +31,19 @@ public class BtcExchangeApplicationService {
     @Transactional
     public CreateDepositAddressResponse createDepositAddress(CreateDepositAddressRequest request) {
 
-        try {
-            DepositAddress depositAddress = btcWalletService.createDepositAddress(request.getName());
-            depositAddressRepository.save(depositAddress);
-            log.info(String.format("Creating Deposit Address (%s)", request.getName()));
-        } catch (Exception e) {
-            log.info("ERROR : Fail To Create Deposit Address..!");
-        }
+        DepositAddress depositAddress = btcWalletService.createDepositAddress(request.getName());
+        depositAddressRepository.save(depositAddress);
+        log.info(String.format("Creating Deposit Address (%s)", request.getName()));
+
         return CreateDepositAddressResponse.of(request.getName());
     }
 
     @Transactional
     public BtcTransferResponse transfer(BtcTransferRequest request) {
 
-        // 보내는 사용자 지갑 조회 for check and update User Wallet Balance
-        DepositAddress depositAddress = depositAddressRepository.findByDepositAddressId(request.getDepositAddressId())
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Can Not Found Deposit Address (%s)", request.getDepositAddressId())));
+        // 보내는 주소 조회 for check and update Deposit Address Balance
+        DepositAddress depositAddress = depositAddressRepository.findByAddress(request.getFrom())
+                .orElseThrow(() -> new IllegalArgumentException(String.format("ERROR : Can Not Found Deposit Address. (%s)", request.getFrom())));
 
         depositAddress.withdrawBy(
                 request.getAmount(),
@@ -54,7 +51,7 @@ public class BtcExchangeApplicationService {
                 btcWalletService.getWalletBalance()
         );
         depositAddressRepository.save(depositAddress);
-        log.info(String.format("Update Balance (%s)", depositAddress.getName()));
+        log.info(String.format("Withdraw Balance..! (%s)", depositAddress.getName()));
 
         btcWalletService.transfer(request.getAmount(), request.getTo());
         log.info(String.format("Transfer Requested..! (%s)", depositAddress.getName()));

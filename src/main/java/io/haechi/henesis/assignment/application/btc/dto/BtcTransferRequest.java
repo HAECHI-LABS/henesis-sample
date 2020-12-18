@@ -12,6 +12,10 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BtcTransferRequest {
 
+    @NotNull(message = "From Address must be not null")
+    @NotEmpty(message = "From Address must be not empty")
+    private String from;
+
     @NotNull(message = "To Address must be not null")
     @NotEmpty(message = "To Address must be not empty")
     private String to;
@@ -20,7 +24,5 @@ public class BtcTransferRequest {
     @NotEmpty(message = "Amount must be not empty")
     private BtcAmount amount;
 
-    @NotNull(message = "Deposit Address must be not null")
-    @NotEmpty(message = "Deposit Address must be not empty")
-    private String depositAddressId;
+
 }

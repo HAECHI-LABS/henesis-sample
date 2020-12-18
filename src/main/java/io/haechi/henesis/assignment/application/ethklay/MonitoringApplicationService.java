@@ -47,7 +47,6 @@ public class MonitoringApplicationService {
                 .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
                 .collect(Collectors.toList());
 
-
         transactionRepository.saveAll(transactions);
         transactions.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
 
@@ -64,7 +63,7 @@ public class MonitoringApplicationService {
     public void updateWalletStatus() {
         // 모든 사용자 지갑
         ethKlayHenesisWalletService.getAllUserWallet().forEach(u -> {
-            walletRepository.findByWalletId(u.getWalletId()).ifPresent(e -> {
+            walletRepository.findByAddress(u.getAddress()).ifPresent(e -> {
                 e.setStatus(u.getStatus());
                 e.setUpdatedAt(u.getUpdatedAt());
                 walletRepository.save(e);

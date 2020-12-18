@@ -18,7 +18,4 @@ public interface EthKlayWalletService {
     TransferEvent getTransactions(String updatedAtGte);
 
     List<Wallet> getAllUserWallet();
-
-    List<Wallet> getAllMasterWallet();
-
 }

@@ -52,6 +52,7 @@ public class HenesisWalletConfig {
         return henesisWalletProperties.getBtcWalletId();
     }
 
+
     @Bean
     @Qualifier("ethPassphrase")
     public String ethPassphrase(HenesisWalletProperties henesisWalletProperties) {

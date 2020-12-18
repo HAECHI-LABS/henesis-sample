@@ -83,18 +83,4 @@ public class ExchangeController {
     public FlushResponse flushKlay(@RequestBody FlushRequest flushRequest) {
         return klayExchangeApplicationService.flush();
     }
-
-
-    @PostMapping("eth/updateAllWallet/")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void updateEthWalletList() {
-        ethExchangeApplicationService.updateWalletList();
-
-    }
-
-    @PostMapping("klay/updateAllWallet/")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void updateKlayWalletList() {
-        klayExchangeApplicationService.updateWalletList();
-    }
 }

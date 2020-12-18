@@ -20,7 +20,6 @@ public class BtcMonitoringApplicationService {
     private final BtcHenesisWalletService btcHenesisWalletService;
     private final BtcTransactionRepository btcTransactionRepository;
     private final ActionSupplier<UpdateAction> updateActionSupplier;
-    private final String updatedAtLt = "";
     private String updatedAtGte = Long.toString(System.currentTimeMillis());
 
     public BtcMonitoringApplicationService(
@@ -48,16 +47,5 @@ public class BtcMonitoringApplicationService {
         btcTransactionRepository.saveAll(btcTransactions);
 
         btcTransactions.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
-
-
-//        btcTransactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(
-//                lt -> this.updatedAtLt = lt.getUpdatedAt()
-//        );
-
-
-//      newTransaction.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
-
-
     }
-
 }

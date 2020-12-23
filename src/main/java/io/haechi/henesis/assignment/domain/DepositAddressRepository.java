@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.domain.btc;
+package io.haechi.henesis.assignment.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

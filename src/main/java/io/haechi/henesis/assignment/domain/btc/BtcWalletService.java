@@ -1,5 +1,7 @@
 package io.haechi.henesis.assignment.domain.btc;
 
+import io.haechi.henesis.assignment.domain.DepositAddress;
+
 import java.util.List;
 
 public interface BtcWalletService {

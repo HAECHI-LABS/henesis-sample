@@ -5,7 +5,6 @@ import io.haechi.henesis.assignment.domain.UpdateAction;
 import io.haechi.henesis.assignment.domain.ethklay.EthKlayWalletService;
 import io.haechi.henesis.assignment.domain.ethklay.FlushedTransactionRepository;
 import io.haechi.henesis.assignment.domain.ethklay.TransactionRepository;
-import io.haechi.henesis.assignment.domain.ethklay.WalletRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

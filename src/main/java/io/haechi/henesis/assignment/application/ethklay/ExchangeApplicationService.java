@@ -1,6 +1,8 @@
 package io.haechi.henesis.assignment.application.ethklay;
 
 import io.haechi.henesis.assignment.application.ethklay.dto.*;
+import io.haechi.henesis.assignment.domain.DepositAddress;
+import io.haechi.henesis.assignment.domain.DepositAddressRepository;
 import io.haechi.henesis.assignment.domain.ethklay.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,22 +13,22 @@ import java.util.List;
 public abstract class ExchangeApplicationService {
 
     private final EthKlayWalletService ethKlayWalletService;
-    private final WalletRepository walletRepository;
+    private final DepositAddressRepository depositAddressRepository;
     private final FlushedTransactionRepository flushedTransactionRepository;
 
     public ExchangeApplicationService(EthKlayWalletService ethKlayWalletService,
-                                      WalletRepository walletRepository,
+                                      DepositAddressRepository depositAddressRepository,
                                       FlushedTransactionRepository flushedTransactionRepository) {
         this.ethKlayWalletService = ethKlayWalletService;
-        this.walletRepository = walletRepository;
+        this.depositAddressRepository = depositAddressRepository;
         this.flushedTransactionRepository = flushedTransactionRepository;
     }
 
 
     @Transactional
     public CreateWalletResponse createUserWallet(CreateWalletRequest request) {
-        Wallet wallet = ethKlayWalletService.createUserWallet(request.getName());
-        walletRepository.save(wallet);
+        DepositAddress depositAddress = ethKlayWalletService.createDepositAddress(request.getName());
+        this.depositAddressRepository.save(depositAddress);
 
         log.info(String.format("Creating User Wallet (%s)", request.getName()));
         return CreateWalletResponse.of(request.getName());
@@ -36,22 +38,22 @@ public abstract class ExchangeApplicationService {
     public TransferResponse transfer(TransferRequest request) {
 
         // 보내는 사용자 지갑 조회 for check and update User Wallet Balance
-        Wallet wallet = walletRepository.findByAddress(request.getFrom())
+        DepositAddress depositAddress = this.depositAddressRepository.findByAddress(request.getFrom())
                 .orElseThrow(() -> new IllegalArgumentException(String.format("ERROR : Can Not Found User Wallet. (%s)", request.getFrom())));
 
-        wallet.withdrawBy(
+        depositAddress.withdrawBy(
                 request.getAmount(),
                 ethKlayWalletService.getMasterWalletBalance()
         );
 
-        walletRepository.save(wallet);
-        log.info(String.format("Withdraw Balance..! (%s)", wallet.getName()));
+        this.depositAddressRepository.save(depositAddress);
+        log.info(String.format("Withdraw Balance..! (%s)", depositAddress.getName()));
 
         ethKlayWalletService.transfer(request.getAmount(), request.getTo());
-        log.info(String.format("Transfer Requested..! (%s)", wallet.getName()));
+        log.info(String.format("Transfer Requested..! (%s)", depositAddress.getName()));
 
         return TransferResponse.of(
-                wallet.getName(),
+                depositAddress.getName(),
                 request.getAmount().toHexString()
         );
     }

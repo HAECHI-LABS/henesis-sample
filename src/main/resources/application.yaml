@@ -28,9 +28,9 @@ app:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://localhost:5433/henesis
+    username: user
+    password: password
     platform: postgres
     hikari:
       auto-commit: false

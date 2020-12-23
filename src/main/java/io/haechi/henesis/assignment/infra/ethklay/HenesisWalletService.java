@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.infra.ethklay;
 
+import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.Pagination;
 import io.haechi.henesis.assignment.domain.ethklay.*;
 import io.haechi.henesis.assignment.infra.ethklay.dto.*;
@@ -84,7 +85,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
      * @return UserWallet
      */
     @Override
-    public Wallet createUserWallet(String name) {
+    public DepositAddress createDepositAddress(String name) {
 
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
         param.add("name", name);
@@ -97,15 +98,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
         ).getBody();
 
 
-        return Wallet.of(
-                response.getId(),
-                response.getName(),
-                response.getAddress(),
-                response.getBlockchain(),
-                response.getStatus(),
-                masterWalletId,
-                response.getCreatedAt(),
-                response.getUpdatedAt()
+        return DepositAddress.of(
         );
 
     }
@@ -160,7 +153,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
     }
 
     @Override
-    public List<Wallet> getAllUserWallet() {
+    public List<DepositAddress> getAllDepositAddresses() {
 
         List<UserWalletJsonObject> response = Objects.requireNonNull(restTemplate.getForEntity(
                 String.format("%s/wallets/%s/user-wallets?size=%s/", ticker, masterWalletId, size),
@@ -168,40 +161,10 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
         ).getBody()).getResults();
 
         return response.stream().map(u ->
-                Wallet.of(
-                        u.getId(),
-                        u.getName(),
-                        u.getAddress(),
-                        u.getBlockchain(),
-                        u.getStatus(),
-                        masterWalletId,
-                        u.getCreatedAt(),
-                        u.getUpdatedAt()
+                DepositAddress.of(
                 )
         ).collect(Collectors.toList());
     }
-
-
-    public List<Wallet> getAllMasterWallet() {
-        List<MasterWalletJsonObject> response = Arrays.asList(Objects.requireNonNull(restTemplate.getForEntity(
-                String.format("%s/wallets/", ticker),
-                MasterWalletJsonObject[].class
-        ).getBody()));
-
-        return response.stream().map(m ->
-                Wallet.of(
-                        m.getId(),
-                        m.getName(),
-                        m.getAddress(),
-                        m.getBlockchain(),
-                        m.getStatus(),
-                        masterWalletId,
-                        m.getCreatedAt(),
-                        m.getUpdatedAt()
-                )
-        ).collect(Collectors.toList());
-    }
-
 
     /**
      * 사용자 지갑 잔액을 모두 끌어오기 API Call

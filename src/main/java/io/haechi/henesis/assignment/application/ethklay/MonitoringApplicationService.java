@@ -1,6 +1,7 @@
 package io.haechi.henesis.assignment.application.ethklay;
 
 import io.haechi.henesis.assignment.domain.ActionSupplier;
+import io.haechi.henesis.assignment.domain.DepositAddressRepository;
 import io.haechi.henesis.assignment.domain.UpdateAction;
 import io.haechi.henesis.assignment.domain.ethklay.*;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class MonitoringApplicationService {
 
     private final EthKlayWalletService ethKlayHenesisWalletService;
-    private final WalletRepository walletRepository;
+    private final DepositAddressRepository depositAddressRepository;
     private final FlushedTransactionRepository flushedTransactionRepository;
     private final TransactionRepository transactionRepository;
     private final ActionSupplier<UpdateAction> updateActionSupplier;
@@ -24,13 +25,13 @@ public class MonitoringApplicationService {
 
     public MonitoringApplicationService(
             EthKlayWalletService ethKlayHenesisWalletService,
-            WalletRepository walletRepository,
+            DepositAddressRepository depositAddressRepository,
             FlushedTransactionRepository flushedTransactionRepository,
             TransactionRepository transactionRepository,
             ActionSupplier<UpdateAction> updateActionSupplier
     ) {
         this.ethKlayHenesisWalletService = ethKlayHenesisWalletService;
-        this.walletRepository = walletRepository;
+        this.depositAddressRepository = depositAddressRepository;
         this.flushedTransactionRepository = flushedTransactionRepository;
         this.transactionRepository = transactionRepository;
         this.updateActionSupplier = updateActionSupplier;
@@ -62,11 +63,11 @@ public class MonitoringApplicationService {
     @Scheduled(fixedRate = 6000, initialDelay = 2000)
     public void updateWalletStatus() {
         // 모든 사용자 지갑
-        ethKlayHenesisWalletService.getAllUserWallet().forEach(u -> {
-            walletRepository.findByAddress(u.getAddress()).ifPresent(e -> {
+        ethKlayHenesisWalletService.getAllDepositAddresses().forEach(u -> {
+            this.depositAddressRepository.findByAddress(u.getAddress()).ifPresent(e -> {
                 e.setStatus(u.getStatus());
                 e.setUpdatedAt(u.getUpdatedAt());
-                walletRepository.save(e);
+                this.depositAddressRepository.save(e);
             });
         });
     }

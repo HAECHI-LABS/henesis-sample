@@ -3,7 +3,7 @@ package io.haechi.henesis.assignment.infra.btc;
 import io.haechi.henesis.assignment.domain.btc.BtcAmount;
 import io.haechi.henesis.assignment.domain.btc.BtcTransaction;
 import io.haechi.henesis.assignment.domain.btc.BtcWalletService;
-import io.haechi.henesis.assignment.domain.btc.DepositAddress;
+import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.infra.btc.dto.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

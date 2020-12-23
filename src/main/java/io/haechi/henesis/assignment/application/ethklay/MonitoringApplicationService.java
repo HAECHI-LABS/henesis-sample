@@ -2,6 +2,8 @@ package io.haechi.henesis.assignment.application.ethklay;
 
 import io.haechi.henesis.assignment.domain.ActionSupplier;
 import io.haechi.henesis.assignment.domain.DepositAddressRepository;
+import io.haechi.henesis.assignment.domain.Transfer;
+import io.haechi.henesis.assignment.domain.TransferRepository;
 import io.haechi.henesis.assignment.domain.UpdateAction;
 import io.haechi.henesis.assignment.domain.ethklay.*;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +20,7 @@ public class MonitoringApplicationService {
     private final EthKlayWalletService ethKlayHenesisWalletService;
     private final DepositAddressRepository depositAddressRepository;
     private final FlushedTransactionRepository flushedTransactionRepository;
-    private final TransactionRepository transactionRepository;
+    private final TransferRepository transferRepository;
     private final ActionSupplier<UpdateAction> updateActionSupplier;
 
     private String updatedAtGte = Long.toString(System.currentTimeMillis());
@@ -27,13 +29,13 @@ public class MonitoringApplicationService {
             EthKlayWalletService ethKlayHenesisWalletService,
             DepositAddressRepository depositAddressRepository,
             FlushedTransactionRepository flushedTransactionRepository,
-            TransactionRepository transactionRepository,
+            TransferRepository transferRepository,
             ActionSupplier<UpdateAction> updateActionSupplier
     ) {
         this.ethKlayHenesisWalletService = ethKlayHenesisWalletService;
         this.depositAddressRepository = depositAddressRepository;
         this.flushedTransactionRepository = flushedTransactionRepository;
-        this.transactionRepository = transactionRepository;
+        this.transferRepository = transferRepository;
         this.updateActionSupplier = updateActionSupplier;
     }
 
@@ -41,17 +43,17 @@ public class MonitoringApplicationService {
     @Scheduled(fixedRate = 2000, initialDelay = 500)
     public void updateTransactions() {
 
-        List<Transaction> transactions = ethKlayHenesisWalletService.getTransactions(updatedAtGte).getResults()
+        List<Transfer> transactions = ethKlayHenesisWalletService.getTransactions(updatedAtGte).getResults()
                 .stream()
-                .filter(Transaction::isDesired)
-                .filter(tx -> transactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
-                .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
+                .filter(Transfer::isDesired)
+                .filter(tx -> this.transferRepository.findAllByHenesisId(tx.getHenesisId()).isEmpty())
+                .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getHenesisId()).isEmpty())
                 .collect(Collectors.toList());
 
-        transactionRepository.saveAll(transactions);
+        this.transferRepository.saveAll(transactions);
         transactions.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
 
-        transactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(
+        this.transferRepository.findTopByOrderByUpdatedAtDesc().ifPresent(
                 gte -> this.updatedAtGte = gte.getUpdatedAt()
         );
 
@@ -79,11 +81,11 @@ public class MonitoringApplicationService {
 
         TransferEvent ethKlayTransferEvent = ethKlayHenesisWalletService.getTransactions(updatedAtGte);
 
-        List<Transaction> transactions = ethKlayTransferEvent.getResults().stream()
-                .filter(Transaction::isDesired).collect(Collectors.toList());
+        List<Transfer> transactions = ethKlayTransferEvent.getResults().stream()
+                .filter(Transfer::isDesired).collect(Collectors.toList());
 
         transactions.forEach(tx -> {
-            flushedTransactionRepository.findByTransactionId(tx.getTransactionId())
+            flushedTransactionRepository.findByTransactionId(tx.getHenesisId())
                     .ifPresent(f -> {
                         f.setStatus(tx.getStatus());
                         f.setUpdatedAt(tx.getUpdatedAt());

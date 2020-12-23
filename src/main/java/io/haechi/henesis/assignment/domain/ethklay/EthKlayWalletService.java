@@ -2,6 +2,7 @@ package io.haechi.henesis.assignment.domain.ethklay;
 
 
 import io.haechi.henesis.assignment.domain.DepositAddress;
+import io.haechi.henesis.assignment.domain.Transfer;
 
 import java.util.List;
 
@@ -11,11 +12,11 @@ public interface EthKlayWalletService {
 
     Amount getMasterWalletBalance();
 
-    Transaction transfer(Amount amount, String to);
+    Transfer transfer(Amount amount, String to);
 
-    List<String> getUserWalletIds();
+    List<String> getDepositAddressIds();
 
-    Transaction flushAll(List<String> userWalletIds);
+    Transfer flushAll(List<String> userWalletIds);
 
     TransferEvent getTransactions(String updatedAtGte);
 

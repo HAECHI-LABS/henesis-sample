@@ -61,7 +61,7 @@ public abstract class ExchangeApplicationService {
     @Transactional
     public FlushResponse flush() {
 
-        List<String> userWalletIds = ethKlayWalletService.getUserWalletIds();
+        List<String> userWalletIds = ethKlayWalletService.getDepositAddressIds();
 
         Transaction transaction = ethKlayWalletService.flushAll(userWalletIds);
         flushedTransactionRepository.save(

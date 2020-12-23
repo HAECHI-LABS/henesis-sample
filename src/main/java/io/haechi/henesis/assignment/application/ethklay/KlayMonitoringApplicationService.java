@@ -1,10 +1,11 @@
 package io.haechi.henesis.assignment.application.ethklay;
 
 import io.haechi.henesis.assignment.domain.ActionSupplier;
+import io.haechi.henesis.assignment.domain.DepositAddressRepository;
+import io.haechi.henesis.assignment.domain.TransferRepository;
 import io.haechi.henesis.assignment.domain.UpdateAction;
 import io.haechi.henesis.assignment.domain.ethklay.EthKlayWalletService;
 import io.haechi.henesis.assignment.domain.ethklay.FlushedTransactionRepository;
-import io.haechi.henesis.assignment.domain.ethklay.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -15,16 +16,16 @@ public class KlayMonitoringApplicationService extends MonitoringApplicationServi
 
     public KlayMonitoringApplicationService(
             @Qualifier("klayHenesisWalletService") EthKlayWalletService klayHenesisWalletService,
-            WalletRepository walletRepository,
+            DepositAddressRepository depositAddressRepository,
             FlushedTransactionRepository flushedTransactionRepository,
-            TransactionRepository transactionRepository,
+            TransferRepository transferRepository,
             ActionSupplier<UpdateAction> updateActionSupplier
     ) {
         super(
                 klayHenesisWalletService,
-                walletRepository,
+                depositAddressRepository,
                 flushedTransactionRepository,
-                transactionRepository,
+                transferRepository,
                 updateActionSupplier
         );
     }

@@ -1,6 +1,6 @@
 package io.haechi.henesis.assignment.infra.btc;
 
-import io.haechi.henesis.assignment.domain.btc.BtcTransaction;
+import io.haechi.henesis.assignment.domain.Transfer;
 import io.haechi.henesis.assignment.domain.btc.BtcWalletService;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.ethklay.Amount;
@@ -91,25 +91,14 @@ public class BtcHenesisWalletService implements BtcWalletService {
     }
 
     @Override
-    public List<BtcTransaction> getTransactions(String updatedAtGte) {
+    public List<Transfer> getTransactions(String updatedAtGte) {
         GetTransfersJsonObject response = restTemplate.getForEntity(
                 String.format("btc/transfers?updatedAtGte=%s&size=%s", updatedAtGte, btcSize),
                 GetTransfersJsonObject.class
         ).getBody();
 
         return response.getResults().stream().map(t ->
-                BtcTransaction.of(
-                        t.getWalletId(),
-                        t.getFeeAmount(),
-                        t.getReceivedAt(),
-                        t.getSendTo(),
-                        t.getType(),
-                        t.getStatus(),
-                        Amount.of(t.getAmount()),
-                        t.getTransaction().getId(),
-                        t.getTransaction().getTransactionHash(),
-                        t.getTransaction().getCreatedAt(),
-                        t.getTransaction().getUpdatedAt()
+                Transfer.of(
                 )
         ).collect(Collectors.toList()
         );

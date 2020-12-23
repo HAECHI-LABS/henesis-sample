@@ -2,6 +2,7 @@ package io.haechi.henesis.assignment.domain.ethklay;
 
 
 import io.haechi.henesis.assignment.domain.Pagination;
+import io.haechi.henesis.assignment.domain.Transfer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +15,11 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TransferEvent {
     private Pagination pagination;
-    private List<Transaction> results;
+    private List<Transfer> results;
 
     private TransferEvent(
             Pagination pagination,
-            List<Transaction> results
+            List<Transfer> results
     ) {
         this.pagination = pagination;
         this.results = results;
@@ -26,7 +27,7 @@ public class TransferEvent {
 
     public static TransferEvent of(
             Pagination pagination,
-            List<Transaction> results
+            List<Transfer> results
     ) {
         return new TransferEvent(
                 pagination,

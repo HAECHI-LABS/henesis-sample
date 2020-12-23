@@ -2,6 +2,7 @@ package io.haechi.henesis.assignment.infra.ethklay;
 
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.Pagination;
+import io.haechi.henesis.assignment.domain.Transfer;
 import io.haechi.henesis.assignment.domain.ethklay.*;
 import io.haechi.henesis.assignment.infra.ethklay.dto.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -58,21 +59,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
                         response.getPagination().getTotalCount()
                 ),
                 response.getResults().stream().map(t ->
-                        Transaction.of(
-                                t.getFrom(),
-                                t.getTo(),
-                                t.getAmount(),
-                                t.getBlockchain(),
-                                t.getStatus(),
-                                t.getTransactionId(),
-                                t.getTransactionHash(),
-                                t.getCoinSymbol(),
-                                t.getConfirmation(),
-                                t.getTransferType(),
-                                t.getCreatedAt(),
-                                t.getUpdatedAt(),
-                                t.getWalletId(),
-                                t.getWalletName()
+                        Transfer.of(
                         )
                 ).collect(Collectors.toList())
         );
@@ -109,7 +96,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
      * @param
      */
     @Override
-    public Transaction transfer(Amount amount, String to) {
+    public Transfer transfer(Amount amount, String to) {
 
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
@@ -124,7 +111,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
                 TransactionJsonObject.class
         ).getBody();
 
-        return Transaction.newInstanceOf(
+        return Transfer.newInstanceOf(
                 response.getId(),
                 response.getBlockchain(),
                 response.getStatus(),
@@ -140,7 +127,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
      * @return
      */
     @Override
-    public List<String> getUserWalletIds() {
+    public List<String> getDepositAddressIds() {
 
         List<UserWalletJsonObject> getAllUserWallet = Objects.requireNonNull(restTemplate.getForEntity(
                 String.format("%s/wallets/%s/user-wallets?size=%s/", ticker, masterWalletId, "50"),
@@ -173,7 +160,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
      * @return Transaction
      */
     @Override
-    public Transaction flushAll(List<String> userWalletIds) {
+    public Transfer flushAll(List<String> userWalletIds) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
         param.add("ticker", ticker);
@@ -186,7 +173,7 @@ public abstract class HenesisWalletService implements EthKlayWalletService {
                 TransactionJsonObject.class
         ).getBody();
 
-        return Transaction.newInstanceOf(
+        return Transfer.newInstanceOf(
                 response.getId(),
                 response.getBlockchain(),
                 response.getStatus(),

@@ -16,7 +16,7 @@ public class DepositAddress {
     @Id
     @Column(updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     @Column(name = "deposit_address_id")
     private String depositAddressId;
     @Column(name = "master_wallet_id")

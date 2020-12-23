@@ -1,9 +1,9 @@
 package io.haechi.henesis.assignment.application.btc;
 
 import io.haechi.henesis.assignment.domain.ActionSupplier;
+import io.haechi.henesis.assignment.domain.Transfer;
+import io.haechi.henesis.assignment.domain.TransferRepository;
 import io.haechi.henesis.assignment.domain.UpdateAction;
-import io.haechi.henesis.assignment.domain.btc.BtcTransaction;
-import io.haechi.henesis.assignment.domain.btc.BtcTransactionRepository;
 import io.haechi.henesis.assignment.infra.btc.BtcHenesisWalletService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,17 +18,17 @@ import java.util.stream.Collectors;
 @Service
 public class BtcMonitoringApplicationService {
     private final BtcHenesisWalletService btcHenesisWalletService;
-    private final BtcTransactionRepository btcTransactionRepository;
+    private final TransferRepository transferRepository;
     private final ActionSupplier<UpdateAction> updateActionSupplier;
     private String updatedAtGte = Long.toString(System.currentTimeMillis());
 
     public BtcMonitoringApplicationService(
             @Qualifier("btcHenesisWalletService") BtcHenesisWalletService btcHenesisWalletService,
-            BtcTransactionRepository btcTransactionRepository,
+            TransferRepository transferRepository,
             ActionSupplier<UpdateAction> updateActionSupplier
     ) {
         this.btcHenesisWalletService = btcHenesisWalletService;
-        this.btcTransactionRepository = btcTransactionRepository;
+        this.transferRepository = transferRepository;
         this.updateActionSupplier = updateActionSupplier;
     }
 
@@ -36,16 +36,16 @@ public class BtcMonitoringApplicationService {
     @Transactional
     @Scheduled(fixedRate = 2000, initialDelay = 500)
     public void updateTransactions() {
-        btcTransactionRepository.findTopByOrderByUpdatedAtDesc().ifPresent(
+        this.transferRepository.findTopByOrderByUpdatedAtDesc().ifPresent(
                 gte -> this.updatedAtGte = gte.getUpdatedAt()
         );
-        List<BtcTransaction> btcTransactions = btcHenesisWalletService.getTransactions(updatedAtGte).stream()
-                .filter(BtcTransaction::isDesired)
-                .filter(tx -> btcTransactionRepository.findAllByTransactionId(tx.getTransactionId()).isEmpty())
+        List<Transfer> transfers = btcHenesisWalletService.getTransactions(updatedAtGte).stream()
+                .filter(Transfer::isDesired)
+                .filter(tx -> this.transferRepository.findAllByHenesisId(tx.getHenesisId()).isEmpty())
                 .collect(Collectors.toList());
 
-        btcTransactionRepository.saveAll(btcTransactions);
+        this.transferRepository.saveAll(transfers);
 
-        btcTransactions.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
+        transfers.forEach(tx -> updateActionSupplier.supply(tx.situation()).updateBalance(tx));
     }
 }

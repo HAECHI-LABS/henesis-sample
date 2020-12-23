@@ -19,7 +19,6 @@ public class MonitoringApplicationService {
 
     private final EthKlayWalletService ethKlayHenesisWalletService;
     private final DepositAddressRepository depositAddressRepository;
-    private final FlushedTransactionRepository flushedTransactionRepository;
     private final TransferRepository transferRepository;
     private final ActionSupplier<UpdateAction> updateActionSupplier;
 
@@ -28,13 +27,11 @@ public class MonitoringApplicationService {
     public MonitoringApplicationService(
             EthKlayWalletService ethKlayHenesisWalletService,
             DepositAddressRepository depositAddressRepository,
-            FlushedTransactionRepository flushedTransactionRepository,
             TransferRepository transferRepository,
             ActionSupplier<UpdateAction> updateActionSupplier
     ) {
         this.ethKlayHenesisWalletService = ethKlayHenesisWalletService;
         this.depositAddressRepository = depositAddressRepository;
-        this.flushedTransactionRepository = flushedTransactionRepository;
         this.transferRepository = transferRepository;
         this.updateActionSupplier = updateActionSupplier;
     }
@@ -47,7 +44,7 @@ public class MonitoringApplicationService {
                 .stream()
                 .filter(Transfer::isDesired)
                 .filter(tx -> this.transferRepository.findAllByHenesisId(tx.getHenesisId()).isEmpty())
-                .filter(tx -> flushedTransactionRepository.findAllByTransactionId(tx.getHenesisId()).isEmpty())
+                .filter(tx -> !tx.isFlushed())
                 .collect(Collectors.toList());
 
         this.transferRepository.saveAll(transactions);
@@ -71,26 +68,6 @@ public class MonitoringApplicationService {
                 e.setUpdatedAt(u.getUpdatedAt());
                 this.depositAddressRepository.save(e);
             });
-        });
-    }
-
-    @Async
-    @Transactional
-    @Scheduled(fixedRate = 5000, initialDelay = 1000)
-    public void updateFlushedTransactionStatus() {
-
-        TransferEvent ethKlayTransferEvent = ethKlayHenesisWalletService.getTransactions(updatedAtGte);
-
-        List<Transfer> transactions = ethKlayTransferEvent.getResults().stream()
-                .filter(Transfer::isDesired).collect(Collectors.toList());
-
-        transactions.forEach(tx -> {
-            flushedTransactionRepository.findByTransactionId(tx.getHenesisId())
-                    .ifPresent(f -> {
-                        f.setStatus(tx.getStatus());
-                        f.setUpdatedAt(tx.getUpdatedAt());
-                        flushedTransactionRepository.save(f);
-                    });
         });
     }
 }

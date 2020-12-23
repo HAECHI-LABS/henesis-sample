@@ -14,14 +14,11 @@ public abstract class ExchangeApplicationService {
 
     private final EthKlayWalletService ethKlayWalletService;
     private final DepositAddressRepository depositAddressRepository;
-    private final FlushedTransactionRepository flushedTransactionRepository;
 
     public ExchangeApplicationService(EthKlayWalletService ethKlayWalletService,
-                                      DepositAddressRepository depositAddressRepository,
-                                      FlushedTransactionRepository flushedTransactionRepository) {
+                                      DepositAddressRepository depositAddressRepository) {
         this.ethKlayWalletService = ethKlayWalletService;
         this.depositAddressRepository = depositAddressRepository;
-        this.flushedTransactionRepository = flushedTransactionRepository;
     }
 
 
@@ -60,26 +57,26 @@ public abstract class ExchangeApplicationService {
 
     @Transactional
     public FlushResponse flush() {
-
-        List<String> userWalletIds = ethKlayWalletService.getDepositAddressIds();
-
-        Transaction transaction = ethKlayWalletService.flushAll(userWalletIds);
-        flushedTransactionRepository.save(
-                FlushedTransaction.of(
-                        transaction.getTransactionId(),
-                        transaction.getBlockchain(),
-                        transaction.getStatus(),
-                        transaction.getCreatedAt(),
-                        transaction.getUpdatedAt()
-                )
-        );
-        log.info(String.format("Flush Requested..! (%s)", transaction.getBlockchain()));
-
-        return FlushResponse.of(
-                transaction.getTransactionId(),
-                transaction.getBlockchain(),
-                transaction.getStatus()
-        );
+        return null;
+//        List<String> userWalletIds = ethKlayWalletService.getDepositAddressIds();
+//
+//        Transaction transaction = ethKlayWalletService.flushAll(userWalletIds);
+//        flushedTransactionRepository.save(
+//                FlushedTransaction.of(
+//                        transaction.getTransactionId(),
+//                        transaction.getBlockchain(),
+//                        transaction.getStatus(),
+//                        transaction.getCreatedAt(),
+//                        transaction.getUpdatedAt()
+//                )
+//        );
+//        log.info(String.format("Flush Requested..! (%s)", transaction.getBlockchain()));
+//
+//        return FlushResponse.of(
+//                transaction.getTransactionId(),
+//                transaction.getBlockchain(),
+//                transaction.getStatus()
+//        );
 
     }
 }

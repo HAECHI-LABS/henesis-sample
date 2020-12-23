@@ -47,6 +47,7 @@ public class Transfer {
     private String createdAt;
     // TODO: LocalDateTime
     private String updatedAt;
+    private boolean isFlushed;
 
     public static Transfer of(
     ) {

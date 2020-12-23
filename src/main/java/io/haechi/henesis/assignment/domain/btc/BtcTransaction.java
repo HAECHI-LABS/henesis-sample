@@ -1,6 +1,7 @@
 package io.haechi.henesis.assignment.domain.btc;
 
 import io.haechi.henesis.assignment.domain.Situation;
+import io.haechi.henesis.assignment.domain.ethklay.Amount;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,7 +22,7 @@ public class BtcTransaction {
     private String sendTo;
     private String type;
     private String status;
-    private BtcAmount amount;
+    private Amount amount;
 
     private String transactionId;
     private String transactionHash;
@@ -35,7 +36,7 @@ public class BtcTransaction {
             String sendTo,
             String type,
             String status,
-            BtcAmount amount,
+            Amount amount,
             String transactionId,
             String transactionHash,
             String createdAt,
@@ -61,7 +62,7 @@ public class BtcTransaction {
             String sendTo,
             String type,
             String status,
-            BtcAmount amount,
+            Amount amount,
             String transactionId,
             String transactionHash,
             String createdAt,

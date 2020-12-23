@@ -24,6 +24,7 @@ public class Amount {
         this.amount = value.amount;
     }
 
+    // TODO: decimal
     private Amount(Double amount) {
         this.amount = BigDecimal.valueOf(amount * Math.pow(10, 18)).toBigInteger();
     }
@@ -66,6 +67,20 @@ public class Amount {
             throw new IllegalStateException("Not Enough Master Wallet Balance..!");
         }
 
+        this.amount = this.amount.subtract(value.amount);
+    }
+
+    // btc
+    public void subtractBy(Amount value, Amount feeAmount, Amount spendableAmount) {
+        // 수수료 포함 금액
+        value.add(feeAmount);
+
+        if (this.amount.compareTo(value.amount) < 0) {
+            throw new IllegalStateException("Not Enough Deposit Address Balance..!");
+        }
+        if (spendableAmount.amount.compareTo(value.amount) < 0) {
+            throw new IllegalStateException("Not Enough Wallet Balance..!");
+        }
         this.amount = this.amount.subtract(value.amount);
     }
 

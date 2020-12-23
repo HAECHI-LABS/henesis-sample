@@ -1,9 +1,9 @@
 package io.haechi.henesis.assignment.infra.btc;
 
-import io.haechi.henesis.assignment.domain.btc.BtcAmount;
 import io.haechi.henesis.assignment.domain.btc.BtcTransaction;
 import io.haechi.henesis.assignment.domain.btc.BtcWalletService;
 import io.haechi.henesis.assignment.domain.DepositAddress;
+import io.haechi.henesis.assignment.domain.ethklay.Amount;
 import io.haechi.henesis.assignment.infra.btc.dto.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -50,26 +50,21 @@ public class BtcHenesisWalletService implements BtcWalletService {
         ).getBody();
 
         return DepositAddress.of(
-                response.getDepositAddressId(),
-                response.getName(),
-                response.getAddress(),
-                response.getPub(),
-                response.getCreatedAt()
         );
     }
 
     @Override
-    public BtcAmount getEstimatedFee() {
+    public Amount getEstimatedFee() {
         GetEstimatedFeeJsonObject response = restTemplate.getForEntity(
                 String.format("/btc/wallets/%s/estimated-fee", walletId),
                 GetEstimatedFeeJsonObject.class
         ).getBody();
 
-        return BtcAmount.of(response.getEstimatedFee());
+        return Amount.of(response.getEstimatedFee());
     }
 
     @Override
-    public BtcAmount getWalletBalance() {
+    public Amount getWalletBalance() {
         List<GetWalletBalanceJsonObject> response = Arrays.asList(
                 Objects.requireNonNull(restTemplate.getForEntity(
                         String.format("/btc/wallets/%s/balance", walletId),
@@ -77,11 +72,11 @@ public class BtcHenesisWalletService implements BtcWalletService {
                 ).getBody())
         );
 
-        return BtcAmount.of(response.stream().findFirst().get().getSpendableAmount());
+        return Amount.of(response.stream().findFirst().get().getSpendableAmount());
     }
 
     @Override
-    public void transfer(BtcAmount amount, String to) {
+    public void transfer(Amount amount, String to) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
         param.add("amount", amount.toHexString());
@@ -110,7 +105,7 @@ public class BtcHenesisWalletService implements BtcWalletService {
                         t.getSendTo(),
                         t.getType(),
                         t.getStatus(),
-                        BtcAmount.of(t.getAmount()),
+                        Amount.of(t.getAmount()),
                         t.getTransaction().getId(),
                         t.getTransaction().getTransactionHash(),
                         t.getTransaction().getCreatedAt(),

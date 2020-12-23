@@ -1,6 +1,6 @@
 package io.haechi.henesis.assignment.application.btc.dto;
 
-import io.haechi.henesis.assignment.domain.btc.BtcAmount;
+import io.haechi.henesis.assignment.domain.ethklay.Amount;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
@@ -22,7 +22,7 @@ public class BtcTransferRequest {
 
     @NotNull(message = "Amount must be not null")
     @NotEmpty(message = "Amount must be not empty")
-    private BtcAmount amount;
+    private Amount amount;
 
 
 }

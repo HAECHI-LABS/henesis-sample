@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.application.ethklay;
 
+import io.haechi.henesis.assignment.domain.DepositAddressRepository;
 import io.haechi.henesis.assignment.domain.ethklay.EthKlayWalletService;
 import io.haechi.henesis.assignment.domain.ethklay.FlushedTransactionRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,8 +11,8 @@ public class KlayExchangeApplicationService extends ExchangeApplicationService {
 
     public KlayExchangeApplicationService(
             @Qualifier("klayHenesisWalletService") EthKlayWalletService klayHenesisWalletClient,
-            WalletRepository walletRepository,
+            DepositAddressRepository depositAddressRepository,
             FlushedTransactionRepository flushedTransactionRepository) {
-        super(klayHenesisWalletClient, walletRepository, flushedTransactionRepository);
+        super(klayHenesisWalletClient, depositAddressRepository, flushedTransactionRepository);
     }
 }

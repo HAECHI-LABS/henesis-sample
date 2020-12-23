@@ -1,11 +1,9 @@
 package io.haechi.henesis.assignment.domain;
 
-import io.haechi.henesis.assignment.domain.btc.BtcAmount;
 import io.haechi.henesis.assignment.domain.ethklay.Amount;
 import lombok.*;
 
 import javax.persistence.*;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Entity
@@ -48,10 +46,11 @@ public class DepositAddress {
     }
 
 
-    public void increaseBalanceBy(BtcAmount amount) {
+    public void increaseBalanceBy(Amount amount) {
     }
 
-    public void withdrawBy(BtcAmount amount, BtcAmount estimatedFee, BtcAmount walletBalance) {
+    // btc
+    public void withdrawBy(Amount amount, Amount estimatedFee, Amount walletBalance) {
     }
 
     public void withdrawBy(Amount amount, Amount walletBalance) {

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 @Transactional
-public interface TransactionRepository extends JpaRepository<Transaction, String>, JpaSpecificationExecutor<Wallet> {
+public interface TransactionRepository extends JpaRepository<Transaction, String> {
 
     List<Transaction> findAllByTransactionId(String transactionId);
 

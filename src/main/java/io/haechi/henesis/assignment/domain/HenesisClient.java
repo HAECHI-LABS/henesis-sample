@@ -5,7 +5,7 @@ import java.util.List;
 public interface HenesisClient {
     DepositAddress createDepositAddress(String name);
 
-    Transfer transfer(String to, Amount amount);
+    Transfer transfer(String to, String symbol, Amount amount);
 
     Amount getMasterWalletBalance();
 

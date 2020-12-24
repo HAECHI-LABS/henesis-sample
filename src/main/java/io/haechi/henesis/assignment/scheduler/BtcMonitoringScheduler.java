@@ -58,7 +58,7 @@ public class BtcMonitoringScheduler {
                         depositAddress.deposit(transfer.getAmount());
                         return;
                     }
-                    depositAddress.withdrawal(transfer.getAmount());
+                    depositAddress.withdraw(transfer.getAmount());
                 });
     }
 }

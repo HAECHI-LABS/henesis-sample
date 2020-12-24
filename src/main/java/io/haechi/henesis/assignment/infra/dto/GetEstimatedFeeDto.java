@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.infra.btc.dto;
+package io.haechi.henesis.assignment.infra.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -7,8 +7,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GetEstimatedFeeJsonObject {
-
+public class GetEstimatedFeeDto {
     @JsonProperty("estimatedFee")
     private String estimatedFee;
 }

@@ -16,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Table(name = "transfers")
@@ -76,55 +77,12 @@ public class Transfer {
     @Column(name = "henesis_updated_at")
     private String henesisUpdatedAt;
 
-    @Column(name = "is_flushed")
-    private boolean isFlushed;
-
-    public static Transfer ready(
-            String from,
-            String to,
-            Amount amount,
-            String symbol,
-            Blockchain blockchain,
-            Long depositAddressId
-    ) {
-        return new Transfer(
-                from,
-                to,
-                amount,
-                symbol,
-                blockchain,
-                depositAddressId
-        );
-    }
-
-    private Transfer(
-            String from,
-            String to,
-            Amount amount,
-            String symbol,
-            Blockchain blockchain,
-            Long depositAddressId
-    ) {
-        this.from = from;
-        this.to = to;
-        this.amount = amount;
-        this.symbol = symbol;
-        this.blockchain = blockchain;
-        this.depositAddressId = depositAddressId;
-        this.status = Status.READY;
-        this.type = Type.WITHDRAWAL;
-        this.isFlushed = false;
-    }
-
     public void updateStatus(Status status) {
         this.status = status;
     }
 
-    public void syncWithHenesis(Transfer transfer) {
-        this.henesisId = transfer.getHenesisId();
-        this.status = transfer.getStatus();
-        this.hash = transfer.getHash();
-        this.henesisUpdatedAt = transfer.getHenesisUpdatedAt();
+    public boolean isFlushed() {
+        return this.type.equals(Type.FLUSH);
     }
 
     public static Transfer of() {
@@ -181,30 +139,77 @@ public class Transfer {
         this.henesisUpdatedAt = henesisUpdatedAt;
     }
 
+    public static Transfer flush(
+            String henesisId,
+            String symbol,
+            Blockchain blockchain,
+            Status status,
+            String henesisUpdatedAt
+    ) {
+        return new Transfer(
+                henesisId,
+                symbol,
+                blockchain,
+                status,
+                henesisUpdatedAt
+        );
+    }
+
+    private Transfer(
+            String henesisId,
+            String symbol,
+            Blockchain blockchain,
+            Status status,
+            String henesisUpdatedAt
+    ) {
+        this.henesisId = henesisId;
+        this.symbol = symbol;
+        this.blockchain = blockchain;
+        this.status = status;
+        this.henesisUpdatedAt = henesisUpdatedAt;
+        this.type = Type.FLUSH;
+    }
+
     public static Transfer transfer(
             String henesisId,
             Status status,
+            String to,
+            Amount amount,
+            String symbol,
             Blockchain blockchain,
-            String hash
+            String hash,
+            String henesisUpdatedAt
     ) {
         return new Transfer(
                 henesisId,
                 status,
+                to,
+                amount,
+                symbol,
                 blockchain,
-                hash
+                hash,
+                henesisUpdatedAt
         );
     }
 
     private Transfer(
             String henesisId,
             Status status,
+            String to,
+            Amount amount,
+            String symbol,
             Blockchain blockchain,
-            String hash
+            String hash,
+            String henesisUpdatedAt
     ) {
         this.henesisId = henesisId;
         this.status = status;
+        this.to = to;
+        this.amount = amount;
+        this.symbol = symbol;
         this.blockchain = blockchain;
         this.hash = hash;
+        this.henesisUpdatedAt = henesisUpdatedAt;
     }
 
     public static Transfer newInstanceOf(
@@ -259,7 +264,6 @@ public class Transfer {
     }
 
     public enum Status {
-        READY("ready"),
         REQUESTED("requested"),
         FAILED("failed"),
         MINED("mined"),
@@ -279,11 +283,19 @@ public class Transfer {
                     .orElseThrow(() ->
                             new IllegalArgumentException(String.format("'%s' is not supported transfer status", name)));
         }
+
+        public static List<Status> unconfirmed() {
+            return Arrays.asList(
+                    REQUESTED,
+                    MINED
+            );
+        }
     }
 
     public enum Type {
         WITHDRAWAL("withdrawal"),
-        DEPOSIT("deposit");
+        DEPOSIT("deposit"),
+        FLUSH("flush");
 
         private final String name;
 

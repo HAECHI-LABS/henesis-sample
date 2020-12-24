@@ -1,17 +1,15 @@
-package io.haechi.henesis.assignment.infra.btc;
+package io.haechi.henesis.assignment.infra;
 
 import io.haechi.henesis.assignment.domain.Amount;
 import io.haechi.henesis.assignment.domain.Blockchain;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.Transfer;
-import io.haechi.henesis.assignment.infra.btc.dto.BtcTransferResponse;
-import io.haechi.henesis.assignment.infra.btc.dto.GetEstimatedFeeJsonObject;
-import io.haechi.henesis.assignment.infra.btc.dto.GetWalletBalanceJsonObject;
-import io.haechi.henesis.assignment.infra.dto.CreateDepositAddressResponse;
-import io.haechi.henesis.assignment.infra.ethklay.dto.PaginationResponse;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import io.haechi.henesis.assignment.infra.dto.BtcTransferDto;
+import io.haechi.henesis.assignment.infra.dto.GetEstimatedFeeDto;
+import io.haechi.henesis.assignment.infra.dto.GetWalletBalanceDto;
+import io.haechi.henesis.assignment.infra.dto.CreateDepositAddressDto;
+import io.haechi.henesis.assignment.infra.dto.PaginationDto;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -45,10 +43,10 @@ public class BtcHenesisClient implements HenesisClient {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
         param.add("name", name);
 
-        CreateDepositAddressResponse response = restTemplate.postForEntity(
+        CreateDepositAddressDto response = restTemplate.postForEntity(
                 String.format("/btc/wallets/%s/deposit-addresses", masterWalletId),
                 param,
-                CreateDepositAddressResponse.class
+                CreateDepositAddressDto.class
         ).getBody();
 
         return DepositAddress.fromHenesis(
@@ -62,9 +60,9 @@ public class BtcHenesisClient implements HenesisClient {
 
     @Override
     public Amount getEstimatedFee() {
-        GetEstimatedFeeJsonObject response = restTemplate.getForEntity(
+        GetEstimatedFeeDto response = restTemplate.getForEntity(
                 String.format("/btc/wallets/%s/estimated-fee", masterWalletId),
-                GetEstimatedFeeJsonObject.class
+                GetEstimatedFeeDto.class
         ).getBody();
 
         return Amount.of(response.getEstimatedFee());
@@ -72,10 +70,10 @@ public class BtcHenesisClient implements HenesisClient {
 
     @Override
     public Amount getMasterWalletBalance() {
-        List<GetWalletBalanceJsonObject> response = Arrays.asList(
+        List<GetWalletBalanceDto> response = Arrays.asList(
                 Objects.requireNonNull(restTemplate.getForEntity(
                         String.format("/btc/wallets/%s/balance", masterWalletId),
-                        GetWalletBalanceJsonObject[].class
+                        GetWalletBalanceDto[].class
                 ).getBody())
         );
 
@@ -83,32 +81,36 @@ public class BtcHenesisClient implements HenesisClient {
     }
 
     @Override
-    public Transfer transfer(String to, Amount amount) {
+    public Transfer transfer(String to, String symbol, Amount amount) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
         param.add("amount", amount.toHexString());
         param.add("to", to);
         param.add("passphrase", this.passphrase);
 
-        BtcTransferResponse response = this.restTemplate.postForEntity(
+        BtcTransferDto response = this.restTemplate.postForEntity(
                 String.format("btc/wallets/%s/transfer", this.masterWalletId),
                 param,
-                BtcTransferResponse.class
+                BtcTransferDto.class
         ).getBody();
 
         return Transfer.transfer(
                 response.getId(),
                 Transfer.Status.of(response.getStatus()),
+                to,
+                amount,
+                symbol,
                 Blockchain.BITCOIN,
-                response.getHash()
+                response.getHash(),
+                response.getUpdatedAt()
         );
     }
 
     @Override
     public List<Transfer> getLatestTransfersByUpdatedAtGte(String updatedAtGte) {
-        PaginationResponse<BtcTransferResponse> response = restTemplate.getForEntity(
+        PaginationDto<BtcTransferDto> response = restTemplate.getForEntity(
                 String.format("btc/transfers?updatedAtGte=%s&size=%s", updatedAtGte, this.btcSize),
-                PaginationResponse.class
+                PaginationDto.class
         ).getBody();
 
         return response.getResults().stream()
@@ -136,9 +138,9 @@ public class BtcHenesisClient implements HenesisClient {
 
     @Override
     public DepositAddress getDepositAddress(String id) {
-        CreateDepositAddressResponse response = restTemplate.getForEntity(
+        CreateDepositAddressDto response = restTemplate.getForEntity(
                 String.format("btc/wallets/%s/deposit-addresses/%s", this.masterWalletId, id),
-                CreateDepositAddressResponse.class
+                CreateDepositAddressDto.class
         ).getBody();
 
         return DepositAddress.fromHenesis(

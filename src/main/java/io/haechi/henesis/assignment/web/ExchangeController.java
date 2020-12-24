@@ -54,8 +54,11 @@ public class ExchangeController {
     @ResponseStatus(value = HttpStatus.CREATED)
     public FlushResponse flushKlay(
             @RequestParam String blockchain,
-            @RequestBody FlushRequest flushRequest
+            @RequestBody FlushRequest request
     ) {
-        return this.exchangeApplicationService.flush(Blockchain.of(blockchain));
+        return this.exchangeApplicationService.flush(
+                Blockchain.of(blockchain),
+                request.getDepositAddressIds()
+        );
     }
 }

@@ -3,6 +3,7 @@ package io.haechi.henesis.assignment.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -55,15 +56,31 @@ public class Amount {
         return this.value.doubleValue() / (BigInteger.TEN.pow(18)).doubleValue();
     }
 
-    public void add(Amount amount) {
+    public Amount add(Amount amount) {
         this.value = this.value.add(amount.getValue());
+        return this;
     }
 
-    public void subtract(Amount amount) {
-        // TODO: negativa check
+    public boolean isSpendableAmount(Amount amount) {
+        try {
+            this.subtract(amount);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Amount subtract(Amount amount) {
+        if (this.compareTo(amount) < 0) {
+            throw new IllegalStateException("amount cannot be negative");
+        }
         this.value = this.value.subtract(amount.getValue());
+        return this;
     }
 
+    public int compareTo(Amount amount) {
+        return this.value.compareTo(amount.getValue());
+    }
 
     public void subtractBy(Amount value, Amount spendableAmount) {
 

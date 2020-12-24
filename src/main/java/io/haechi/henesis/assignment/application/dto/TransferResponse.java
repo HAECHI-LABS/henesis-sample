@@ -1,6 +1,10 @@
 package io.haechi.henesis.assignment.application.dto;
 
+import io.haechi.henesis.assignment.domain.Amount;
+import io.haechi.henesis.assignment.domain.Blockchain;
+import io.haechi.henesis.assignment.domain.Transfer;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,28 +12,22 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TransferResponse {
-    private String name;
-    private String amount;
+    private Long id;
+    private Transfer.Status status;
+    private String to;
+    private Amount amount;
+    private Blockchain blockchain;
+    private Long depositAddressId;
 
-    private TransferResponse(
-            String name,
-            String amount
-    ) {
-        this.name = name;
-        this.amount = amount;
+    public TransferResponse(Transfer transfer) {
+        this.id = transfer.getId();
+        this.status = transfer.getStatus();
+        this.to = transfer.getTo();
+        this.amount = transfer.getAmount();
+        this.blockchain = transfer.getBlockchain();
+        this.depositAddressId = transfer.getDepositAddressId();
     }
-
-    public static TransferResponse of(
-            String name,
-            String amount
-    ) {
-        return new TransferResponse(
-                name,
-                amount
-        );
-    }
-
-
 }

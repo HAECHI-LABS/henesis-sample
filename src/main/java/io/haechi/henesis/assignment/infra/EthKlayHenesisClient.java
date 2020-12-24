@@ -1,15 +1,15 @@
-package io.haechi.henesis.assignment.infra.ethklay;
+package io.haechi.henesis.assignment.infra;
 
 import io.haechi.henesis.assignment.domain.Amount;
 import io.haechi.henesis.assignment.domain.Blockchain;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.Transfer;
-import io.haechi.henesis.assignment.infra.dto.CreateDepositAddressResponse;
-import io.haechi.henesis.assignment.infra.ethklay.dto.EthKlayTransferResponse;
-import io.haechi.henesis.assignment.infra.ethklay.dto.MasterWalletBalanceJsonObject;
-import io.haechi.henesis.assignment.infra.ethklay.dto.PaginationResponse;
-import io.haechi.henesis.assignment.infra.ethklay.dto.ValueTransferEventResponse;
+import io.haechi.henesis.assignment.infra.dto.CreateDepositAddressDto;
+import io.haechi.henesis.assignment.infra.dto.EthKlayTransferDto;
+import io.haechi.henesis.assignment.infra.dto.MasterWalletBalanceDto;
+import io.haechi.henesis.assignment.infra.dto.PaginationDto;
+import io.haechi.henesis.assignment.infra.dto.ValueTransferEventDto;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -51,14 +51,14 @@ public class EthKlayHenesisClient implements HenesisClient {
         param.add("name", name);
         param.add("passphrase", this.passphrase);
 
-        CreateDepositAddressResponse response = this.restTemplate.postForEntity(
+        CreateDepositAddressDto response = this.restTemplate.postForEntity(
                 String.format(
                         "%s/wallets/%s/user-wallets/",
                         this.blockchain.toSymbol(),
                         this.masterWalletId
                 ),
                 param,
-                CreateDepositAddressResponse.class
+                CreateDepositAddressDto.class
         ).getBody();
 
         return DepositAddress.fromHenesis(
@@ -78,31 +78,35 @@ public class EthKlayHenesisClient implements HenesisClient {
      */
     @Override
     // TODO: support token
-    public Transfer transfer(String to, Amount amount) {
+    public Transfer transfer(String to, String symbol, Amount amount) {
 
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
 
         param.add("amount", amount.toHexString());
         param.add("to", to);
-        param.add("ticker", this.blockchain.toSymbol());
+        param.add("ticker", symbol);
         param.add("passphrase", this.passphrase);
 
         // TODO: template
-        EthKlayTransferResponse response = this.restTemplate.postForEntity(
+        EthKlayTransferDto response = this.restTemplate.postForEntity(
                 String.format(
                         "%s/wallets/%s/transfer",
                         this.blockchain.toSymbol(),
                         this.masterWalletId
                 ),
                 param,
-                EthKlayTransferResponse.class
+                EthKlayTransferDto.class
         ).getBody();
 
         return Transfer.transfer(
                 response.getId(),
                 Transfer.Status.of(response.getStatus()),
+                to,
+                amount,
+                response.getCoinSymbol(),
                 Blockchain.of(response.getBlockchain()),
-                response.getCreatedAt()
+                response.getHash(),
+                response.getUpdatedAt()
         );
     }
 
@@ -116,14 +120,14 @@ public class EthKlayHenesisClient implements HenesisClient {
     // TODO: polish
     public Amount getMasterWalletBalance() {
 
-        List<MasterWalletBalanceJsonObject> response = Arrays.asList(
+        List<MasterWalletBalanceDto> response = Arrays.asList(
                 this.restTemplate.getForEntity(
                         String.format(
                                 "%s/wallets/%s/balance",
                                 this.blockchain.toSymbol(),
                                 this.masterWalletId
                         ),
-                        MasterWalletBalanceJsonObject[].class
+                        MasterWalletBalanceDto[].class
                 ).getBody()
         );
 
@@ -145,14 +149,14 @@ public class EthKlayHenesisClient implements HenesisClient {
      */
     @Override
     public List<Transfer> getLatestTransfersByUpdatedAtGte(String updatedAtGte) {
-        PaginationResponse<ValueTransferEventResponse> response = this.restTemplate.getForEntity(
+        PaginationDto<ValueTransferEventDto> response = this.restTemplate.getForEntity(
                 String.format(
                         "%s/value-transfer-events?updatedAtGte=%s&size=%s",
                         this.blockchain.toSymbol(),
                         updatedAtGte,
                         this.size
                 ),
-                PaginationResponse.class
+                PaginationDto.class
         ).getBody();
 
 
@@ -186,29 +190,30 @@ public class EthKlayHenesisClient implements HenesisClient {
         param.add("passphrase", this.passphrase);
         param.addAll("userWalletIds", depositAddressIds);
 
-        EthKlayTransferResponse response = this.restTemplate.postForEntity(
+        EthKlayTransferDto response = this.restTemplate.postForEntity(
                 String.format(
                         "%s/wallets/%s/flush",
                         this.blockchain.toSymbol(),
                         this.masterWalletId
                 ),
                 param,
-                EthKlayTransferResponse.class
+                EthKlayTransferDto.class
         ).getBody();
 
-        return Transfer.newInstanceOf(
+        return Transfer.flush(
                 response.getId(),
-                response.getBlockchain(),
-                response.getStatus(),
+                response.getCoinSymbol(),
+                Blockchain.of(response.getBlockchain()),
+                Transfer.Status.of(response.getStatus()),
                 response.getCreatedAt()
         );
     }
 
     @Override
     public DepositAddress getDepositAddress(String id) {
-        CreateDepositAddressResponse response = this.restTemplate.getForEntity(
+        CreateDepositAddressDto response = this.restTemplate.getForEntity(
                 String.format("%s/wallets/%s/user-wallets/%s", this.blockchain.toSymbol(), masterWalletId, id),
-                CreateDepositAddressResponse.class
+                CreateDepositAddressDto.class
         ).getBody();
 
         return DepositAddress.fromHenesis(

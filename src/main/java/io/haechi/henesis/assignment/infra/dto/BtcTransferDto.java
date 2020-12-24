@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.infra.btc.dto;
+package io.haechi.henesis.assignment.infra.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BtcTransferResponse {
+public class BtcTransferDto {
     private String id;
     private String hash;
     private String blockNumber;
@@ -25,5 +25,5 @@ public class BtcTransferResponse {
     private String updatedAt;
     private String type;
     private String hex;
-    private List<BtcTransactionOutputJsonObject> outputs;
+    private List<BtcTransactionOutputDto> outputs;
 }

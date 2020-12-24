@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.infra.ethklay.dto;
+package io.haechi.henesis.assignment.infra.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,11 +15,11 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PaginationResponse<T> {
+public class PaginationDto<T> {
     private Meta pagination;
     private List<T> results = new ArrayList<>();
 
-    public PaginationResponse(
+    public PaginationDto(
             String nextUrl,
             String previousUrl,
             int totalCount,

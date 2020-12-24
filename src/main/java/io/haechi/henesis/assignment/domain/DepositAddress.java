@@ -44,8 +44,37 @@ public class DepositAddress {
         this.amount.add(amount);
     }
 
-    public void withdrawal(Amount amount) {
+    public void withdraw(Amount amount) {
         this.amount.subtract(amount);
+    }
+
+    // TODO 별로임
+    public boolean hasSpendableAmount(
+            Amount requestAmount,
+            Amount unconfirmedAmount,
+            Amount estimatedFee
+    ) {
+        return this.amount.isSpendableAmount(requestAmount.add(unconfirmedAmount).add(estimatedFee));
+    }
+
+    public Transfer transfer(
+            String to,
+            Amount amount,
+            String symbol,
+            HenesisClient henesisClient,
+            BalanceValidator balanceValidator
+    ) {
+        if (!balanceValidator.validate(this, amount, symbol)) {
+            // TODO: log
+            throw new IllegalStateException("there is no spendable balance");
+        }
+
+        Transfer transfer = henesisClient.transfer(to, symbol, amount);
+        if (!this.blockchain.equals(Blockchain.BITCOIN)) {
+            transfer.setFrom(this.getAddress());
+        }
+        transfer.setDepositAddressId(this.getId());
+        return transfer;
     }
 
     public static DepositAddress of(){

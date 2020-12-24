@@ -49,7 +49,7 @@ public class RestTemplateConfig {
 
 
     @Bean
-    @Qualifier("restTemplate")
+    @Qualifier("henesisRestTemplate")
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(

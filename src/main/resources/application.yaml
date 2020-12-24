@@ -8,7 +8,7 @@ restTemplate:
 
 app:
   name: enclave-api
-  henesis-wallet:
+  henesis:
     url: http://localhost:3000
     api-secret: XP0SZ8TY/6O6hlMAfjcAtmESj/ihFlVed/nkNTDHrmo=
     access-token: eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6ImptZWVmMDgwMkBnbWFpbC5jb20iLCJpZCI6IjI2ZTQyMjliOTQ0ZWZlNjNiYWU4MThlZDMyYTY0YTkxIiwidHlwZSI6IkxPTkciLCJsb25nVHlwZSI6dHJ1ZSwiaXNzIjoiaGVuZXNpcy13YWxsZXQtaWRlbnRpdHktcHJvZC10ZXN0bmV0IiwiaWF0IjoxNjA1NjY4Mzg5LCJleHAiOjE5MjEwMjgzODl9.6d1HBljaYYaDB0xkI8zZ7wiUcGrDgx7K-PcfGUE1JPwOuZnng7QQWcvHrLM98C6-m8PENLNKr7m8-N7uIriqAw
@@ -17,7 +17,7 @@ app:
     eth-passphrase: ethPassphrase
     eth-size: 500
 
-    btc-walletId: 22b0611bfd5a98441dbdd51a1c9d8e24
+    btc-masterWalletId: 22b0611bfd5a98441dbdd51a1c9d8e24
     btc-passphrase: btcPassphrase
     btc-size: 500
 

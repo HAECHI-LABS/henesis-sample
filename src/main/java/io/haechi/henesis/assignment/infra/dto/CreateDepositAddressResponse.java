@@ -1,19 +1,19 @@
-package io.haechi.henesis.assignment.infra.btc.dto;
+package io.haechi.henesis.assignment.infra.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DepositAddressJsonObject {
-    @JsonProperty("id")
+public class CreateDepositAddressResponse {
     private String id;
-    @JsonProperty("name")
     private String name;
-    @JsonProperty("address")
     private String address;
-    @JsonProperty("createdAt")
+    private String blockchain;
+    private String status;
     private String createdAt;
 }

@@ -15,7 +15,7 @@ public class BtcTransferJsonObject {
     @JsonProperty("outputIndex")
     private int outputIndex;
     @JsonProperty("transaction")
-    private BtcTransactionJsonObject transaction;
+    private BtcTransferResponse transaction;
     @JsonProperty("receivedAt")
     private String receivedAt;
     @JsonProperty("sendTo")

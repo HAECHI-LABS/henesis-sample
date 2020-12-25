@@ -1,10 +1,20 @@
 package io.haechi.henesis.assignment.domain;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Entity
@@ -40,6 +50,40 @@ public class DepositAddress {
     // TODO: LocalDateTime
     @Column(name = "updated_at")
     private String updatedAt;
+
+    private DepositAddress(
+            String henesisId,
+            Status status,
+            Blockchain blockchain,
+            String name,
+            String address
+    ) {
+        this.henesisId = henesisId;
+        this.status = status;
+        this.blockchain = blockchain;
+        this.name = name;
+        this.address = address;
+    }
+
+    public static DepositAddress of() {
+        return new DepositAddress();
+    }
+
+    public static DepositAddress fromHenesis(
+            String henesisId,
+            Status status,
+            Blockchain blockchain,
+            String name,
+            String address
+    ) {
+        return new DepositAddress(
+                henesisId,
+                status,
+                blockchain,
+                name,
+                address
+        );
+    }
 
     public void deposit(Amount amount) {
         this.amount.add(amount);
@@ -79,39 +123,6 @@ public class DepositAddress {
         }
         transfer.setDepositAddressId(this.getId());
         return transfer;
-    }
-
-    public static DepositAddress of(){
-        return new DepositAddress();
-    }
-    public static DepositAddress fromHenesis(
-            String henesisId,
-            Status status,
-            Blockchain blockchain,
-            String name,
-            String address
-    ) {
-        return new DepositAddress(
-                henesisId,
-                status,
-                blockchain,
-                name,
-                address
-        );
-    }
-
-    private DepositAddress(
-            String henesisId,
-            Status status,
-            Blockchain blockchain,
-            String name,
-            String address
-    ) {
-        this.henesisId = henesisId;
-        this.status = status;
-        this.blockchain = blockchain;
-        this.name = name;
-        this.address = address;
     }
 
     public void increaseBalanceBy(Amount amount) {

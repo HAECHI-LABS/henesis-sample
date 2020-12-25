@@ -2,7 +2,7 @@ package io.haechi.henesis.assignment.domain;
 
 import java.util.Arrays;
 
-public enum  Blockchain {
+public enum Blockchain {
     ETHEREUM("ethereum", "eth"),
     KLAYTN("klaytn", "klay"),
     BITCOIN("bitcoin", "btc");

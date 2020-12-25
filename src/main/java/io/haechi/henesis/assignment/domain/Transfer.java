@@ -80,12 +80,63 @@ public class Transfer {
     @Column(name = "henesis_updated_at")
     private String henesisUpdatedAt;
 
-    public void updateStatus(Status status) {
+    private Transfer(
+            String henesisId,
+            String from,
+            String to,
+            Amount amount,
+            Blockchain blockchain,
+            Status status,
+            String symbol,
+            Type type,
+            String hash,
+            String henesisUpdatedAt
+    ) {
+        this.henesisId = henesisId;
+        this.from = from;
+        this.to = to;
+        this.amount = amount;
+        this.blockchain = blockchain;
         this.status = status;
+        this.symbol = symbol;
+        this.type = type;
+        this.hash = hash;
+        this.henesisUpdatedAt = henesisUpdatedAt;
     }
 
-    public boolean isFlushed() {
-        return this.type.equals(Type.FLUSH);
+    private Transfer(
+            String henesisId,
+            String symbol,
+            Blockchain blockchain,
+            Status status,
+            String henesisUpdatedAt
+    ) {
+        this.henesisId = henesisId;
+        this.symbol = symbol;
+        this.blockchain = blockchain;
+        this.status = status;
+        this.henesisUpdatedAt = henesisUpdatedAt;
+        this.type = Type.FLUSH;
+    }
+
+    private Transfer(
+            String henesisId,
+            Status status,
+            String to,
+            Amount amount,
+            String symbol,
+            Blockchain blockchain,
+            String hash,
+            String henesisUpdatedAt
+    ) {
+        this.henesisId = henesisId;
+        this.status = status;
+        this.to = to;
+        this.amount = amount;
+        this.symbol = symbol;
+        this.blockchain = blockchain;
+        this.hash = hash;
+        this.henesisUpdatedAt = henesisUpdatedAt;
     }
 
     public static Transfer of() {
@@ -118,30 +169,6 @@ public class Transfer {
         );
     }
 
-    private Transfer(
-            String henesisId,
-            String from,
-            String to,
-            Amount amount,
-            Blockchain blockchain,
-            Status status,
-            String symbol,
-            Type type,
-            String hash,
-            String henesisUpdatedAt
-    ) {
-        this.henesisId = henesisId;
-        this.from = from;
-        this.to = to;
-        this.amount = amount;
-        this.blockchain = blockchain;
-        this.status = status;
-        this.symbol = symbol;
-        this.type = type;
-        this.hash = hash;
-        this.henesisUpdatedAt = henesisUpdatedAt;
-    }
-
     public static Transfer flush(
             String henesisId,
             String symbol,
@@ -156,21 +183,6 @@ public class Transfer {
                 status,
                 henesisUpdatedAt
         );
-    }
-
-    private Transfer(
-            String henesisId,
-            String symbol,
-            Blockchain blockchain,
-            Status status,
-            String henesisUpdatedAt
-    ) {
-        this.henesisId = henesisId;
-        this.symbol = symbol;
-        this.blockchain = blockchain;
-        this.status = status;
-        this.henesisUpdatedAt = henesisUpdatedAt;
-        this.type = Type.FLUSH;
     }
 
     public static Transfer transfer(
@@ -195,26 +207,6 @@ public class Transfer {
         );
     }
 
-    private Transfer(
-            String henesisId,
-            Status status,
-            String to,
-            Amount amount,
-            String symbol,
-            Blockchain blockchain,
-            String hash,
-            String henesisUpdatedAt
-    ) {
-        this.henesisId = henesisId;
-        this.status = status;
-        this.to = to;
-        this.amount = amount;
-        this.symbol = symbol;
-        this.blockchain = blockchain;
-        this.hash = hash;
-        this.henesisUpdatedAt = henesisUpdatedAt;
-    }
-
     public static Transfer newInstanceOf(
             String transactionId,
             String blockchain,
@@ -228,6 +220,14 @@ public class Transfer {
 //                createdAt
         );
 
+    }
+
+    public void updateStatus(Status status) {
+        this.status = status;
+    }
+
+    public boolean isFlushed() {
+        return this.type.equals(Type.FLUSH);
     }
 
     // BTC

@@ -53,6 +53,7 @@ public class MonitoringScheduler {
                     localTransfer.updateStatus(henesisTransfer.getStatus());
                     return localTransfer;
                 })
+                .filter(transfer -> !transfer.isFlushed())
                 .filter(Transfer::isConfirmed) // TODO: when occurs reorg
                 .forEach(transfer -> {
                     String address = transfer.isDeposit() ? transfer.getTo() : transfer.getFrom();
@@ -67,7 +68,6 @@ public class MonitoringScheduler {
                 });
     }
 
-    //지갑 상태 업데이트 (CREATING, ACTIVE, INACTIVE)
     @Async
     @Transactional
     @Scheduled(fixedRate = 6000, initialDelay = 2000)

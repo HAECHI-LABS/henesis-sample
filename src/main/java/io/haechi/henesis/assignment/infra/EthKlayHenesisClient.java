@@ -2,9 +2,11 @@ package io.haechi.henesis.assignment.infra;
 
 import io.haechi.henesis.assignment.domain.Amount;
 import io.haechi.henesis.assignment.domain.Blockchain;
+import io.haechi.henesis.assignment.domain.Coin;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.Transfer;
+import io.haechi.henesis.assignment.infra.dto.CoinDto;
 import io.haechi.henesis.assignment.infra.dto.CreateDepositAddressDto;
 import io.haechi.henesis.assignment.infra.dto.EthKlayTransferDto;
 import io.haechi.henesis.assignment.infra.dto.MasterWalletBalanceDto;
@@ -222,6 +224,20 @@ public class EthKlayHenesisClient implements HenesisClient {
                 Blockchain.of(response.getBlockchain()),
                 response.getName(),
                 response.getAddress()
+        );
+    }
+
+    @Override
+    public Coin getCoin(String symbol) {
+        CoinDto response = this.restTemplate.getForEntity(
+                String.format("%s/coins/%s", this.blockchain.toSymbol(), symbol.toLowerCase()),
+                CoinDto.class
+        ).getBody();
+
+        return new Coin(
+                response.getSymbol(),
+                response.getDecimals(),
+                this.blockchain
         );
     }
 }

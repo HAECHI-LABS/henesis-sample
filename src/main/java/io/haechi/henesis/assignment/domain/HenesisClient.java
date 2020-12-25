@@ -16,4 +16,6 @@ public interface HenesisClient {
     Transfer flush(List<String> depositAddressIds);
 
     DepositAddress getDepositAddress(String id);
+
+    Coin getCoin(String symbol);
 }

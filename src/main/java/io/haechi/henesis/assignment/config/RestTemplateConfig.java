@@ -3,11 +3,14 @@ package io.haechi.henesis.assignment.config;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.client.*;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
@@ -16,37 +19,23 @@ import java.util.Collections;
 
 @Configuration
 public class RestTemplateConfig {
+    private static final int READ_TIMEOUT = 10000;
+    private static final int CONNECT_TIMEOUT = 5000;
+    private static final int MAX_CONN_TOTAL = 100;
+    private static final int MAX_CONN_PER_ROUTE = 5;
 
     private final String walletAccessToken;
     private final String walletApiSecret;
     private final String walletUrl;
-    @Value("${restTemplate.factory.readTimeout}")
-    private int READ_TIMEOUT;
-    @Value("${restTemplate.factory.connectTimeout}")
-    private int CONNECT_TIMEOUT;
-    @Value("${restTemplate.httpClient.maxConnTotal}")
-    private int MAX_CONN_TOTAL;
-    @Value("${restTemplate.httpClient.maxConnPerRoute}")
-    private int MAX_CONN_PER_ROUTE;
 
 
     public RestTemplateConfig(
-            @Qualifier("walletApiSecret") String walletApiSecret,
-            @Qualifier("walletAccessToken") String walletAccessToken,
-            @Qualifier("walletUrl") String walletUrl
+            HenesisProperties henesisProperties
     ) {
-        this.walletApiSecret = walletApiSecret;
-        this.walletAccessToken = walletAccessToken;
-        this.walletUrl = walletUrl;
+        this.walletApiSecret = henesisProperties.getApiSecret();
+        this.walletAccessToken = henesisProperties.getAccessToken();
+        this.walletUrl = henesisProperties.getUrl();
     }
-
-    @Bean
-    public RestTemplate defaultRestTemplate() {
-        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
-        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory());
-        return restTemplate;
-    }
-
 
     @Bean
     @Qualifier("henesisRestTemplate")

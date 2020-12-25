@@ -1,4 +1,4 @@
-package io.haechi.henesis.assignment.application.dto;
+package io.haechi.henesis.assignment.domain;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -6,15 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigInteger;
-
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TransferRequest {
+public class Coin {
     private String symbol;
-    private String to;
-    private BigInteger amount;
+    private Integer decimals;
+    private Blockchain blockchain;
 }

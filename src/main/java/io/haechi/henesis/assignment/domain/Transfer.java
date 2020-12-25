@@ -63,6 +63,9 @@ public class Transfer {
     @Column(name = "symbol")
     private String symbol;
 
+    @Column(name = "decimal")
+    private Integer decimal;
+
     @Column(name = "hash")
     private String hash;
 

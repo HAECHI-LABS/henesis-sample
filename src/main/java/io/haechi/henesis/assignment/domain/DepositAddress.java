@@ -3,6 +3,7 @@ package io.haechi.henesis.assignment.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -59,11 +60,14 @@ public class DepositAddress {
 
     public Transfer transfer(
             String to,
-            Amount amount,
+            BigInteger requestedAmount,
             String symbol,
             HenesisClient henesisClient,
             BalanceValidator balanceValidator
     ) {
+        Coin coin = henesisClient.getCoin(symbol);
+        Amount amount = Amount.of(requestedAmount, coin.getDecimals());
+
         if (!balanceValidator.validate(this, amount, symbol)) {
             // TODO: log
             throw new IllegalStateException("there is no spendable balance");

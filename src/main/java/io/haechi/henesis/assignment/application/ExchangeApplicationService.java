@@ -9,7 +9,6 @@ import io.haechi.henesis.assignment.domain.BalanceValidator;
 import io.haechi.henesis.assignment.domain.Blockchain;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.DepositAddressRepository;
-import io.haechi.henesis.assignment.domain.EthKlayWalletService;
 import io.haechi.henesis.assignment.domain.HenesisClientSupplier;
 import io.haechi.henesis.assignment.domain.Transfer;
 import io.haechi.henesis.assignment.domain.TransferRepository;
@@ -81,8 +80,8 @@ public class ExchangeApplicationService {
             throw new IllegalArgumentException("flush is possible only for 50 at a time");
         }
 
-        if (depositAddressIds.isEmpty() || depositAddressIds == null) {
-            // 전부
+        if (depositAddressIds == null || depositAddressIds.isEmpty()) {
+            throw new IllegalArgumentException("depositAddressIds is null or empty");
         }
 
         Transfer flushTransfer = this.henesisClientSupplier.supply(blockchain).flush(depositAddressIds);

@@ -2,6 +2,7 @@ package io.haechi.henesis.assignment.infra;
 
 import io.haechi.henesis.assignment.domain.Amount;
 import io.haechi.henesis.assignment.domain.Blockchain;
+import io.haechi.henesis.assignment.domain.Coin;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.Transfer;
@@ -149,6 +150,15 @@ public class BtcHenesisClient implements HenesisClient {
                 Blockchain.BITCOIN,
                 response.getName(),
                 response.getAddress()
+        );
+    }
+
+    @Override
+    public Coin getCoin(String symbol) {
+        return new Coin(
+                Blockchain.BITCOIN.toSymbol(),
+                8,
+                Blockchain.BITCOIN
         );
     }
 }

@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.scheduler;
 
+import io.haechi.henesis.assignment.domain.BalanceManager;
 import io.haechi.henesis.assignment.domain.Blockchain;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.DepositAddressRepository;
@@ -17,17 +18,20 @@ public class MonitoringScheduler {
     private final HenesisClient henesisClient;
     private final DepositAddressRepository depositAddressRepository;
     private final TransferRepository transferRepository;
+    private final BalanceManager balanceManager;
     private final Blockchain blockchain;
 
     public MonitoringScheduler(
             HenesisClient henesisClient,
             DepositAddressRepository depositAddressRepository,
             TransferRepository transferRepository,
+            BalanceManager balanceManager,
             Blockchain blockchain
     ) {
         this.henesisClient = henesisClient;
         this.depositAddressRepository = depositAddressRepository;
         this.transferRepository = transferRepository;
+        this.balanceManager = balanceManager;
         this.blockchain = blockchain;
     }
 
@@ -59,12 +63,7 @@ public class MonitoringScheduler {
                     String address = transfer.isDeposit() ? transfer.getTo() : transfer.getFrom();
                     DepositAddress depositAddress = this.depositAddressRepository.findByAddress(address)
                             .orElseThrow(() -> new IllegalStateException(String.format("there is no '%s' deposit address", address)));
-
-                    if (transfer.isDeposit()) {
-                        depositAddress.deposit(transfer.getAmount());
-                        return;
-                    }
-                    depositAddress.withdraw(transfer.getAmount());
+                    this.balanceManager.reflectTransfer(transfer, depositAddress);
                 });
     }
 

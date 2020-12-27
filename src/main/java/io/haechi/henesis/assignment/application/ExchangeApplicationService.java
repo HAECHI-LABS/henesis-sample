@@ -5,7 +5,7 @@ import io.haechi.henesis.assignment.application.dto.CreateDepositAddressResponse
 import io.haechi.henesis.assignment.application.dto.FlushResponse;
 import io.haechi.henesis.assignment.application.dto.TransferRequest;
 import io.haechi.henesis.assignment.application.dto.TransferResponse;
-import io.haechi.henesis.assignment.domain.BalanceValidator;
+import io.haechi.henesis.assignment.domain.BalanceManager;
 import io.haechi.henesis.assignment.domain.Blockchain;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.DepositAddressRepository;
@@ -24,18 +24,18 @@ public class ExchangeApplicationService {
     private final HenesisClientSupplier henesisClientSupplier;
     private final DepositAddressRepository depositAddressRepository;
     private final TransferRepository transferRepository;
-    private final BalanceValidator balanceValidator;
+    private final BalanceManager balanceManager;
 
     public ExchangeApplicationService(
             HenesisClientSupplier henesisClientSupplier,
             DepositAddressRepository depositAddressRepository,
             TransferRepository transferRepository,
-            BalanceValidator balanceValidator
+            BalanceManager balanceManager
     ) {
         this.henesisClientSupplier = henesisClientSupplier;
         this.depositAddressRepository = depositAddressRepository;
         this.transferRepository = transferRepository;
-        this.balanceValidator = balanceValidator;
+        this.balanceManager = balanceManager;
     }
 
     @Transactional
@@ -62,7 +62,7 @@ public class ExchangeApplicationService {
                 request.getAmount(),
                 request.getSymbol(),
                 this.henesisClientSupplier.supply(blockchain),
-                this.balanceValidator
+                this.balanceManager
         );
 
         log.info(String.format("Transfer Requested..! (%s)", depositAddress.getName()));

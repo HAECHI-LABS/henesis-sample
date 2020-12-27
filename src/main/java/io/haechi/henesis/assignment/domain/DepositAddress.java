@@ -30,11 +30,9 @@ public class DepositAddress {
     private Long id;
     @Column(name = "henesis_id")
     private String henesisId;
-    // TODO: enum
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;
-    // TODO: enum
     @Column(name = "blockchain")
     @Enumerated(EnumType.STRING)
     private Blockchain blockchain;
@@ -42,8 +40,6 @@ public class DepositAddress {
     private String name;
     @Column(name = "address")
     private String address;
-    @Column(name = "amount")
-    private Amount amount = new Amount();
     // TODO: LocalDateTime
     @Column(name = "created_at")
     private String createdAt;
@@ -85,34 +81,17 @@ public class DepositAddress {
         );
     }
 
-    public void deposit(Amount amount) {
-        this.amount.add(amount);
-    }
-
-    public void withdraw(Amount amount) {
-        this.amount.subtract(amount);
-    }
-
-    // TODO 별로임
-    public boolean hasSpendableAmount(
-            Amount requestAmount,
-            Amount unconfirmedAmount,
-            Amount estimatedFee
-    ) {
-        return this.amount.isSpendableAmount(requestAmount.add(unconfirmedAmount).add(estimatedFee));
-    }
-
     public Transfer transfer(
             String to,
             BigInteger requestedAmount,
             String symbol,
             HenesisClient henesisClient,
-            BalanceValidator balanceValidator
+            BalanceManager balanceManager
     ) {
         Coin coin = henesisClient.getCoin(symbol);
         Amount amount = Amount.of(requestedAmount, coin.getDecimals());
 
-        if (!balanceValidator.validate(this, amount, symbol)) {
+        if (!balanceManager.hasSpendableBalance(this, amount, symbol)) {
             // TODO: log
             throw new IllegalStateException("there is no spendable balance");
         }
@@ -123,16 +102,6 @@ public class DepositAddress {
         }
         transfer.setDepositAddressId(this.getId());
         return transfer;
-    }
-
-    public void increaseBalanceBy(Amount amount) {
-    }
-
-    // btc
-    public void withdrawBy(Amount amount, Amount estimatedFee, Amount walletBalance) {
-    }
-
-    public void withdrawBy(Amount amount, Amount walletBalance) {
     }
 
     public void updateStatus(Status status) {

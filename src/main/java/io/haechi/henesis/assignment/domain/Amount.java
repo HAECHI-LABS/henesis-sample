@@ -44,6 +44,10 @@ public class Amount {
         return new Amount(value);
     }
 
+    public static Amount zero() {
+        return new Amount(BigInteger.ZERO);
+    }
+
     public String toHexString() {
         return "0x" + this.value.toString(16);
     }

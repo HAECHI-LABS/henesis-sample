@@ -1,5 +1,8 @@
 package io.haechi.henesis.assignment.domain;
 
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface HenesisClient {
@@ -11,11 +14,19 @@ public interface HenesisClient {
 
     Amount getEstimatedFee();
 
-    List<Transfer> getLatestTransfersByUpdatedAtGte(String updatedAtGte);
+    List<Transfer> getLatestTransfersByUpdatedAtGte(LocalDateTime updatedAtGte, int size);
+
+    Pagination<Transfer> getTransfersByUpdatedAtGte(LocalDateTime updatedAtGte, Pageable pageable);
+
+    List<Balance> getDepositAddressBalances(DepositAddress depositAddress);
+
+    Pagination<DepositAddress> getDepositAddresses(Pageable pageable);
 
     Transfer flush(List<String> depositAddressIds);
 
     DepositAddress getDepositAddress(String id);
 
     Coin getCoin(String symbol);
+
+    String getMasterWalletAddress();
 }

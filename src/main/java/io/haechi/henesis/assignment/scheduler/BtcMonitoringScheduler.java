@@ -7,10 +7,13 @@ import io.haechi.henesis.assignment.domain.DepositAddressRepository;
 import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.Transfer;
 import io.haechi.henesis.assignment.domain.TransferRepository;
+import io.haechi.henesis.assignment.support.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.Month;
 
 @Slf4j
 public class BtcMonitoringScheduler {
@@ -18,17 +21,20 @@ public class BtcMonitoringScheduler {
     private final DepositAddressRepository depositAddressRepository;
     private final TransferRepository transferRepository;
     private final BalanceManager balanceManager;
+    private final int pollingSize;
 
     public BtcMonitoringScheduler(
             HenesisClient henesisClient,
             DepositAddressRepository depositAddressRepository,
             TransferRepository transferRepository,
-            BalanceManager balanceManager
+            BalanceManager balanceManager,
+            int pollingSize
     ) {
         this.henesisClient = henesisClient;
         this.depositAddressRepository = depositAddressRepository;
         this.transferRepository = transferRepository;
         this.balanceManager = balanceManager;
+        this.pollingSize = pollingSize;
     }
 
     /*
@@ -39,11 +45,12 @@ public class BtcMonitoringScheduler {
     @Transactional
     @Scheduled(fixedRate = 2000, initialDelay = 500)
     public void updateTransactions() {
-        String lastUpdatedAt = this.transferRepository.findTopByBlockchainOrderByHenesisUpdatedAt(Blockchain.BITCOIN)
+        LocalDateTime lastUpdatedAt = this.transferRepository.findTopByBlockchainOrderByHenesisUpdatedAtDesc(Blockchain.BITCOIN)
                 .map(Transfer::getUpdatedAt)
-                .orElse(Long.toString(System.currentTimeMillis()));
+                .map(time -> time.plusNanos(1))
+                .orElse(Utils.toLocalDateTime(Long.toString(System.currentTimeMillis())));
 
-        this.henesisClient.getLatestTransfersByUpdatedAtGte(lastUpdatedAt)
+        this.henesisClient.getLatestTransfersByUpdatedAtGte(lastUpdatedAt, this.pollingSize)
                 .stream()
                 .map(henesisTransfer -> {
                     Transfer localTransfer = this.transferRepository.findByHenesisId(henesisTransfer.getHenesisId()).orElse(null);
@@ -58,6 +65,7 @@ public class BtcMonitoringScheduler {
                     DepositAddress depositAddress = this.depositAddressRepository.findByAddress(transfer.getTo())
                             .orElseThrow(() -> new IllegalStateException(String.format("there is no '%s' deposit address", transfer.getTo())));
                     this.balanceManager.reflectTransfer(transfer, depositAddress);
+                    this.transferRepository.save(transfer);
                 });
     }
 }

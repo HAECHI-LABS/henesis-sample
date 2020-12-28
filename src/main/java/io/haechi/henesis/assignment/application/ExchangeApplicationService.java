@@ -7,6 +7,7 @@ import io.haechi.henesis.assignment.application.dto.TransferRequest;
 import io.haechi.henesis.assignment.application.dto.TransferResponse;
 import io.haechi.henesis.assignment.domain.BalanceManager;
 import io.haechi.henesis.assignment.domain.Blockchain;
+import io.haechi.henesis.assignment.domain.Coin;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.DepositAddressRepository;
 import io.haechi.henesis.assignment.domain.HenesisClientSupplier;
@@ -41,10 +42,8 @@ public class ExchangeApplicationService {
     @Transactional
     public CreateDepositAddressResponse createDepositAddress(Blockchain blockchain, CreateDepositAddressRequest request) {
         DepositAddress depositAddress = this.henesisClientSupplier.supply(blockchain).createDepositAddress(request.getName());
-        this.depositAddressRepository.save(depositAddress);
-
         log.info(String.format("Creating User Wallet (%s)", request.getName()));
-        return CreateDepositAddressResponse.of(request.getName());
+        return CreateDepositAddressResponse.of(this.depositAddressRepository.save(depositAddress));
     }
 
     // Advanced: when fail to save transfer

@@ -15,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,12 +25,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Transfer {
-    @Id
-    @Column(updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class Transfer extends DomainEntity {
     @Column(name = "from_address")
     private String from;
 
@@ -42,7 +38,7 @@ public class Transfer {
     @Column(name = "henesis_id")
     private String henesisId;
 
-    @AttributeOverride(name = "value", column = @Column(name = "amount"))
+    @AttributeOverride(name = "value", column = @Column(name = "amount", precision = 78))
     private Amount amount = new Amount();
 
     @AttributeOverride(name = "value", column = @Column(name = "fee"))
@@ -69,16 +65,8 @@ public class Transfer {
     @Column(name = "hash")
     private String hash;
 
-    // TODO: LocalDateTime
-    @Column(name = "created_at")
-    private String createdAt;
-    // TODO: LocalDateTime
-
-    @Column(name = "updated_at")
-    private String updatedAt;
-
     @Column(name = "henesis_updated_at")
-    private String henesisUpdatedAt;
+    private LocalDateTime henesisUpdatedAt;
 
     private Transfer(
             String henesisId,
@@ -90,7 +78,7 @@ public class Transfer {
             String symbol,
             Type type,
             String hash,
-            String henesisUpdatedAt
+            LocalDateTime henesisUpdatedAt
     ) {
         this.henesisId = henesisId;
         this.from = from;
@@ -109,7 +97,7 @@ public class Transfer {
             String symbol,
             Blockchain blockchain,
             Status status,
-            String henesisUpdatedAt
+            LocalDateTime henesisUpdatedAt
     ) {
         this.henesisId = henesisId;
         this.symbol = symbol;
@@ -127,7 +115,7 @@ public class Transfer {
             String symbol,
             Blockchain blockchain,
             String hash,
-            String henesisUpdatedAt
+            LocalDateTime henesisUpdatedAt
     ) {
         this.henesisId = henesisId;
         this.status = status;
@@ -153,7 +141,7 @@ public class Transfer {
             String symbol,
             Type type,
             String hash,
-            String henesisUpdatedAt
+            LocalDateTime henesisUpdatedAt
     ) {
         return new Transfer(
                 henesisId,
@@ -174,7 +162,7 @@ public class Transfer {
             String symbol,
             Blockchain blockchain,
             Status status,
-            String henesisUpdatedAt
+            LocalDateTime henesisUpdatedAt
     ) {
         return new Transfer(
                 henesisId,
@@ -193,7 +181,7 @@ public class Transfer {
             String symbol,
             Blockchain blockchain,
             String hash,
-            String henesisUpdatedAt
+            LocalDateTime henesisUpdatedAt
     ) {
         return new Transfer(
                 henesisId,
@@ -268,6 +256,7 @@ public class Transfer {
 
     public enum Status {
         REQUESTED("requested"),
+        PENDING("pending"),
         FAILED("failed"),
         MINED("mined"),
         REVERTED("reverted"),

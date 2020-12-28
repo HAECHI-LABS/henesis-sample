@@ -22,7 +22,6 @@ public class BtcTransferDto {
     private String sendTo;
     private String feeAmount;
     private String createdAt;
-    private String updatedAt;
     private String type;
     private String hex;
     private List<BtcTransactionOutputDto> outputs;

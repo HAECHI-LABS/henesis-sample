@@ -19,14 +19,16 @@ public class MonitoringConfig {
             @Qualifier("ethHenesisClient") HenesisClient ethHenesisClient,
             DepositAddressRepository depositAddressRepository,
             TransferRepository transferRepository,
-            BalanceManager balanceManager
+            BalanceManager balanceManager,
+            HenesisProperties henesisProperties
     ) {
         return new MonitoringScheduler(
                 ethHenesisClient,
                 depositAddressRepository,
                 transferRepository,
                 balanceManager,
-                Blockchain.KLAYTN
+                Blockchain.ETHEREUM,
+                henesisProperties.getEthPollingSize()
         );
     }
 
@@ -35,14 +37,16 @@ public class MonitoringConfig {
             @Qualifier("klayHenesisClient") HenesisClient klayHenesisClient,
             DepositAddressRepository depositAddressRepository,
             TransferRepository transferRepository,
-            BalanceManager balanceManager
+            BalanceManager balanceManager,
+            HenesisProperties henesisProperties
     ) {
         return new MonitoringScheduler(
                 klayHenesisClient,
                 depositAddressRepository,
                 transferRepository,
                 balanceManager,
-                Blockchain.ETHEREUM
+                Blockchain.KLAYTN,
+                henesisProperties.getKlayPollingSize()
         );
     }
 
@@ -51,13 +55,15 @@ public class MonitoringConfig {
             @Qualifier("btcHenesisClient") HenesisClient btcHenesisClient,
             DepositAddressRepository depositAddressRepository,
             TransferRepository transferRepository,
-            BalanceManager balanceManager
+            BalanceManager balanceManager,
+            HenesisProperties henesisProperties
     ) {
         return new BtcMonitoringScheduler(
                 btcHenesisClient,
                 depositAddressRepository,
                 transferRepository,
-                balanceManager
+                balanceManager,
+                henesisProperties.getBtcPollingSize()
         );
     }
 }

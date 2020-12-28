@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.domain;
 
+import io.haechi.henesis.assignment.domain.exception.BadRequestException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,13 +22,8 @@ import java.util.Arrays;
 @Table(name = "deposit_addresses")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DepositAddress {
-    @Id
-    @Column(updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class DepositAddress extends DomainEntity {
     @Column(name = "henesis_id")
     private String henesisId;
     @Column(name = "status")
@@ -40,29 +36,23 @@ public class DepositAddress {
     private String name;
     @Column(name = "address")
     private String address;
-    // TODO: LocalDateTime
-    @Column(name = "created_at")
-    private String createdAt;
-    // TODO: LocalDateTime
-    @Column(name = "updated_at")
-    private String updatedAt;
+    @Column(name = "master_wallet_address")
+    private String masterWalletAddress;
 
     private DepositAddress(
             String henesisId,
             Status status,
             Blockchain blockchain,
             String name,
-            String address
+            String address,
+            String masterWalletAddress
     ) {
         this.henesisId = henesisId;
         this.status = status;
         this.blockchain = blockchain;
         this.name = name;
         this.address = address;
-    }
-
-    public static DepositAddress of() {
-        return new DepositAddress();
+        this.masterWalletAddress = masterWalletAddress;
     }
 
     public static DepositAddress fromHenesis(
@@ -70,14 +60,16 @@ public class DepositAddress {
             Status status,
             Blockchain blockchain,
             String name,
-            String address
+            String address,
+            String masterWalletAddress
     ) {
         return new DepositAddress(
                 henesisId,
                 status,
                 blockchain,
                 name,
-                address
+                address,
+                masterWalletAddress
         );
     }
 
@@ -88,17 +80,18 @@ public class DepositAddress {
             HenesisClient henesisClient,
             BalanceManager balanceManager
     ) {
-        Coin coin = henesisClient.getCoin(symbol);
-        Amount amount = Amount.of(requestedAmount, coin.getDecimals());
-
-        if (!balanceManager.hasSpendableBalance(this, amount, symbol)) {
-            // TODO: log
-            throw new IllegalStateException("there is no spendable balance");
+        try {
+            henesisClient.getCoin(symbol);
+        } catch (Exception e) {
+            throw new BadRequestException(String.format("henesis doesn't support '%s'", symbol));
         }
+        Amount amount = Amount.of(requestedAmount);
+        balanceManager.validateSpendableBalance(this, amount, symbol);
 
         Transfer transfer = henesisClient.transfer(to, symbol, amount);
+        // TODO: withdrawal 시 from은 master wallet
         if (!this.blockchain.equals(Blockchain.BITCOIN)) {
-            transfer.setFrom(this.getAddress());
+            transfer.setFrom(this.getMasterWalletAddress());
         }
         transfer.setDepositAddressId(this.getId());
         return transfer;

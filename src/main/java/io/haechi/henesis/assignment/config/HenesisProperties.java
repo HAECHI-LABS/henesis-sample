@@ -18,8 +18,11 @@ public class HenesisProperties {
     private String klayMasterWalletId;
     private String btcMasterWalletId;
 
-    private String ethSize;
-    private String klaySize;
-    private String btcSize;
+    private Integer ethPollingSize = 100;
+    private Integer klayPollingSize = 100;
+    private Integer btcPollingSize = 100;
 
+    private Long ethPollingInterval = 10000L;
+    private Long klayPollingInterval = 3000L;
+    private Long btcPollingInterval = 180000L;
 }

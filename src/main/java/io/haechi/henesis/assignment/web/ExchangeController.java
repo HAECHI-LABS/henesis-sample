@@ -10,6 +10,7 @@ import io.haechi.henesis.assignment.application.dto.TransferResponse;
 import io.haechi.henesis.assignment.domain.Blockchain;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(value = "Henesis")
 @RestController
-@RequestMapping("exchange")
+@RequestMapping("/api/exchange")
 public class ExchangeController {
     private final ExchangeApplicationService exchangeApplicationService;
 
@@ -30,7 +31,7 @@ public class ExchangeController {
         this.exchangeApplicationService = exchangeApplicationService;
     }
 
-    @PostMapping("/deposit-address")
+    @PostMapping("/deposit-addresses")
     @ResponseStatus(value = HttpStatus.CREATED)
     public CreateDepositAddressResponse createEthWallet(
             @RequestParam String blockchain,
@@ -42,7 +43,7 @@ public class ExchangeController {
         );
     }
 
-    @PostMapping("/deposit-address/{depositAddressId}/transfer")
+    @PostMapping("/deposit-addresses/{depositAddressId}/transfer")
     @ResponseStatus(value = HttpStatus.CREATED)
     public TransferResponse transferEth(
             @PathVariable Long depositAddressId,

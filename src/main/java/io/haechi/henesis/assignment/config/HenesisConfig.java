@@ -17,7 +17,6 @@ import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties({HenesisProperties.class})
-// TODO: polish
 public class HenesisConfig {
     @Bean
     public HenesisProperties henesisProperties() {
@@ -34,7 +33,6 @@ public class HenesisConfig {
                 restTemplate,
                 henesisProperties.getEthMasterWalletId(),
                 henesisProperties.getEthPassphrase(),
-                henesisProperties.getEthSize(),
                 Blockchain.ETHEREUM
         );
     }
@@ -49,8 +47,7 @@ public class HenesisConfig {
                 restTemplate,
                 henesisProperties.getKlayMasterWalletId(),
                 henesisProperties.getKlayPassphrase(),
-                henesisProperties.getKlaySize(),
-                Blockchain.ETHEREUM
+                Blockchain.KLAYTN
         );
     }
 
@@ -63,8 +60,7 @@ public class HenesisConfig {
         return new BtcHenesisClient(
                 restTemplate,
                 henesisProperties.getBtcMasterWalletId(),
-                henesisProperties.getBtcPassphrase(),
-                henesisProperties.getBtcSize()
+                henesisProperties.getBtcPassphrase()
         );
     }
 

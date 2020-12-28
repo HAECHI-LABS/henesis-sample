@@ -2,21 +2,23 @@ app:
   name: enclave-api
   henesis:
     url: http://localhost:3000
-    api-secret: XP0SZ8TY/6O6hlMAfjcAtmESj/ihFlVed/nkNTDHrmo=
-    access-token: eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6ImptZWVmMDgwMkBnbWFpbC5jb20iLCJpZCI6IjI2ZTQyMjliOTQ0ZWZlNjNiYWU4MThlZDMyYTY0YTkxIiwidHlwZSI6IkxPTkciLCJsb25nVHlwZSI6dHJ1ZSwiaXNzIjoiaGVuZXNpcy13YWxsZXQtaWRlbnRpdHktcHJvZC10ZXN0bmV0IiwiaWF0IjoxNjA1NjY4Mzg5LCJleHAiOjE5MjEwMjgzODl9.6d1HBljaYYaDB0xkI8zZ7wiUcGrDgx7K-PcfGUE1JPwOuZnng7QQWcvHrLM98C6-m8PENLNKr7m8-N7uIriqAw
+    api-secret: pvZ4CrBm5z9/uBSQgmkOvm/kDxkFiLxx8RSZZMkWRo4=
+    access-token: eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6InRvYnlAaGFlY2hpLmlvIiwiaWQiOiJjMDBiNWIxMDA4NjU4MGM2ZTc0NTZlZDQwYTcxMDkzZSIsInR5cGUiOiJMT05HIiwiaXNzIjoid2FsbGV0LXByb2QtdGVzdG5ldCIsImlhdCI6MTU5NDcyNzM2MCwiZXhwIjoxMDAwMDAxNTk0NzI3MzYwfQ.ueBjMrq3xT9F86geXxaoaIxQyXjKG4coMweSHj4muJw6yojjtbfuhUKfIjGFUE1kFDrmR-sT_G7uEOU4WKUMCA
 
-    eth-masterWalletId: fa869ba8733854ea3401eb4f1aac7c66
-    eth-passphrase: ethPassphrase
-    eth-size: 500
+    eth-master-wallet-id: 3d5898988fdcbb77535eb7eade178a8e
+    eth-passphrase: password
+    eth-polling-size: 500
+    eth-polling-interval: 10000 # 10 seconds
 
-    btc-masterWalletId: 22b0611bfd5a98441dbdd51a1c9d8e24
-    btc-passphrase: btcPassphrase
-    btc-size: 500
+    klay-master-wallet-id: d7d1a1d9a9c526c9c6f75bc0a58055e1
+    klay-passphrase: password
+    klay-polling-size: 500
+    klay-polling-interval: 3000 # 3 seconds
 
-    klay-masterWalletId: ec198a2a5c901dfb8c2e8124a78a2e7a
-    klay-passphrase: klayPassphrase
-    klay-size: 500
-
+    btc-master-wallet-id: d74a91146d1d36d518e461e469c8c911
+    btc-passphrase: password
+    btc-polling-size: 500
+    btc-polling-interval: 180000 # 3 minute
 
 spring:
   datasource:

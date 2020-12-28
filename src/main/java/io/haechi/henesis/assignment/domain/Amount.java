@@ -53,28 +53,14 @@ public class Amount {
     }
 
     public Amount add(Amount amount) {
-        this.value = this.value.add(amount.getValue());
-        return this;
+        return new Amount(this.value.add(amount.getValue()));
     }
 
     public Amount subtract(Amount amount) {
-        if (this.compareTo(amount) < 0) {
-            throw new IllegalStateException("amount cannot be negative");
-        }
-        this.value = this.value.subtract(amount.getValue());
-        return this;
+        return new Amount(this.value.subtract(amount.getValue()));
     }
 
     public int compareTo(Amount amount) {
         return this.value.compareTo(amount.getValue());
-    }
-
-    public boolean isSpendableAmount(Amount amount) {
-        try {
-            this.subtract(amount);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 }

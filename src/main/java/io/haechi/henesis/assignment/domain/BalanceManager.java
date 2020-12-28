@@ -17,7 +17,7 @@ public class BalanceManager {
         this.balanceRepository = balanceRepository;
     }
 
-    public boolean hasSpendableBalance(
+    public void validateSpendableBalance(
             DepositAddress depositAddress,
             Amount requestedAmount,
             String symbol
@@ -32,7 +32,20 @@ public class BalanceManager {
         );
         Balance balance = balanceRepository.findByDepositAddressAndSymbol(depositAddress, symbol)
                 .orElse(Balance.zero(depositAddress, symbol));
-        return balance.hasSpendableAmount(requestedAmount, unconfirmedAmount);
+
+        if (balance.getAmount().compareTo(unconfirmedAmount) < 0 || balance.getAmount().subtract(unconfirmedAmount).compareTo(requestedAmount) < 0) {
+            throw new IllegalStateException(
+                    String.format(
+                            "there is no spendable balance at '%s'. '%s' has '%s' spendable balance and requested amount is '%s'",
+                            symbol,
+                            depositAddress.getAddress(),
+                            balance.getAmount().compareTo(unconfirmedAmount) < 0
+                                    ? BigInteger.ZERO
+                                    : balance.getAmount().subtract(unconfirmedAmount),
+                            requestedAmount
+                    )
+            );
+        }
     }
 
     // TODO: naming

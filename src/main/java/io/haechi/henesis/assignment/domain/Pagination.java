@@ -1,40 +1,41 @@
 package io.haechi.henesis.assignment.domain;
 
-
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Pagination {
-    private String nextUrl;
-    private String previousUrl;
-    private Integer totalCount;
-    private Integer pageSize;
+public class Pagination<T> {
+    private Meta pagination;
+    private List<T> results = new ArrayList<>();
 
-    private Pagination(
-            String nextUrl,
-            String previousUrl,
-            Integer totalCount
+    public Pagination(
+            Meta pagination,
+            List<T> results
     ) {
-        this.nextUrl = nextUrl;
-        this.previousUrl = previousUrl;
-        this.totalCount = totalCount;
-    }
-
-    public static Pagination of(
-            String nextUrl,
-            String previousUrl,
-            Integer totalCount
-    ) {
-        return new Pagination(
-                nextUrl,
-                previousUrl,
-                totalCount
+        this.pagination = new Meta(
+                pagination.getNextUrl(),
+                pagination.getPreviousUrl(),
+                pagination.getTotalCount()
         );
+        this.results = results;
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class Meta {
+        private String nextUrl;
+        private String previousUrl;
+        private int totalCount;
+    }
 }

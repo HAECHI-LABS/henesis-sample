@@ -13,9 +13,11 @@ import java.util.Optional;
 @Repository
 @Transactional
 public interface DepositAddressRepository extends JpaRepository<DepositAddress, Long> {
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<DepositAddress> findByAddress(String address);
 
     List<DepositAddress> findAllByBlockchainAndStatus(Blockchain blockchain, DepositAddress.Status status);
+
+    boolean existsByHenesisId(String henesisId);
+
+    List<DepositAddress> findAllByBlockchain(Blockchain blockchain);
 }

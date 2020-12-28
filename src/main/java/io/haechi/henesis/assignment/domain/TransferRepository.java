@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
     Optional<Transfer> findByHenesisId(String henesisId);
 
-    Optional<Transfer> findTopByBlockchainOrderByHenesisUpdatedAt(Blockchain blockchain);
+    Optional<Transfer> findTopByBlockchainOrderByHenesisUpdatedAtDesc(Blockchain blockchain);
 
     @Query(
             value = "SELECT SUM(t.amount.value) " +
@@ -27,4 +27,6 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
             @Param("symbol") String symbol,
             @Param("statuses") List<Transfer.Status> statuses
     );
+
+    boolean existsByHenesisId(String henesisId);
 }

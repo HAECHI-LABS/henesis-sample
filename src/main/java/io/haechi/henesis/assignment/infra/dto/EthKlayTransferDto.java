@@ -22,5 +22,4 @@ public class EthKlayTransferDto {
     private String status;
     private String keyId;
     private String createdAt;
-    private String updatedAt;
 }

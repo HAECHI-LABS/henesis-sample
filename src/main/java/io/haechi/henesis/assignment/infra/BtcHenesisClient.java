@@ -1,20 +1,27 @@
 package io.haechi.henesis.assignment.infra;
 
 import io.haechi.henesis.assignment.domain.Amount;
+import io.haechi.henesis.assignment.domain.Balance;
 import io.haechi.henesis.assignment.domain.Blockchain;
 import io.haechi.henesis.assignment.domain.Coin;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.HenesisClient;
+import io.haechi.henesis.assignment.domain.Pagination;
 import io.haechi.henesis.assignment.domain.Transfer;
 import io.haechi.henesis.assignment.infra.dto.BtcTransferDto;
 import io.haechi.henesis.assignment.infra.dto.CreateDepositAddressDto;
 import io.haechi.henesis.assignment.infra.dto.GetEstimatedFeeDto;
 import io.haechi.henesis.assignment.infra.dto.GetWalletBalanceDto;
-import io.haechi.henesis.assignment.infra.dto.PaginationDto;
+import io.haechi.henesis.assignment.support.Utils;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpMethod;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -24,18 +31,15 @@ public class BtcHenesisClient implements HenesisClient {
     private final RestTemplate restTemplate;
     private final String masterWalletId;
     private final String passphrase;
-    private final String btcSize;
 
     public BtcHenesisClient(
             RestTemplate restTemplate,
             String btcMasterWalletId,
-            String btcPassphrase,
-            String btcSize
+            String btcPassphrase
     ) {
         this.restTemplate = restTemplate;
         this.masterWalletId = btcMasterWalletId;
         this.passphrase = btcPassphrase;
-        this.btcSize = btcSize;
     }
 
 
@@ -55,7 +59,8 @@ public class BtcHenesisClient implements HenesisClient {
                 DepositAddress.Status.ACTIVE,
                 Blockchain.BITCOIN,
                 response.getName(),
-                response.getAddress()
+                response.getAddress(),
+                this.getMasterWalletAddress()
         );
     }
 
@@ -103,15 +108,21 @@ public class BtcHenesisClient implements HenesisClient {
                 symbol,
                 Blockchain.BITCOIN,
                 response.getHash(),
-                response.getUpdatedAt()
+                Utils.toLocalDateTime(response.getCreatedAt())
         );
     }
 
     @Override
-    public List<Transfer> getLatestTransfersByUpdatedAtGte(String updatedAtGte) {
-        PaginationDto<BtcTransferDto> response = restTemplate.getForEntity(
-                String.format("btc/transfers?updatedAtGte=%s&size=%s", updatedAtGte, this.btcSize),
-                PaginationDto.class
+    public List<Transfer> getLatestTransfersByUpdatedAtGte(LocalDateTime updatedAtGte, int size) {
+        Pagination<BtcTransferDto> response = restTemplate.exchange(
+                String.format(
+                        "btc/transfers?updatedAtGte=%s&size=%s",
+                        Timestamp.valueOf(updatedAtGte).getTime(),
+                        size
+                ),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Pagination<BtcTransferDto>>(){}
         ).getBody();
 
         return response.getResults().stream()
@@ -127,9 +138,81 @@ public class BtcHenesisClient implements HenesisClient {
                         "BTC",
                         Transfer.Type.of(result.getType()),
                         result.getHash(),
-                        result.getUpdatedAt()
-                )).collect(Collectors.toList()
-                );
+                        Utils.toLocalDateTime(result.getCreatedAt())
+                )).collect(Collectors.toList());
+    }
+
+    @Override
+    public Pagination<Transfer> getTransfersByUpdatedAtGte(LocalDateTime updatedAtGte, Pageable pageable) {
+        Pagination<BtcTransferDto> response = this.restTemplate.exchange(
+                String.format(
+                        "btc/transfers?walletId=%s&updatedAtGte=%s&page=%s&size=%s",
+                        this.masterWalletId,
+                        Timestamp.valueOf(updatedAtGte).getTime(),
+                        pageable.getPageNumber(),
+                        pageable.getPageSize()
+                ),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Pagination<BtcTransferDto>>() {
+                }
+        ).getBody();
+
+        return new Pagination<>(
+                response.getPagination(),
+                response.getResults().stream()
+                        .map(result -> Transfer.fromHenesis(
+                                result.getId(),
+                                null,
+                                result.getReceivedAt() != null
+                                        ? result.getReceivedAt()
+                                        : result.getSendTo(),
+                                Amount.of(result.getAmount()),
+                                Blockchain.BITCOIN,
+                                Transfer.Status.of(result.getStatus()),
+                                "BTC",
+                                Transfer.Type.of(result.getType()),
+                                result.getHash(),
+                                Utils.toLocalDateTime(result.getCreatedAt())
+                        ))
+                        .collect(Collectors.toList())
+        );
+    }
+
+    @Override
+    public List<Balance> getDepositAddressBalances(DepositAddress depositAddress) {
+        throw new IllegalStateException("henesis doesn't manage deposit address's balance for bitcoin");
+    }
+
+    @Override
+    public Pagination<DepositAddress> getDepositAddresses(Pageable pageable) {
+        Pagination<CreateDepositAddressDto> response = this.restTemplate.exchange(
+                String.format(
+                        "btc/wallets/%s/deposit-addresses?page=%s&size=%s",
+                        masterWalletId,
+                        pageable.getPageNumber(),
+                        pageable.getPageSize()
+                ),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Pagination<CreateDepositAddressDto>>() {
+                }
+        ).getBody();
+
+        String masterWalletAddress = this.getMasterWalletAddress();
+        return new Pagination<>(
+                response.getPagination(),
+                response.getResults().stream()
+                        .map(result -> DepositAddress.fromHenesis(
+                                result.getId(),
+                                DepositAddress.Status.ACTIVE,
+                                Blockchain.BITCOIN,
+                                result.getName(),
+                                result.getAddress(),
+                                masterWalletAddress
+                        ))
+                        .collect(Collectors.toList())
+        );
     }
 
     @Override
@@ -149,7 +232,8 @@ public class BtcHenesisClient implements HenesisClient {
                 DepositAddress.Status.ACTIVE,
                 Blockchain.BITCOIN,
                 response.getName(),
-                response.getAddress()
+                response.getAddress(),
+                this.getMasterWalletAddress()
         );
     }
 
@@ -160,5 +244,15 @@ public class BtcHenesisClient implements HenesisClient {
                 8,
                 Blockchain.BITCOIN
         );
+    }
+
+    @Override
+    public String getMasterWalletAddress() {
+        CreateDepositAddressDto response = this.restTemplate.getForEntity(
+                String.format("btc/wallets/%s", this.masterWalletId),
+                CreateDepositAddressDto.class
+        ).getBody();
+
+        return response.getAddress();
     }
 }

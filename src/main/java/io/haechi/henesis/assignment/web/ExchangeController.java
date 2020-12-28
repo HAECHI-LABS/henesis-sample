@@ -2,13 +2,11 @@ package io.haechi.henesis.assignment.web;
 
 import io.haechi.henesis.assignment.application.ExchangeApplicationService;
 import io.haechi.henesis.assignment.application.dto.CreateDepositAddressRequest;
-import io.haechi.henesis.assignment.application.dto.CreateDepositAddressResponse;
+import io.haechi.henesis.assignment.application.dto.DepositAddressDto;
 import io.haechi.henesis.assignment.application.dto.FlushRequest;
-import io.haechi.henesis.assignment.application.dto.FlushResponse;
+import io.haechi.henesis.assignment.application.dto.TransferDto;
 import io.haechi.henesis.assignment.application.dto.TransferRequest;
-import io.haechi.henesis.assignment.application.dto.TransferResponse;
 import io.haechi.henesis.assignment.domain.Blockchain;
-import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(value = "Henesis")
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/exchange")
 public class ExchangeController {
@@ -31,9 +30,15 @@ public class ExchangeController {
         this.exchangeApplicationService = exchangeApplicationService;
     }
 
+    @GetMapping("/deposit-addresses")
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public List<DepositAddressDto> getDepositAddresses(@RequestParam String blockchain) {
+        return this.exchangeApplicationService.getDepositAddresses(Blockchain.of(blockchain));
+    }
+
     @PostMapping("/deposit-addresses")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public CreateDepositAddressResponse createEthWallet(
+    public DepositAddressDto createDepositAddress(
             @RequestParam String blockchain,
             @RequestBody CreateDepositAddressRequest createWalletRequest
     ) {
@@ -45,7 +50,7 @@ public class ExchangeController {
 
     @PostMapping("/deposit-addresses/{depositAddressId}/transfer")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public TransferResponse transferEth(
+    public TransferDto transfer(
             @PathVariable Long depositAddressId,
             @RequestParam String blockchain,
             @RequestBody TransferRequest transferRequest
@@ -59,7 +64,7 @@ public class ExchangeController {
 
     @PostMapping("/flush")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public FlushResponse flushKlay(
+    public TransferDto flush(
             @RequestParam String blockchain,
             @RequestBody FlushRequest request
     ) {

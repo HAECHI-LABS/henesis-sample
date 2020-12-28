@@ -8,23 +8,21 @@ import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.Pagination;
 import io.haechi.henesis.assignment.domain.Transfer;
+import io.haechi.henesis.assignment.domain.exception.InternalServerException;
 import io.haechi.henesis.assignment.infra.dto.BtcTransferDto;
-import io.haechi.henesis.assignment.infra.dto.CreateDepositAddressDto;
+import io.haechi.henesis.assignment.infra.dto.CreateHenesisDepositAddressRequest;
 import io.haechi.henesis.assignment.infra.dto.GetEstimatedFeeDto;
-import io.haechi.henesis.assignment.infra.dto.GetWalletBalanceDto;
+import io.haechi.henesis.assignment.infra.dto.HenesisDepositAddressDto;
+import io.haechi.henesis.assignment.infra.dto.HenesisTransferRequest;
 import io.haechi.henesis.assignment.support.Utils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class BtcHenesisClient implements HenesisClient {
@@ -48,13 +46,10 @@ public class BtcHenesisClient implements HenesisClient {
 
     @Override
     public DepositAddress createDepositAddress(String name) {
-        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
-        param.add("name", name);
-
-        CreateDepositAddressDto response = restTemplate.postForEntity(
+        HenesisDepositAddressDto response = restTemplate.postForEntity(
                 String.format("/btc/wallets/%s/deposit-addresses", masterWalletId),
-                param,
-                CreateDepositAddressDto.class
+                new CreateHenesisDepositAddressRequest(name),
+                HenesisDepositAddressDto.class
         ).getBody();
 
         return DepositAddress.fromHenesis(
@@ -78,28 +73,14 @@ public class BtcHenesisClient implements HenesisClient {
     }
 
     @Override
-    public Amount getMasterWalletBalance() {
-        List<GetWalletBalanceDto> response = Arrays.asList(
-                Objects.requireNonNull(restTemplate.getForEntity(
-                        String.format("/btc/wallets/%s/balance", masterWalletId),
-                        GetWalletBalanceDto[].class
-                ).getBody())
-        );
-
-        return Amount.of(response.stream().findFirst().get().getSpendableAmount());
-    }
-
-    @Override
     public Transfer transfer(String to, String symbol, Amount amount) {
-        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
-
-        param.add("amount", amount.toHexString());
-        param.add("to", to);
-        param.add("passphrase", this.passphrase);
-
         BtcTransferDto response = this.restTemplate.postForEntity(
                 String.format("btc/wallets/%s/transfer", this.masterWalletId),
-                param,
+                new HenesisTransferRequest(
+                        amount.toHexString(),
+                        to,
+                        this.passphrase
+                ),
                 BtcTransferDto.class
         ).getBody();
 
@@ -125,7 +106,8 @@ public class BtcHenesisClient implements HenesisClient {
                 ),
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<Pagination<BtcTransferDto>>(){}
+                new ParameterizedTypeReference<Pagination<BtcTransferDto>>() {
+                }
         ).getBody();
 
         return response.getResults().stream()
@@ -186,12 +168,12 @@ public class BtcHenesisClient implements HenesisClient {
 
     @Override
     public List<Balance> getDepositAddressBalances(DepositAddress depositAddress) {
-        throw new IllegalStateException("henesis doesn't manage deposit address's balance for bitcoin");
+        throw new InternalServerException("henesis doesn't manage deposit address's balance for bitcoin");
     }
 
     @Override
     public Pagination<DepositAddress> getDepositAddresses(Pageable pageable) {
-        Pagination<CreateDepositAddressDto> response = this.restTemplate.exchange(
+        Pagination<HenesisDepositAddressDto> response = this.restTemplate.exchange(
                 String.format(
                         "btc/wallets/%s/deposit-addresses?page=%s&size=%s",
                         masterWalletId,
@@ -200,7 +182,7 @@ public class BtcHenesisClient implements HenesisClient {
                 ),
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<Pagination<CreateDepositAddressDto>>() {
+                new ParameterizedTypeReference<Pagination<HenesisDepositAddressDto>>() {
                 }
         ).getBody();
 
@@ -221,14 +203,14 @@ public class BtcHenesisClient implements HenesisClient {
 
     @Override
     public Transfer flush(List<String> depositAddressHenesisIds) {
-        throw new IllegalStateException("henesis doesn't support flush for bitcoin");
+        throw new InternalServerException("henesis doesn't support flush for bitcoin");
     }
 
     @Override
     public DepositAddress getDepositAddress(String id) {
-        CreateDepositAddressDto response = restTemplate.getForEntity(
+        HenesisDepositAddressDto response = restTemplate.getForEntity(
                 String.format("btc/wallets/%s/deposit-addresses/%s", this.masterWalletId, id),
-                CreateDepositAddressDto.class
+                HenesisDepositAddressDto.class
         ).getBody();
 
         return DepositAddress.fromHenesis(
@@ -251,10 +233,15 @@ public class BtcHenesisClient implements HenesisClient {
     }
 
     @Override
+    public boolean isSupportedCoin(Blockchain blockchain, String symbol) {
+        return blockchain.equals(Blockchain.BITCOIN) && symbol.equalsIgnoreCase(Blockchain.BITCOIN.toSymbol());
+    }
+
+    @Override
     public String getMasterWalletAddress() {
-        CreateDepositAddressDto response = this.restTemplate.getForEntity(
+        HenesisDepositAddressDto response = this.restTemplate.getForEntity(
                 String.format("btc/wallets/%s", this.masterWalletId),
-                CreateDepositAddressDto.class
+                HenesisDepositAddressDto.class
         ).getBody();
 
         return response.getAddress();

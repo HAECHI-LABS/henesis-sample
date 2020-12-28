@@ -13,7 +13,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CreateDepositAddressDto {
+public class HenesisDepositAddressDto {
     private String id;
     private String name;
     private String address;

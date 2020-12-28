@@ -1,5 +1,7 @@
 package io.haechi.henesis.assignment.domain;
 
+import io.haechi.henesis.assignment.domain.exception.InternalServerException;
+
 import java.util.Map;
 
 public class HenesisClientSupplier {
@@ -12,7 +14,7 @@ public class HenesisClientSupplier {
     public HenesisClient supply(Blockchain blockchain) {
         HenesisClient client = this.map.get(blockchain);
         if (client == null) {
-            throw new IllegalArgumentException(String.format("'%s' is not supported henesis client type", blockchain));
+            throw new InternalServerException(String.format("'%s' is not supported henesis client type", blockchain));
         }
         return client;
     }

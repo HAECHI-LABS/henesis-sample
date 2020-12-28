@@ -10,8 +10,6 @@ public interface HenesisClient {
 
     Transfer transfer(String to, String symbol, Amount amount);
 
-    Amount getMasterWalletBalance();
-
     Amount getEstimatedFee();
 
     List<Transfer> getLatestTransfersByUpdatedAtGte(LocalDateTime updatedAtGte, int size);
@@ -27,6 +25,8 @@ public interface HenesisClient {
     DepositAddress getDepositAddress(String id);
 
     Coin getCoin(String symbol);
+
+    boolean isSupportedCoin(Blockchain blockchain, String symbol);
 
     String getMasterWalletAddress();
 }

@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.domain;
 
+import io.haechi.henesis.assignment.domain.exception.BadRequestException;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -34,7 +35,7 @@ public class BalanceManager {
                 .orElse(Balance.zero(depositAddress, symbol));
 
         if (balance.getAmount().compareTo(unconfirmedAmount) < 0 || balance.getAmount().subtract(unconfirmedAmount).compareTo(requestedAmount) < 0) {
-            throw new IllegalStateException(
+            throw new BadRequestException(
                     String.format(
                             "there is no spendable balance at '%s'. '%s' has '%s' spendable balance and requested amount is '%s'",
                             symbol,

@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TransferResponse {
+public class TransferDto {
     private Long id;
     private Transfer.Status status;
     private String to;
@@ -22,7 +22,7 @@ public class TransferResponse {
     private Blockchain blockchain;
     private Long depositAddressId;
 
-    public TransferResponse(Transfer transfer) {
+    public TransferDto(Transfer transfer) {
         this.id = transfer.getId();
         this.status = transfer.getStatus();
         this.to = transfer.getTo();

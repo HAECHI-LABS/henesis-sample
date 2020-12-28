@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.domain;
 
+import io.haechi.henesis.assignment.domain.exception.BadRequestException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +16,7 @@ public class Amount {
 
     private Amount(String hexString) {
         if (!hexString.startsWith("0x")) {
-            throw new IllegalArgumentException(String.format("invalid hex string format: %s", hexString));
+            throw new BadRequestException(String.format("invalid hex string format: %s", hexString));
         }
         this.value = new BigInteger(hexString.substring(2), 16);
     }

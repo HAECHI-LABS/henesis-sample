@@ -1,7 +1,7 @@
 package io.haechi.henesis.assignment.domain;
 
+import io.haechi.henesis.assignment.domain.exception.InternalServerException;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +13,6 @@ import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "balances")
@@ -31,19 +30,19 @@ public class Balance extends DomainEntity {
     @AttributeOverride(name = "value", column = @Column(name = "amount", precision = 78))
     private Amount amount = new Amount();
 
+    private Balance(DepositAddress depositAddress, String symbol, Amount amount) {
+        super();
+        this.depositAddress = depositAddress;
+        this.symbol = symbol;
+        this.amount = amount;
+    }
+
     public static Balance of(DepositAddress depositAddress, String symbol, Amount amount) {
         return new Balance(depositAddress, symbol, amount);
     }
 
     public static Balance zero(DepositAddress depositAddress, String symbol) {
         return new Balance(depositAddress, symbol, Amount.zero());
-    }
-
-    private Balance(DepositAddress depositAddress, String symbol, Amount amount) {
-        super();
-        this.depositAddress = depositAddress;
-        this.symbol = symbol;
-        this.amount = amount;
     }
 
     public void changeAmount(Amount amount) {
@@ -56,7 +55,7 @@ public class Balance extends DomainEntity {
 
     public void subtract(Amount amount) {
         if (this.amount.compareTo(amount) < 0) {
-            throw new IllegalStateException("balance cannot be negative");
+            throw new InternalServerException("balance cannot be negative");
         }
         this.amount = this.amount.subtract(amount);
     }

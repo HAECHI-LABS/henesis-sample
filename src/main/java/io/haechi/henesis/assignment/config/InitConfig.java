@@ -23,12 +23,12 @@ import java.util.List;
 @Configuration
 @Profile("init")
 public class InitConfig implements CommandLineRunner {
-    private HenesisClient klayHenesisClient;
-    private HenesisClient ethHenesisClient;
-    private HenesisClient btcHenesisClient;
-    private DepositAddressRepository depositAddressRepository;
-    private BalanceRepository balanceRepository;
-    private TransferRepository transferRepository;
+    private final HenesisClient klayHenesisClient;
+    private final HenesisClient ethHenesisClient;
+    private final HenesisClient btcHenesisClient;
+    private final DepositAddressRepository depositAddressRepository;
+    private final BalanceRepository balanceRepository;
+    private final TransferRepository transferRepository;
 
     public InitConfig(
             @Qualifier("klayHenesisClient") HenesisClient klayHenesisClient,
@@ -57,7 +57,7 @@ public class InitConfig implements CommandLineRunner {
 
     private void sync(HenesisClient client, Blockchain blockchain) {
         Pageable pageable = PageRequest.of(0, 50);
-        while(true) {
+        while (true) {
             Pagination<DepositAddress> depositAddressPagination = client.getDepositAddresses(pageable);
 
             if (depositAddressPagination.getResults().isEmpty()) {
@@ -74,8 +74,8 @@ public class InitConfig implements CommandLineRunner {
         }
 
         pageable = PageRequest.of(0, 50);
-        while(true) {
-            Pagination<Transfer> transferPagination = client.getTransfersByUpdatedAtGte(LocalDateTime.of(0,1,1,0, 0), pageable);
+        while (true) {
+            Pagination<Transfer> transferPagination = client.getTransfersByUpdatedAtGte(LocalDateTime.of(0, 1, 1, 0, 0), pageable);
 
             if (transferPagination.getResults().isEmpty()) {
                 break;
@@ -91,7 +91,7 @@ public class InitConfig implements CommandLineRunner {
         }
 
         // henesis dosen't manage deposit address's balance for Bitcoin
-        if(blockchain.equals(Blockchain.BITCOIN)) {
+        if (blockchain.equals(Blockchain.BITCOIN)) {
             return;
         }
 

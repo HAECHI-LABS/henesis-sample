@@ -2,7 +2,6 @@ package io.haechi.henesis.assignment.domain;
 
 import io.haechi.henesis.assignment.domain.exception.BadRequestException;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,9 +10,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -80,16 +76,14 @@ public class DepositAddress extends DomainEntity {
             HenesisClient henesisClient,
             BalanceManager balanceManager
     ) {
-        try {
-            henesisClient.getCoin(symbol);
-        } catch (Exception e) {
+        if (!henesisClient.isSupportedCoin(this.blockchain, symbol)) {
             throw new BadRequestException(String.format("henesis doesn't support '%s'", symbol));
         }
         Amount amount = Amount.of(requestedAmount);
         balanceManager.validateSpendableBalance(this, amount, symbol);
 
         Transfer transfer = henesisClient.transfer(to, symbol, amount);
-        // TODO: withdrawal 시 from은 master wallet
+        // 출금 시 실제 트랜잭션이 발생하는 곳은 master wallet
         if (!this.blockchain.equals(Blockchain.BITCOIN)) {
             transfer.setFrom(this.getMasterWalletAddress());
         }

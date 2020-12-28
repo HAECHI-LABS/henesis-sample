@@ -4,19 +4,15 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MasterWalletBalanceDto {
-    private String coinId;
-    private String coinType;
-    private String amount;
-    private Integer decimals;
-    private String spendableAmount;
+public class CreateHenesisDepositAddressRequest {
     private String name;
-    private String symbol;
+    private String passphrase;
+
+    public CreateHenesisDepositAddressRequest(String name) {
+        this.name = name;
+    }
 }

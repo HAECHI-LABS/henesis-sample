@@ -22,6 +22,7 @@ public class ValueTransferEventDto {
     private String coinSymbol;
     private String transferType;
     private String hash;
+    private String transactionId;
     private String createdAt;
     private String updatedAt;
 

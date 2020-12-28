@@ -22,7 +22,7 @@ public interface HenesisClient {
 
     Pagination<DepositAddress> getDepositAddresses(Pageable pageable);
 
-    Transfer flush(List<String> depositAddressIds);
+    Transfer flush(List<String> depositAddressHenesisIds);
 
     DepositAddress getDepositAddress(String id);
 

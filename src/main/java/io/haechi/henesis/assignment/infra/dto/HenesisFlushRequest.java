@@ -1,16 +1,17 @@
 package io.haechi.henesis.assignment.infra.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import java.util.List;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GetEstimatedFeeDto {
-    private String estimatedFee;
+public class HenesisFlushRequest {
+    private String ticker;
+    private String passphrase;
+    private List<String> userWalletIds;
 }

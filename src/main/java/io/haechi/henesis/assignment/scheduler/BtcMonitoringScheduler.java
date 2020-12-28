@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.Month;
 
 @Slf4j
 public class BtcMonitoringScheduler {
@@ -22,19 +21,22 @@ public class BtcMonitoringScheduler {
     private final TransferRepository transferRepository;
     private final BalanceManager balanceManager;
     private final int pollingSize;
+    private final String masterWalletAddress;
 
     public BtcMonitoringScheduler(
             HenesisClient henesisClient,
             DepositAddressRepository depositAddressRepository,
             TransferRepository transferRepository,
             BalanceManager balanceManager,
-            int pollingSize
+            int pollingSize,
+            String masterWalletAddress
     ) {
         this.henesisClient = henesisClient;
         this.depositAddressRepository = depositAddressRepository;
         this.transferRepository = transferRepository;
         this.balanceManager = balanceManager;
         this.pollingSize = pollingSize;
+        this.masterWalletAddress = masterWalletAddress;
     }
 
     /*
@@ -53,13 +55,14 @@ public class BtcMonitoringScheduler {
         this.henesisClient.getLatestTransfersByUpdatedAtGte(lastUpdatedAt, this.pollingSize)
                 .stream()
                 .map(henesisTransfer -> {
-                    Transfer localTransfer = this.transferRepository.findByHenesisId(henesisTransfer.getHenesisId()).orElse(null);
+                    Transfer localTransfer = this.transferRepository.findByHenesisTransferId(henesisTransfer.getHenesisTransferId()).orElse(null);
                     if (localTransfer == null) {
                         return henesisTransfer;
                     }
                     localTransfer.updateStatus(henesisTransfer.getStatus());
                     return localTransfer;
                 })
+                .filter(transfer -> !transfer.getTo().equals(this.masterWalletAddress)) // 마스터 지갑은 관리하지 않는다. 마스터 지갑 입금 내역은 제외
                 .filter(Transfer::isConfirmed) // TODO: when occurs reorg
                 .forEach(transfer -> {
                     DepositAddress depositAddress = this.depositAddressRepository.findByAddress(transfer.getTo())

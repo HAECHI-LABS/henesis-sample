@@ -65,7 +65,8 @@ public class ExchangeController {
     ) {
         return this.exchangeApplicationService.flush(
                 Blockchain.of(blockchain),
-                request.getDepositAddressIds()
+                request.getDepositAddressIds(),
+                request.getSymbol()
         );
     }
 }

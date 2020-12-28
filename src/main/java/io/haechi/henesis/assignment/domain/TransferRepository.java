@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
-    Optional<Transfer> findByHenesisId(String henesisId);
+    Optional<Transfer> findByHenesisTransferId(String henesisId);
 
     Optional<Transfer> findTopByBlockchainOrderByHenesisUpdatedAtDesc(Blockchain blockchain);
 
@@ -28,5 +28,5 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
             @Param("statuses") List<Transfer.Status> statuses
     );
 
-    boolean existsByHenesisId(String henesisId);
+    boolean existsByHenesisTransferId(String henesisId);
 }

@@ -50,15 +50,15 @@ public class BalanceManager {
 
     // TODO: naming
     public void reflectTransfer(Transfer transfer, DepositAddress depositAddress) {
-        Balance balance = balanceRepository.findByDepositAddressAndSymbol(depositAddress, transfer.getSymbol())
+        Balance balance = this.balanceRepository.findByDepositAddressAndSymbol(depositAddress, transfer.getSymbol())
                 .orElse(Balance.zero(depositAddress, transfer.getSymbol()));
 
         if (transfer.isDeposit()) {
             balance.add(transfer.getAmount());
-            balanceRepository.save(balance);
+            this.balanceRepository.save(balance);
             return;
         }
         balance.subtract(transfer.getAmount());
-        balanceRepository.save(balance);
+        this.balanceRepository.save(balance);
     }
 }

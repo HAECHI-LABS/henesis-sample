@@ -28,7 +28,8 @@ public class MonitoringConfig {
                 transferRepository,
                 balanceManager,
                 Blockchain.ETHEREUM,
-                henesisProperties.getEthPollingSize()
+                henesisProperties.getEthPollingSize(),
+                henesisProperties.getEthMasterWalletAddress()
         );
     }
 
@@ -46,7 +47,8 @@ public class MonitoringConfig {
                 transferRepository,
                 balanceManager,
                 Blockchain.KLAYTN,
-                henesisProperties.getKlayPollingSize()
+                henesisProperties.getKlayPollingSize(),
+                henesisProperties.getKlayMasterWalletAddress()
         );
     }
 
@@ -63,7 +65,8 @@ public class MonitoringConfig {
                 depositAddressRepository,
                 transferRepository,
                 balanceManager,
-                henesisProperties.getBtcPollingSize()
+                henesisProperties.getBtcPollingSize(),
+                henesisProperties.getBtcMasterWalletAddress()
         );
     }
 }

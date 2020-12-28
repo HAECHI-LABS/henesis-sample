@@ -30,16 +30,19 @@ import java.util.stream.Collectors;
 public class BtcHenesisClient implements HenesisClient {
     private final RestTemplate restTemplate;
     private final String masterWalletId;
+    private final String masterWalletAddress;
     private final String passphrase;
 
     public BtcHenesisClient(
             RestTemplate restTemplate,
-            String btcMasterWalletId,
-            String btcPassphrase
+            String masterWalletId,
+            String masterWalletAddress,
+            String paassphrase
     ) {
         this.restTemplate = restTemplate;
-        this.masterWalletId = btcMasterWalletId;
-        this.passphrase = btcPassphrase;
+        this.masterWalletId = masterWalletId;
+        this.masterWalletAddress = masterWalletAddress;
+        this.passphrase = paassphrase;
     }
 
 
@@ -60,7 +63,7 @@ public class BtcHenesisClient implements HenesisClient {
                 Blockchain.BITCOIN,
                 response.getName(),
                 response.getAddress(),
-                this.getMasterWalletAddress()
+                this.masterWalletAddress
         );
     }
 
@@ -128,6 +131,7 @@ public class BtcHenesisClient implements HenesisClient {
         return response.getResults().stream()
                 .map(result -> Transfer.fromHenesis(
                         result.getId(),
+                        result.getTransaction().getId(),
                         null,
                         result.getReceivedAt() != null
                                 ? result.getReceivedAt()
@@ -163,6 +167,7 @@ public class BtcHenesisClient implements HenesisClient {
                 response.getResults().stream()
                         .map(result -> Transfer.fromHenesis(
                                 result.getId(),
+                                result.getTransaction().getId(),
                                 null,
                                 result.getReceivedAt() != null
                                         ? result.getReceivedAt()
@@ -199,7 +204,6 @@ public class BtcHenesisClient implements HenesisClient {
                 }
         ).getBody();
 
-        String masterWalletAddress = this.getMasterWalletAddress();
         return new Pagination<>(
                 response.getPagination(),
                 response.getResults().stream()
@@ -209,14 +213,14 @@ public class BtcHenesisClient implements HenesisClient {
                                 Blockchain.BITCOIN,
                                 result.getName(),
                                 result.getAddress(),
-                                masterWalletAddress
+                                this.masterWalletAddress
                         ))
                         .collect(Collectors.toList())
         );
     }
 
     @Override
-    public Transfer flush(List<String> depositAddressIds) {
+    public Transfer flush(List<String> depositAddressHenesisIds) {
         throw new IllegalStateException("henesis doesn't support flush for bitcoin");
     }
 
@@ -233,7 +237,7 @@ public class BtcHenesisClient implements HenesisClient {
                 Blockchain.BITCOIN,
                 response.getName(),
                 response.getAddress(),
-                this.getMasterWalletAddress()
+                this.masterWalletAddress
         );
     }
 

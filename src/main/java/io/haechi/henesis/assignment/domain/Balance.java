@@ -46,14 +46,18 @@ public class Balance extends DomainEntity {
         this.amount = amount;
     }
 
+    public void changeAmount(Amount amount) {
+        this.amount = amount;
+    }
+
     public void add(Amount amount) {
-        this.amount.add(amount);
+        this.amount = this.amount.add(amount);
     }
 
     public void subtract(Amount amount) {
         if (this.amount.compareTo(amount) < 0) {
             throw new IllegalStateException("balance cannot be negative");
         }
-        this.amount.subtract(amount);
+        this.amount = this.amount.subtract(amount);
     }
 }

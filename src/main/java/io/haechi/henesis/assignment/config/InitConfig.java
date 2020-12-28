@@ -12,6 +12,7 @@ import io.haechi.henesis.assignment.domain.TransferRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Configuration
+@Profile("init")
 public class InitConfig implements CommandLineRunner {
     private HenesisClient klayHenesisClient;
     private HenesisClient ethHenesisClient;
@@ -80,7 +82,7 @@ public class InitConfig implements CommandLineRunner {
             }
 
             transferPagination.getResults().forEach(transfer -> {
-                if (!this.transferRepository.existsByHenesisId(transfer.getHenesisId())) {
+                if (!this.transferRepository.existsByHenesisTransferId(transfer.getHenesisTransferId())) {
                     this.transferRepository.save(transfer);
                 }
             });
@@ -101,7 +103,8 @@ public class InitConfig implements CommandLineRunner {
                         .orElse(Balance.zero(depositAddress, onchainBalance.getSymbol()));
 
                 if (onchainBalance.getAmount().compareTo(offchainBalance.getAmount()) != 0) {
-                    this.balanceRepository.save(onchainBalance);
+                    offchainBalance.changeAmount(onchainBalance.getAmount());
+                    this.balanceRepository.save(offchainBalance);
                 }
             });
         });

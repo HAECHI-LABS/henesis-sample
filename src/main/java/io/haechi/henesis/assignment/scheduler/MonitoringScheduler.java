@@ -23,6 +23,7 @@ public class MonitoringScheduler {
     private final BalanceManager balanceManager;
     private final Blockchain blockchain;
     private final int pollingSize;
+    private final String masterWalletAddress;
 
     public MonitoringScheduler(
             HenesisClient henesisClient,
@@ -30,7 +31,8 @@ public class MonitoringScheduler {
             TransferRepository transferRepository,
             BalanceManager balanceManager,
             Blockchain blockchain,
-            int pollingSize
+            int pollingSize,
+            String masterWalletAddress
     ) {
         this.henesisClient = henesisClient;
         this.depositAddressRepository = depositAddressRepository;
@@ -38,6 +40,7 @@ public class MonitoringScheduler {
         this.balanceManager = balanceManager;
         this.blockchain = blockchain;
         this.pollingSize = pollingSize;
+        this.masterWalletAddress = masterWalletAddress;
     }
 
     /*
@@ -56,7 +59,7 @@ public class MonitoringScheduler {
         this.henesisClient.getLatestTransfersByUpdatedAtGte(lastUpdatedAt, this.pollingSize)
                 .stream()
                 .map(henesisTransfer -> {
-                    Transfer localTransfer = this.transferRepository.findByHenesisId(henesisTransfer.getHenesisId()).orElse(null);
+                    Transfer localTransfer = this.transferRepository.findByHenesisTransferId(henesisTransfer.getHenesisTransferId()).orElse(null);
                     if (localTransfer == null) {
                         return henesisTransfer;
                     }
@@ -66,15 +69,26 @@ public class MonitoringScheduler {
                 .filter(transfer -> !transfer.isFlushed())
                 .filter(Transfer::isConfirmed) // TODO: when occurs reorg
                 .forEach(transfer -> {
+                    // flush로 나온 transfer의 withdrawal은 depositAddressId가 없고 from으로 deposit address를 찾을 수 있다.
                     DepositAddress depositAddress = null;
                     if (transfer.isDeposit()) {
-                        // TODO: 마스터지갑일 경우 제외
+                        // 마스터 지갑은 관리하지 않기 때문에 마스터 지갑 입금 내역은 deposit address에 반영하지 않는다.
+                        if (transfer.getTo().equals(this.masterWalletAddress)) {
+                            this.transferRepository.save(transfer);
+                            return;
+                        }
                         depositAddress = this.depositAddressRepository.findByAddress(transfer.getTo())
                                 .orElseThrow(() -> new IllegalStateException(String.format("there is no '%s' deposit address", transfer.getTo())));
                     } else {
-                        // TODO: deposit address에서 출금이 발생할 때
-                        depositAddress = this.depositAddressRepository.findById(transfer.getDepositAddressId())
-                                .orElseThrow(() -> new IllegalStateException("there is no '%s' deposit address"));
+                        // ETH, KLAY의 경우, from이 deposit address라면 실제 사용자 지갑에서 출금이 발생했거나 flush로 인한 출금이다.
+                        if (transfer.getFrom().equals(this.masterWalletAddress)) {
+                            // TODO: 새로 init해서 transfer에 deposit address id가 없을 때
+                            depositAddress = this.depositAddressRepository.findById(transfer.getDepositAddressId())
+                                    .orElseThrow(() -> new IllegalStateException("there is no '%s' deposit address"));
+                        } else {
+                            depositAddress = this.depositAddressRepository.findByAddress(transfer.getFrom())
+                                    .orElseThrow(() -> new IllegalStateException("there is no '%s' deposit address"));
+                        }
                     }
                     this.balanceManager.reflectTransfer(transfer, depositAddress);
                     this.transferRepository.save(transfer);

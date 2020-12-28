@@ -1,10 +1,8 @@
 package io.haechi.henesis.assignment.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.LockModeType;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +18,6 @@ public interface DepositAddressRepository extends JpaRepository<DepositAddress, 
     boolean existsByHenesisId(String henesisId);
 
     List<DepositAddress> findAllByBlockchain(Blockchain blockchain);
+
+    List<DepositAddress> findAllByBlockchainAndIdIn(Blockchain blockchain, List<Long> ids);
 }

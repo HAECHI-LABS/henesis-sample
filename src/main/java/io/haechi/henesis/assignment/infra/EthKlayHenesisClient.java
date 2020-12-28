@@ -1,5 +1,7 @@
 package io.haechi.henesis.assignment.infra;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.haechi.henesis.assignment.domain.Amount;
 import io.haechi.henesis.assignment.domain.Balance;
 import io.haechi.henesis.assignment.domain.Blockchain;
@@ -8,9 +10,11 @@ import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.Pagination;
 import io.haechi.henesis.assignment.domain.Transfer;
+import io.haechi.henesis.assignment.domain.exception.InternalServerException;
 import io.haechi.henesis.assignment.infra.dto.CoinDto;
 import io.haechi.henesis.assignment.infra.dto.CreateDepositAddressDto;
 import io.haechi.henesis.assignment.infra.dto.EthKlayTransferDto;
+import io.haechi.henesis.assignment.infra.dto.HenesisFlushRequest;
 import io.haechi.henesis.assignment.infra.dto.MasterWalletBalanceDto;
 import io.haechi.henesis.assignment.infra.dto.ValueTransferEventDto;
 import io.haechi.henesis.assignment.support.Utils;
@@ -30,17 +34,20 @@ import java.util.stream.Collectors;
 public class EthKlayHenesisClient implements HenesisClient {
     private final RestTemplate restTemplate;
     private final String masterWalletId;
+    private final String masterWalletAddress;
     private final String passphrase;
     private final Blockchain blockchain;
 
     public EthKlayHenesisClient(
             RestTemplate restTemplate,
             String maseterWalletId,
+            String masterWalletAddress,
             String passphrase,
             Blockchain blockchain
     ) {
         this.restTemplate = restTemplate;
         this.masterWalletId = maseterWalletId;
+        this.masterWalletAddress = masterWalletAddress;
         this.passphrase = passphrase;
         this.blockchain = blockchain;
     }
@@ -72,7 +79,7 @@ public class EthKlayHenesisClient implements HenesisClient {
                 Blockchain.of(response.getBlockchain()),
                 response.getName(),
                 response.getAddress(),
-                this.getMasterWalletAddress()
+                this.masterWalletAddress
         );
 
     }
@@ -171,6 +178,7 @@ public class EthKlayHenesisClient implements HenesisClient {
         return response.getResults().stream()
                 .map(result -> Transfer.fromHenesis(
                         result.getId(),
+                        result.getTransactionId(),
                         result.getFrom(),
                         result.getTo(),
                         Amount.of(result.getAmount()),
@@ -206,6 +214,7 @@ public class EthKlayHenesisClient implements HenesisClient {
                 response.getResults().stream()
                         .map(result -> Transfer.fromHenesis(
                                 result.getId(),
+                                result.getTransactionId(),
                                 result.getFrom(),
                                 result.getTo(),
                                 Amount.of(result.getAmount()),
@@ -260,7 +269,6 @@ public class EthKlayHenesisClient implements HenesisClient {
                 }
         ).getBody();
 
-        String masterWalletAddress = this.getMasterWalletAddress();
         return new Pagination<>(
                 response.getPagination(),
                 response.getResults().stream()
@@ -270,7 +278,7 @@ public class EthKlayHenesisClient implements HenesisClient {
                                 Blockchain.of(result.getBlockchain()),
                                 result.getName(),
                                 result.getAddress(),
-                                masterWalletAddress
+                                this.masterWalletAddress
                         ))
                         .collect(Collectors.toList())
         );
@@ -283,20 +291,18 @@ public class EthKlayHenesisClient implements HenesisClient {
      * @return Transaction
      */
     @Override
-    public Transfer flush(List<String> depositAddressIds) {
-        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
-
-        param.add("ticker", this.blockchain.toSymbol());
-        param.add("passphrase", this.passphrase);
-        param.addAll("userWalletIds", depositAddressIds);
-
+    public Transfer flush(List<String> depositAddressHenesisIds) {
         EthKlayTransferDto response = this.restTemplate.postForEntity(
                 String.format(
                         "%s/wallets/%s/flush",
                         this.blockchain.toSymbol(),
                         this.masterWalletId
                 ),
-                param,
+                new HenesisFlushRequest(
+                        this.blockchain.toSymbol().toUpperCase(),
+                        this.passphrase,
+                        depositAddressHenesisIds
+                ),
                 EthKlayTransferDto.class
         ).getBody();
 
@@ -327,14 +333,14 @@ public class EthKlayHenesisClient implements HenesisClient {
                 Blockchain.of(response.getBlockchain()),
                 response.getName(),
                 response.getAddress(),
-                this.getMasterWalletAddress()
+                this.masterWalletAddress
         );
     }
 
     @Override
     public Coin getCoin(String symbol) {
         CoinDto response = this.restTemplate.getForEntity(
-                String.format("%s/coins/%s", this.blockchain.toSymbol(), symbol.toLowerCase()),
+                String.format("%s/coins/%s", this.blockchain.toSymbol(), symbol.toUpperCase()),
                 CoinDto.class
         ).getBody();
 

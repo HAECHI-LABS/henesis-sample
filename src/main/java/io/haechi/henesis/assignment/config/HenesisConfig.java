@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.haechi.henesis.assignment.domain.Blockchain;
 import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.HenesisClientSupplier;
@@ -27,11 +28,13 @@ public class HenesisConfig {
     @Qualifier("ethHenesisClient")
     public HenesisClient ethHenesisClient(
             HenesisProperties henesisProperties,
-            @Qualifier("henesisRestTemplate") RestTemplate restTemplate
+            @Qualifier("henesisRestTemplate") RestTemplate restTemplate,
+            ObjectMapper objectMapper
     ) {
         return new EthKlayHenesisClient(
                 restTemplate,
                 henesisProperties.getEthMasterWalletId(),
+                henesisProperties.getEthMasterWalletAddress(),
                 henesisProperties.getEthPassphrase(),
                 Blockchain.ETHEREUM
         );
@@ -41,11 +44,13 @@ public class HenesisConfig {
     @Qualifier("klayHenesisClient")
     public HenesisClient klayHenesisClient(
             HenesisProperties henesisProperties,
-            @Qualifier("henesisRestTemplate") RestTemplate restTemplate
+            @Qualifier("henesisRestTemplate") RestTemplate restTemplate,
+            ObjectMapper objectMapper
     ) {
         return new EthKlayHenesisClient(
                 restTemplate,
                 henesisProperties.getKlayMasterWalletId(),
+                henesisProperties.getKlayMasterWalletAddress(),
                 henesisProperties.getKlayPassphrase(),
                 Blockchain.KLAYTN
         );
@@ -60,6 +65,7 @@ public class HenesisConfig {
         return new BtcHenesisClient(
                 restTemplate,
                 henesisProperties.getBtcMasterWalletId(),
+                henesisProperties.getBtcMasterWalletAddress(),
                 henesisProperties.getBtcPassphrase()
         );
     }

@@ -7,17 +7,19 @@ import io.haechi.henesis.assignment.application.dto.TransferRequest;
 import io.haechi.henesis.assignment.application.dto.TransferResponse;
 import io.haechi.henesis.assignment.domain.BalanceManager;
 import io.haechi.henesis.assignment.domain.Blockchain;
-import io.haechi.henesis.assignment.domain.Coin;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.DepositAddressRepository;
+import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.HenesisClientSupplier;
 import io.haechi.henesis.assignment.domain.Transfer;
 import io.haechi.henesis.assignment.domain.TransferRepository;
+import io.haechi.henesis.assignment.domain.exception.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -70,7 +72,18 @@ public class ExchangeApplicationService {
     }
 
     @Transactional
-    public FlushResponse flush(Blockchain blockchain, List<String> depositAddressIds) {
+    public FlushResponse flush(
+            Blockchain blockchain,
+            List<Long> depositAddressIds,
+            String symbol
+    ) {
+        HenesisClient henesisClient = this.henesisClientSupplier.supply(blockchain);
+        try {
+            henesisClient.getCoin(symbol);
+        } catch (Exception e) {
+            throw new BadRequestException(String.format("henesis doesn't support '%s'", symbol));
+        }
+
         if (blockchain.equals(Blockchain.BITCOIN)) {
             throw new IllegalArgumentException("btc doesn't support flush");
         }
@@ -83,7 +96,28 @@ public class ExchangeApplicationService {
             throw new IllegalArgumentException("depositAddressIds is null or empty");
         }
 
-        Transfer flushTransfer = this.henesisClientSupplier.supply(blockchain).flush(depositAddressIds);
+        List<DepositAddress> depositAddresses = this.depositAddressRepository.findAllByBlockchainAndIdIn(blockchain, depositAddressIds);
+        if (depositAddressIds.size() != depositAddresses.size()) {
+            depositAddressIds.remove(
+                    depositAddresses.stream()
+                            .map(DepositAddress::getId)
+                            .collect(Collectors.toList())
+            );
+
+            throw new BadRequestException(
+                    String.format(
+                            "there is no matched deposit address id with '%s'",
+                            depositAddressIds.stream()
+                                    .map(Object::toString)
+                                    .collect(Collectors.joining(", "))
+                    )
+            );
+        }
+        Transfer flushTransfer = henesisClient.flush(
+                depositAddresses.stream()
+                        .map(DepositAddress::getHenesisId)
+                        .collect(Collectors.toList())
+        );
 
         log.info(String.format("Flush Requested..! (%s)", flushTransfer.getBlockchain()));
 

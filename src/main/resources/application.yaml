@@ -5,18 +5,21 @@ app:
     api-secret: pvZ4CrBm5z9/uBSQgmkOvm/kDxkFiLxx8RSZZMkWRo4=
     access-token: eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6InRvYnlAaGFlY2hpLmlvIiwiaWQiOiJjMDBiNWIxMDA4NjU4MGM2ZTc0NTZlZDQwYTcxMDkzZSIsInR5cGUiOiJMT05HIiwiaXNzIjoid2FsbGV0LXByb2QtdGVzdG5ldCIsImlhdCI6MTU5NDcyNzM2MCwiZXhwIjoxMDAwMDAxNTk0NzI3MzYwfQ.ueBjMrq3xT9F86geXxaoaIxQyXjKG4coMweSHj4muJw6yojjtbfuhUKfIjGFUE1kFDrmR-sT_G7uEOU4WKUMCA
 
-    eth-master-wallet-id: 3d5898988fdcbb77535eb7eade178a8e
-    eth-passphrase: password
+    eth-master-wallet-id: "3d5898988fdcbb77535eb7eade178a8e"
+    eth-master-wallet-address: "0x2eda67cc0aaf88a7defc80c51e5d0e543852de0f"
+    eth-passphrase: "password"
     eth-polling-size: 500
     eth-polling-interval: 10000 # 10 seconds
 
-    klay-master-wallet-id: d7d1a1d9a9c526c9c6f75bc0a58055e1
-    klay-passphrase: password
+    klay-master-wallet-id: "d7d1a1d9a9c526c9c6f75bc0a58055e1"
+    klay-master-wallet-address: "0x7d59b57eb8913bf0bd59f08f83fd5676aeb5482c"
+    klay-passphrase: "password"
     klay-polling-size: 500
     klay-polling-interval: 3000 # 3 seconds
 
-    btc-master-wallet-id: d74a91146d1d36d518e461e469c8c911
-    btc-passphrase: password
+    btc-master-wallet-id: "d74a91146d1d36d518e461e469c8c911"
+    btc-master-wallet-address: "2N6jSUMrrHbdVTMmX61avsuG6ou7VH4y5zs"
+    btc-passphrase: "password"
     btc-polling-size: 500
     btc-polling-interval: 180000 # 3 minute
 

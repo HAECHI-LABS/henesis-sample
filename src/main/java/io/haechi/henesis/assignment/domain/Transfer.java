@@ -11,9 +11,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -35,8 +32,11 @@ public class Transfer extends DomainEntity {
     @Column(name = "deposit_address_id")
     private Long depositAddressId;
 
-    @Column(name = "henesis_id")
-    private String henesisId;
+    @Column(name = "henesis_transfer_id")
+    private String henesisTransferId;
+
+    @Column(name = "henesis_transaction_id")
+    private String henesisTransactionId;
 
     @AttributeOverride(name = "value", column = @Column(name = "amount", precision = 78))
     private Amount amount = new Amount();
@@ -68,71 +68,9 @@ public class Transfer extends DomainEntity {
     @Column(name = "henesis_updated_at")
     private LocalDateTime henesisUpdatedAt;
 
-    private Transfer(
-            String henesisId,
-            String from,
-            String to,
-            Amount amount,
-            Blockchain blockchain,
-            Status status,
-            String symbol,
-            Type type,
-            String hash,
-            LocalDateTime henesisUpdatedAt
-    ) {
-        this.henesisId = henesisId;
-        this.from = from;
-        this.to = to;
-        this.amount = amount;
-        this.blockchain = blockchain;
-        this.status = status;
-        this.symbol = symbol;
-        this.type = type;
-        this.hash = hash;
-        this.henesisUpdatedAt = henesisUpdatedAt;
-    }
-
-    private Transfer(
-            String henesisId,
-            String symbol,
-            Blockchain blockchain,
-            Status status,
-            LocalDateTime henesisUpdatedAt
-    ) {
-        this.henesisId = henesisId;
-        this.symbol = symbol;
-        this.blockchain = blockchain;
-        this.status = status;
-        this.henesisUpdatedAt = henesisUpdatedAt;
-        this.type = Type.FLUSH;
-    }
-
-    private Transfer(
-            String henesisId,
-            Status status,
-            String to,
-            Amount amount,
-            String symbol,
-            Blockchain blockchain,
-            String hash,
-            LocalDateTime henesisUpdatedAt
-    ) {
-        this.henesisId = henesisId;
-        this.status = status;
-        this.to = to;
-        this.amount = amount;
-        this.symbol = symbol;
-        this.blockchain = blockchain;
-        this.hash = hash;
-        this.henesisUpdatedAt = henesisUpdatedAt;
-    }
-
-    public static Transfer of() {
-        return new Transfer();
-    }
-
     public static Transfer fromHenesis(
-            String henesisId,
+            String henesisTransferId,
+            String henesisTransactionId,
             String from,
             String to,
             Amount amount,
@@ -144,7 +82,8 @@ public class Transfer extends DomainEntity {
             LocalDateTime henesisUpdatedAt
     ) {
         return new Transfer(
-                henesisId,
+                henesisTransferId,
+                henesisTransactionId,
                 from,
                 to,
                 amount,
@@ -155,6 +94,32 @@ public class Transfer extends DomainEntity {
                 hash,
                 henesisUpdatedAt
         );
+    }
+
+    private Transfer(
+            String henesisTransferId,
+            String henesisTransactionId,
+            String from,
+            String to,
+            Amount amount,
+            Blockchain blockchain,
+            Status status,
+            String symbol,
+            Type type,
+            String hash,
+            LocalDateTime henesisUpdatedAt
+    ) {
+        this.henesisTransferId = henesisTransferId;
+        this.henesisTransactionId = henesisTransactionId;
+        this.from = from;
+        this.to = to;
+        this.amount = amount;
+        this.blockchain = blockchain;
+        this.status = status;
+        this.symbol = symbol;
+        this.type = type;
+        this.hash = hash;
+        this.henesisUpdatedAt = henesisUpdatedAt;
     }
 
     public static Transfer flush(
@@ -173,8 +138,23 @@ public class Transfer extends DomainEntity {
         );
     }
 
+    private Transfer(
+            String henesisTransferId,
+            String symbol,
+            Blockchain blockchain,
+            Status status,
+            LocalDateTime henesisUpdatedAt
+    ) {
+        this.henesisTransferId = henesisTransferId;
+        this.symbol = symbol;
+        this.blockchain = blockchain;
+        this.status = status;
+        this.henesisUpdatedAt = henesisUpdatedAt;
+        this.type = Type.FLUSH;
+    }
+
     public static Transfer transfer(
-            String henesisId,
+            String henesisTransactionId,
             Status status,
             String to,
             Amount amount,
@@ -184,7 +164,8 @@ public class Transfer extends DomainEntity {
             LocalDateTime henesisUpdatedAt
     ) {
         return new Transfer(
-                henesisId,
+                null,
+                henesisTransactionId,
                 status,
                 to,
                 amount,
@@ -195,19 +176,26 @@ public class Transfer extends DomainEntity {
         );
     }
 
-    public static Transfer newInstanceOf(
-            String transactionId,
-            String blockchain,
-            String status,
-            String createdAt
+    private Transfer(
+            String henesisTransferId,
+            String henesisTransactionId,
+            Status status,
+            String to,
+            Amount amount,
+            String symbol,
+            Blockchain blockchain,
+            String hash,
+            LocalDateTime henesisUpdatedAt
     ) {
-        return new Transfer(
-//                transactionId,
-//                blockchain,
-//                status,
-//                createdAt
-        );
-
+        this.henesisTransferId = henesisTransferId;
+        this.henesisTransactionId = henesisTransactionId;
+        this.status = status;
+        this.to = to;
+        this.amount = amount;
+        this.symbol = symbol;
+        this.blockchain = blockchain;
+        this.hash = hash;
+        this.henesisUpdatedAt = henesisUpdatedAt;
     }
 
     public void updateStatus(Status status) {

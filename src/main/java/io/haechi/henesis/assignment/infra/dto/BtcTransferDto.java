@@ -24,5 +24,14 @@ public class BtcTransferDto {
     private String createdAt;
     private String type;
     private String hex;
-    private List<BtcTransactionOutputDto> outputs;
+    private TransactionDto transaction;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class TransactionDto {
+        private String id;
+        private List<BtcTransactionOutputDto> outputs;
+    }
 }

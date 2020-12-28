@@ -14,5 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FlushRequest {
-    private List<String> depositAddressIds = new ArrayList<>();
+    private List<Long> depositAddressIds = new ArrayList<>();
+    private String symbol;
 }

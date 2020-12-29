@@ -77,7 +77,7 @@ public class DepositAddress extends DomainEntity {
             BalanceManager balanceManager
     ) {
         if (!henesisClient.isSupportedCoin(this.blockchain, symbol)) {
-            throw new BadRequestException(String.format("henesis doesn't support '%s'", symbol));
+            throw new BadRequestException(String.format("henesis doesn't support '%s' '%s'", blockchain.toString(), symbol));
         }
         Amount amount = Amount.of(requestedAmount);
         balanceManager.validateSpendableBalance(this, amount, symbol);

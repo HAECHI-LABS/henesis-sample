@@ -17,4 +17,8 @@ public class TransferRequest {
     private String symbol;
     private String to;
     private BigInteger amount;
+
+    public String getSymbol() {
+        return this.symbol.toUpperCase();
+    }
 }

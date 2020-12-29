@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.infra.dto;
 
+import io.haechi.henesis.assignment.domain.Transfer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,11 +23,19 @@ public class ValueTransferEventDto {
     private String coinSymbol;
     private String transferType;
     private String hash;
+    private String walletType;
     private String transactionId;
     private String createdAt;
     private String updatedAt;
 
     public String getId() {
         return Long.toString(this.id);
+    }
+
+    public Transfer.Owner resolveOwner() {
+        if (this.walletType.equals("MASTER_WALLET")) {
+            return Transfer.Owner.MASTER_WALLET;
+        }
+        return Transfer.Owner.DEPOSIT_ADDRESS;
     }
 }

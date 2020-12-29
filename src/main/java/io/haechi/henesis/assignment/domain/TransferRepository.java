@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
-    Optional<Transfer> findByHenesisTransferId(String henesisId);
+    Optional<Transfer> findByHenesisTransactionIdAndType(String henesisTransactionId, Transfer.Type type);
 
-    Optional<Transfer> findTopByBlockchainOrderByHenesisUpdatedAtDesc(Blockchain blockchain);
+    Optional<Transfer> findTopByBlockchainAndStatusOrderByHenesisUpdatedAtDesc(Blockchain blockchain, Transfer.Status status);
 
     @Query(
             value = "SELECT SUM(t.amount.value) " +
@@ -29,4 +29,8 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
     );
 
     boolean existsByHenesisTransferId(String henesisId);
+
+    boolean existsByBlockchainAndHenesisTransactionIdAndType(Blockchain blockchain, String henesisTransactionId, Transfer.Type type);
+
+    Optional<Transfer> findByBlockchainAndHenesisTransactionIdAndType(Blockchain blockchain, String henesisTransactionId, Transfer.Type type);
 }

@@ -20,7 +20,7 @@ import io.haechi.henesis.assignment.support.Utils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
@@ -78,7 +78,6 @@ public class EthKlayHenesisClient implements HenesisClient {
 
     @Override
     public Transfer transfer(String to, String symbol, Amount amount) {
-        // TODO: template
         EthKlayTransferDto response = this.restTemplate.postForEntity(
                 String.format(
                         "%s/wallets/%s/transfer",
@@ -99,7 +98,7 @@ public class EthKlayHenesisClient implements HenesisClient {
                 Transfer.Status.of(response.getStatus()),
                 to,
                 amount,
-                response.getCoinSymbol(),
+                symbol.toUpperCase(),
                 Blockchain.of(response.getBlockchain()),
                 response.getHash(),
                 Utils.toLocalDateTime(response.getCreatedAt())
@@ -139,6 +138,7 @@ public class EthKlayHenesisClient implements HenesisClient {
                         result.getCoinSymbol(),
                         Transfer.Type.of(result.getTransferType()),
                         result.getHash(),
+                        result.resolveOwner(),
                         Utils.toLocalDateTime(result.getUpdatedAt())
                 ))
                 .collect(Collectors.toList());
@@ -175,6 +175,7 @@ public class EthKlayHenesisClient implements HenesisClient {
                                 result.getCoinSymbol(),
                                 Transfer.Type.of(result.getTransferType()),
                                 result.getHash(),
+                                result.resolveOwner(),
                                 Utils.toLocalDateTime(result.getUpdatedAt())
                         ))
                         .collect(Collectors.toList())
@@ -236,7 +237,7 @@ public class EthKlayHenesisClient implements HenesisClient {
     }
 
     @Override
-    public Transfer flush(List<String> depositAddressHenesisIds) {
+    public Transfer flush(String symbol, List<String> depositAddressHenesisIds) {
         EthKlayTransferDto response = this.restTemplate.postForEntity(
                 String.format(
                         "%s/wallets/%s/flush",
@@ -244,7 +245,7 @@ public class EthKlayHenesisClient implements HenesisClient {
                         this.masterWalletId
                 ),
                 new HenesisFlushRequest(
-                        this.blockchain.toSymbol().toUpperCase(),
+                        symbol,
                         this.passphrase,
                         depositAddressHenesisIds
                 ),
@@ -253,9 +254,8 @@ public class EthKlayHenesisClient implements HenesisClient {
 
         return Transfer.flush(
                 response.getId(),
-                response.getCoinSymbol(),
+                symbol,
                 Blockchain.of(response.getBlockchain()),
-                Transfer.Status.of(response.getStatus()),
                 Utils.toLocalDateTime(response.getCreatedAt())
         );
     }
@@ -298,11 +298,15 @@ public class EthKlayHenesisClient implements HenesisClient {
 
     @Override
     public boolean isSupportedCoin(Blockchain blockchain, String symbol) {
-        HttpStatus statusCode = this.restTemplate.getForEntity(
-                String.format("%s/coins/%s", this.blockchain.toSymbol(), symbol.toUpperCase()),
-                CoinDto.class
-        ).getStatusCode();
-        return !statusCode.isError();
+        try {
+            this.restTemplate.getForEntity(
+                    String.format("%s/coins/%s", this.blockchain.toSymbol(), symbol.toUpperCase()),
+                    CoinDto.class
+            );
+        } catch (HttpClientErrorException e) {
+            return !e.getStatusCode().isError();
+        }
+        return true;
     }
 
     @Override

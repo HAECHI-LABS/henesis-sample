@@ -41,9 +41,6 @@ public class Transfer extends DomainEntity {
     @AttributeOverride(name = "value", column = @Column(name = "amount", precision = 78))
     private Amount amount = new Amount();
 
-    @AttributeOverride(name = "value", column = @Column(name = "fee"))
-    private Amount fee;
-
     @Column(name = "blockchain")
     @Enumerated(EnumType.STRING)
     private Blockchain blockchain;
@@ -59,14 +56,15 @@ public class Transfer extends DomainEntity {
     @Column(name = "symbol")
     private String symbol;
 
-    @Column(name = "decimal")
-    private Integer decimal;
-
     @Column(name = "hash")
     private String hash;
 
     @Column(name = "henesis_updated_at")
     private LocalDateTime henesisUpdatedAt;
+
+    @Column(name = "owner")
+    @Enumerated(EnumType.STRING)
+    private Owner owner;
 
     private Transfer(
             String henesisTransferId,
@@ -79,6 +77,7 @@ public class Transfer extends DomainEntity {
             String symbol,
             Type type,
             String hash,
+            Owner owner,
             LocalDateTime henesisUpdatedAt
     ) {
         this.henesisTransferId = henesisTransferId;
@@ -91,22 +90,8 @@ public class Transfer extends DomainEntity {
         this.symbol = symbol;
         this.type = type;
         this.hash = hash;
+        this.owner = owner;
         this.henesisUpdatedAt = henesisUpdatedAt;
-    }
-
-    private Transfer(
-            String henesisTransferId,
-            String symbol,
-            Blockchain blockchain,
-            Status status,
-            LocalDateTime henesisUpdatedAt
-    ) {
-        this.henesisTransferId = henesisTransferId;
-        this.symbol = symbol;
-        this.blockchain = blockchain;
-        this.status = status;
-        this.henesisUpdatedAt = henesisUpdatedAt;
-        this.type = Type.FLUSH;
     }
 
     private Transfer(
@@ -118,6 +103,8 @@ public class Transfer extends DomainEntity {
             String symbol,
             Blockchain blockchain,
             String hash,
+            Owner owner,
+            Type type,
             LocalDateTime henesisUpdatedAt
     ) {
         this.henesisTransferId = henesisTransferId;
@@ -128,7 +115,25 @@ public class Transfer extends DomainEntity {
         this.symbol = symbol;
         this.blockchain = blockchain;
         this.hash = hash;
+        this.owner = owner;
+        this.type = type;
         this.henesisUpdatedAt = henesisUpdatedAt;
+    }
+
+    private Transfer(
+            String henesisTransactionId,
+            String symbol,
+            Blockchain blockchain,
+            Owner owner,
+            Type type,
+            LocalDateTime henesisUpdatedAt
+    ) {
+        this.henesisTransactionId = henesisTransactionId;
+        this.symbol = symbol;
+        this.blockchain = blockchain;
+        this.henesisUpdatedAt = henesisUpdatedAt;
+        this.owner = owner;
+        this.type = type;
     }
 
     public static Transfer fromHenesis(
@@ -142,6 +147,7 @@ public class Transfer extends DomainEntity {
             String symbol,
             Type type,
             String hash,
+            Owner owner,
             LocalDateTime henesisUpdatedAt
     ) {
         return new Transfer(
@@ -155,22 +161,23 @@ public class Transfer extends DomainEntity {
                 symbol,
                 type,
                 hash,
+                owner,
                 henesisUpdatedAt
         );
     }
 
     public static Transfer flush(
-            String henesisId,
+            String henesisTransactionId,
             String symbol,
             Blockchain blockchain,
-            Status status,
             LocalDateTime henesisUpdatedAt
     ) {
         return new Transfer(
-                henesisId,
+                henesisTransactionId,
                 symbol,
                 blockchain,
-                status,
+                Owner.MASTER_WALLET,
+                Type.FLUSH,
                 henesisUpdatedAt
         );
     }
@@ -194,8 +201,16 @@ public class Transfer extends DomainEntity {
                 symbol,
                 blockchain,
                 hash,
+                Owner.MASTER_WALLET,
+                Type.WITHDRAWAL,
                 henesisUpdatedAt
         );
+    }
+
+    public void updateHenesisContext(Transfer transfer) {
+        this.status = transfer.getStatus();
+        this.henesisUpdatedAt = transfer.getHenesisUpdatedAt();
+        this.henesisTransferId = transfer.getHenesisTransferId();
     }
 
     public void updateStatus(Status status) {
@@ -206,11 +221,6 @@ public class Transfer extends DomainEntity {
         return this.type.equals(Type.FLUSH);
     }
 
-    // BTC
-    public boolean isDesired() {
-        return this.isConfirmed() || this.isReverted() || this.isFailed();
-    }
-
     public boolean isDeposit() {
         return this.type.equals(Type.DEPOSIT);
     }
@@ -219,27 +229,20 @@ public class Transfer extends DomainEntity {
         return this.type.equals(Type.WITHDRAWAL);
     }
 
+    public boolean isMasterWallet() {
+        return this.owner.equals(Owner.MASTER_WALLET);
+    }
+
+    public boolean isDepositAddress() {
+        return this.owner.equals(Owner.DEPOSIT_ADDRESS);
+    }
+
+    public boolean isWithdrawnFromDepositAddress() {
+        return this.depositAddressId != null && this.isWithdrawal();
+    }
+
     public boolean isConfirmed() {
         return this.status.equals(Status.CONFIRMED);
-    }
-
-    public boolean isReverted() {
-        return this.status.equals(Status.REVERTED);
-    }
-
-    public boolean isFailed() {
-        return this.status.equals(Status.FAILED);
-    }
-
-    public Situation situation() {
-        if (this.isDeposit() && this.isConfirmed()) {
-            return Situation.DEPOSIT_BTC;
-        }
-        if (this.isWithdrawal() && this.isReverted() || this.isFailed()) {
-            return Situation.ROLLBACK_BTC;
-        }
-
-        return Situation.NOTHING_TO_DO;
     }
 
     public enum Status {
@@ -289,6 +292,25 @@ public class Transfer extends DomainEntity {
                     .findFirst()
                     .orElseThrow(() ->
                             new IllegalArgumentException(String.format("'%s' is not supported transfer type", name)));
+        }
+    }
+
+    public enum Owner {
+        MASTER_WALLET("masterWallet"),
+        DEPOSIT_ADDRESS("depositAddress");
+
+        private final String name;
+
+        Owner(String name) {
+            this.name = name;
+        }
+
+        public static Owner of(String name) {
+            return Arrays.stream(values())
+                    .filter(v -> name.equals(v.name) || name.equalsIgnoreCase(v.name))
+                    .findFirst()
+                    .orElseThrow(() ->
+                            new IllegalArgumentException(String.format("'%s' is not supported transfer owner", name)));
         }
     }
 }

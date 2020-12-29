@@ -38,12 +38,12 @@ public class BalanceManager {
             throw new BadRequestException(
                     String.format(
                             "there is no spendable balance at '%s'. '%s' has '%s' spendable balance and requested amount is '%s'",
-                            symbol,
-                            depositAddress.getAddress(),
+                            symbol.toUpperCase(),
+                            depositAddress.getId(),
                             balance.getAmount().compareTo(unconfirmedAmount) < 0
                                     ? BigInteger.ZERO
-                                    : balance.getAmount().subtract(unconfirmedAmount),
-                            requestedAmount
+                                    : balance.getAmount().subtract(unconfirmedAmount).getValue(),
+                            requestedAmount.getValue()
                     )
             );
         }

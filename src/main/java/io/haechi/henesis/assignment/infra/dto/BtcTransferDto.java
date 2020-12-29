@@ -1,5 +1,6 @@
 package io.haechi.henesis.assignment.infra.dto;
 
+import io.haechi.henesis.assignment.domain.Transfer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +26,16 @@ public class BtcTransferDto {
     private String type;
     private String hex;
     private TransactionDto transaction;
+
+    public Transfer.Owner resolveOwner(String masterWalletAddress) {
+        String address = this.receivedAt != null
+                ? this.receivedAt
+                : this.sendTo;
+        if (address.equals(masterWalletAddress)) {
+            return Transfer.Owner.MASTER_WALLET;
+        }
+        return Transfer.Owner.DEPOSIT_ADDRESS;
+    }
 
     @Getter
     @Setter

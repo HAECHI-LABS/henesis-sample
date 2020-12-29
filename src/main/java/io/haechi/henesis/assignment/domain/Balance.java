@@ -33,7 +33,7 @@ public class Balance extends DomainEntity {
     private Balance(DepositAddress depositAddress, String symbol, Amount amount) {
         super();
         this.depositAddress = depositAddress;
-        this.symbol = symbol;
+        this.symbol = symbol.toUpperCase();
         this.amount = amount;
     }
 

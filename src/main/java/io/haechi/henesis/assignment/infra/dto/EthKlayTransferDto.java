@@ -17,7 +17,6 @@ public class EthKlayTransferDto {
     private String blockchain;
     private String sender;
     private String hash;
-    private String coinSymbol;
     private String error;
     private String status;
     private String keyId;

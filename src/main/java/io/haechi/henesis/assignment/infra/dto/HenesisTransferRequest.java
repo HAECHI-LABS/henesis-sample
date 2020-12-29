@@ -14,9 +14,9 @@ public class HenesisTransferRequest {
     private String ticker;
     private String passphrase;
 
-    public HenesisTransferRequest(String amount, String to, String ticker) {
+    public HenesisTransferRequest(String amount, String to, String passphrase) {
         this.amount = amount;
         this.to = to;
-        this.ticker = ticker;
+        this.passphrase = passphrase;
     }
 }

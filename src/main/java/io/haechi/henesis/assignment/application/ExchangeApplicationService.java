@@ -77,7 +77,7 @@ public class ExchangeApplicationService {
         Transfer transfer = depositAddress.transfer(
                 request.getTo(),
                 request.getAmount(),
-                request.getSymbol(),
+                request.getSymbol().toUpperCase(),
                 this.henesisClientSupplier.supply(blockchain),
                 this.balanceManager
         );
@@ -85,7 +85,7 @@ public class ExchangeApplicationService {
         log.info(
                 String.format(
                         "transfer '%s'(%s) '%s' from deposit address '%s'",
-                        transfer.getSymbol(),
+                        transfer.getSymbol().toUpperCase(),
                         blockchain.toString(),
                         transfer.getAmount().getValue(),
                         depositAddress.getId()
@@ -103,7 +103,7 @@ public class ExchangeApplicationService {
     ) {
         HenesisClient henesisClient = this.henesisClientSupplier.supply(blockchain);
         if (!henesisClient.isSupportedCoin(blockchain, symbol)) {
-            throw new BadRequestException(String.format("henesis doesn't support '%s'", symbol));
+            throw new BadRequestException(String.format("henesis doesn't support '%s' '%s'", blockchain.toString(), symbol.toUpperCase()));
         }
 
         if (blockchain.equals(Blockchain.BITCOIN)) {
@@ -136,6 +136,7 @@ public class ExchangeApplicationService {
             );
         }
         Transfer flushTransfer = henesisClient.flush(
+                symbol,
                 depositAddresses.stream()
                         .map(DepositAddress::getHenesisId)
                         .collect(Collectors.toList())

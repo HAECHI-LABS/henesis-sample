@@ -16,4 +16,8 @@ import java.util.List;
 public class FlushRequest {
     private List<Long> depositAddressIds = new ArrayList<>();
     private String symbol;
+
+    public String getSymbol() {
+        return this.symbol.toUpperCase();
+    }
 }

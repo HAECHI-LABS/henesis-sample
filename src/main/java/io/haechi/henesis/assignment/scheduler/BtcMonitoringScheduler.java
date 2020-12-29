@@ -21,33 +21,31 @@ public class BtcMonitoringScheduler {
     private final TransferRepository transferRepository;
     private final BalanceManager balanceManager;
     private final int pollingSize;
-    private final String masterWalletAddress;
 
     public BtcMonitoringScheduler(
             HenesisClient henesisClient,
             DepositAddressRepository depositAddressRepository,
             TransferRepository transferRepository,
             BalanceManager balanceManager,
-            int pollingSize,
-            String masterWalletAddress
+            int pollingSize
     ) {
         this.henesisClient = henesisClient;
         this.depositAddressRepository = depositAddressRepository;
         this.transferRepository = transferRepository;
         this.balanceManager = balanceManager;
         this.pollingSize = pollingSize;
-        this.masterWalletAddress = masterWalletAddress;
     }
 
     /*
     Advanced
     1. Bunch sync
     2. reorg handling
+    3. dynamically set scheduler using TaskScheduler
      */
     @Transactional
-    @Scheduled(fixedRate = 2000, initialDelay = 500)
+    @Scheduled(fixedRate = 1800, initialDelay = 2000)
     public void updateTransactions() {
-        LocalDateTime lastUpdatedAt = this.transferRepository.findTopByBlockchainOrderByHenesisUpdatedAtDesc(Blockchain.BITCOIN)
+        LocalDateTime lastUpdatedAt = this.transferRepository.findTopByBlockchainAndStatusOrderByHenesisUpdatedAtDesc(Blockchain.BITCOIN, Transfer.Status.CONFIRMED)
                 .map(Transfer::getUpdatedAt)
                 .map(time -> time.plusNanos(1))
                 .orElse(Utils.toLocalDateTime(Long.toString(System.currentTimeMillis())));
@@ -55,20 +53,36 @@ public class BtcMonitoringScheduler {
         this.henesisClient.getLatestTransfersByUpdatedAtGte(lastUpdatedAt, this.pollingSize)
                 .stream()
                 .map(henesisTransfer -> {
-                    Transfer localTransfer = this.transferRepository.findByHenesisTransferId(henesisTransfer.getHenesisTransferId()).orElse(null);
+                    Transfer localTransfer = this.transferRepository.findByHenesisTransactionIdAndType(henesisTransfer.getHenesisTransactionId(), henesisTransfer.getType())
+                            .orElse(null);
                     if (localTransfer == null) {
                         return henesisTransfer;
                     }
                     localTransfer.updateStatus(henesisTransfer.getStatus());
                     return localTransfer;
                 })
-                .filter(transfer -> !transfer.getTo().equals(this.masterWalletAddress)) // 마스터 지갑은 관리하지 않는다. 마스터 지갑 입금 내역은 제외
-                .filter(Transfer::isConfirmed) // TODO: when occurs reorg
+                .map(this.transferRepository::save)
+                .filter(Transfer::isConfirmed)
                 .forEach(transfer -> {
-                    DepositAddress depositAddress = this.depositAddressRepository.findByAddress(transfer.getTo())
-                            .orElseThrow(() -> new IllegalStateException(String.format("there is no '%s' deposit address", transfer.getTo())));
+                    DepositAddress depositAddress = null;
+                    if (transfer.isWithdrawal() && transfer.isMasterWallet()) {
+                        if (!transfer.isWithdrawnFromDepositAddress()) {
+                            return;
+                        }
+                        depositAddress = this.depositAddressRepository.findById(transfer.getDepositAddressId())
+                                .orElseThrow(() -> new IllegalStateException(String.format("there is no '%s' deposit address", transfer.getDepositAddressId())));
+                    }
+
+                    if (transfer.isDeposit() && transfer.isDepositAddress()) {
+                        depositAddress = this.depositAddressRepository.findByAddress(transfer.getTo())
+                                .orElseThrow(() -> new IllegalStateException(String.format("there is no '%s' deposit address", transfer.getTo())));
+                    }
+
+                    if (transfer.isDeposit() && transfer.isMasterWallet()) {
+                        return;
+                    }
+
                     this.balanceManager.reflectTransfer(transfer, depositAddress);
-                    this.transferRepository.save(transfer);
                 });
     }
 }

@@ -100,7 +100,8 @@ public class BtcHenesisClient implements HenesisClient {
     public List<Transfer> getLatestTransfersByUpdatedAtGte(LocalDateTime updatedAtGte, int size) {
         Pagination<BtcTransferDto> response = restTemplate.exchange(
                 String.format(
-                        "btc/transfers?updatedAtGte=%s&size=%s",
+                        "btc/transfers?walletId=%s&updatedAtGte=%s&size=%s",
+                        this.masterWalletId,
                         Timestamp.valueOf(updatedAtGte).getTime(),
                         size
                 ),
@@ -124,6 +125,7 @@ public class BtcHenesisClient implements HenesisClient {
                         "BTC",
                         Transfer.Type.of(result.getType()),
                         result.getHash(),
+                        result.resolveOwner(this.masterWalletAddress),
                         Utils.toLocalDateTime(result.getCreatedAt())
                 )).collect(Collectors.toList());
     }
@@ -160,6 +162,7 @@ public class BtcHenesisClient implements HenesisClient {
                                 "BTC",
                                 Transfer.Type.of(result.getType()),
                                 result.getHash(),
+                                result.resolveOwner(this.masterWalletAddress),
                                 Utils.toLocalDateTime(result.getCreatedAt())
                         ))
                         .collect(Collectors.toList())
@@ -202,7 +205,7 @@ public class BtcHenesisClient implements HenesisClient {
     }
 
     @Override
-    public Transfer flush(List<String> depositAddressHenesisIds) {
+    public Transfer flush(String symbol, List<String> depositAddressHenesisIds) {
         throw new InternalServerException("henesis doesn't support flush for bitcoin");
     }
 

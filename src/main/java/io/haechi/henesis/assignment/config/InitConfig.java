@@ -9,6 +9,7 @@ import io.haechi.henesis.assignment.domain.HenesisClient;
 import io.haechi.henesis.assignment.domain.Pagination;
 import io.haechi.henesis.assignment.domain.Transfer;
 import io.haechi.henesis.assignment.domain.TransferRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Configuration
 @Profile("init")
+@Slf4j
 public class InitConfig implements CommandLineRunner {
     private final HenesisClient klayHenesisClient;
     private final HenesisClient ethHenesisClient;
@@ -56,6 +58,7 @@ public class InitConfig implements CommandLineRunner {
     }
 
     private void sync(HenesisClient client, Blockchain blockchain) {
+        log.info(String.format("start to init '%s' deposit addresses", blockchain.toString()));
         Pageable pageable = PageRequest.of(0, 50);
         while (true) {
             Pagination<DepositAddress> depositAddressPagination = client.getDepositAddresses(pageable);
@@ -73,6 +76,8 @@ public class InitConfig implements CommandLineRunner {
             pageable = pageable.next();
         }
 
+        log.info(String.format("end to init '%s' deposit addresses", blockchain.toString()));
+        log.info(String.format("start to init '%s' transfers", blockchain.toString()));
         pageable = PageRequest.of(0, 50);
         while (true) {
             Pagination<Transfer> transferPagination = client.getTransfersByUpdatedAtGte(LocalDateTime.of(0, 1, 1, 0, 0), pageable);
@@ -90,17 +95,20 @@ public class InitConfig implements CommandLineRunner {
             pageable = pageable.next();
         }
 
+        log.info(String.format("end to init '%s' transfers", blockchain.toString()));
+
         // henesis dosen't manage deposit address's balance for Bitcoin
         if (blockchain.equals(Blockchain.BITCOIN)) {
             return;
         }
 
+        log.info(String.format("start to init '%s' balances", blockchain.toString()));
         List<DepositAddress> depositAddresses = this.depositAddressRepository.findAllByBlockchain(blockchain);
         depositAddresses.forEach(depositAddress -> {
             List<Balance> onchainBalances = client.getDepositAddressBalances(depositAddress);
             onchainBalances.forEach(onchainBalance -> {
-                Balance offchainBalance = this.balanceRepository.findByDepositAddressAndSymbol(depositAddress, onchainBalance.getSymbol())
-                        .orElse(Balance.zero(depositAddress, onchainBalance.getSymbol()));
+                Balance offchainBalance = this.balanceRepository.findByDepositAddressAndSymbol(depositAddress, onchainBalance.getSymbol().toUpperCase())
+                        .orElse(Balance.zero(depositAddress, onchainBalance.getSymbol().toUpperCase()));
 
                 if (onchainBalance.getAmount().compareTo(offchainBalance.getAmount()) != 0) {
                     offchainBalance.changeAmount(onchainBalance.getAmount());
@@ -108,5 +116,7 @@ public class InitConfig implements CommandLineRunner {
                 }
             });
         });
+
+        log.info(String.format("end to init '%s' balances", blockchain.toString()));
     }
 }

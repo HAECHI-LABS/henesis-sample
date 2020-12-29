@@ -1,8 +1,10 @@
 package io.haechi.henesis.assignment.web;
 
 import io.haechi.henesis.assignment.application.ExchangeApplicationService;
+import io.haechi.henesis.assignment.application.dto.BalanceDto;
 import io.haechi.henesis.assignment.application.dto.CreateDepositAddressRequest;
 import io.haechi.henesis.assignment.application.dto.DepositAddressDto;
+import io.haechi.henesis.assignment.application.dto.FlushDto;
 import io.haechi.henesis.assignment.application.dto.FlushRequest;
 import io.haechi.henesis.assignment.application.dto.TransferDto;
 import io.haechi.henesis.assignment.application.dto.TransferRequest;
@@ -31,16 +33,34 @@ public class ExchangeController {
     }
 
     @GetMapping("/deposit-addresses")
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public List<DepositAddressDto> getDepositAddresses(@RequestParam String blockchain) {
+    @ResponseStatus(value = HttpStatus.OK)
+    public List<DepositAddressDto> getDepositAddresses(@RequestParam final String blockchain) {
         return this.exchangeApplicationService.getDepositAddresses(Blockchain.of(blockchain));
+    }
+
+    @GetMapping("/deposit-addresses/{depositAddressId}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public DepositAddressDto getDepositAddress(
+            @PathVariable final Long depositAddressId,
+            @RequestParam final String blockchain
+    ) {
+        return this.exchangeApplicationService.getDepositAddress(depositAddressId, Blockchain.of(blockchain));
+    }
+
+    @GetMapping("/deposit-addresses/{depositAddressId}/balances")
+    @ResponseStatus(value = HttpStatus.OK)
+    public List<BalanceDto> getDepositAddressBalacnes(
+            @PathVariable final Long depositAddressId,
+            @RequestParam final String blockchain
+    ) {
+        return this.exchangeApplicationService.getDepositAddressBalances(depositAddressId, Blockchain.of(blockchain));
     }
 
     @PostMapping("/deposit-addresses")
     @ResponseStatus(value = HttpStatus.CREATED)
     public DepositAddressDto createDepositAddress(
-            @RequestParam String blockchain,
-            @RequestBody CreateDepositAddressRequest createWalletRequest
+            @RequestParam final String blockchain,
+            @RequestBody final CreateDepositAddressRequest createWalletRequest
     ) {
         return this.exchangeApplicationService.createDepositAddress(
                 Blockchain.of(blockchain),
@@ -48,12 +68,18 @@ public class ExchangeController {
         );
     }
 
+    @GetMapping("/transfers/{transferId}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public TransferDto getTransfer(@PathVariable final Long transferId) {
+        return this.exchangeApplicationService.getTransfer(transferId);
+    }
+
     @PostMapping("/deposit-addresses/{depositAddressId}/transfer")
     @ResponseStatus(value = HttpStatus.CREATED)
     public TransferDto transfer(
-            @PathVariable Long depositAddressId,
-            @RequestParam String blockchain,
-            @RequestBody TransferRequest transferRequest
+            @PathVariable final Long depositAddressId,
+            @RequestParam final String blockchain,
+            @RequestBody final TransferRequest transferRequest
     ) {
         return this.exchangeApplicationService.transfer(
                 depositAddressId,
@@ -64,9 +90,9 @@ public class ExchangeController {
 
     @PostMapping("/flush")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public TransferDto flush(
-            @RequestParam String blockchain,
-            @RequestBody FlushRequest request
+    public FlushDto flush(
+            @RequestParam final String blockchain,
+            @RequestBody final FlushRequest request
     ) {
         return this.exchangeApplicationService.flush(
                 Blockchain.of(blockchain),

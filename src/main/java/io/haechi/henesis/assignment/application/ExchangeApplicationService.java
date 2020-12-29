@@ -1,10 +1,13 @@
 package io.haechi.henesis.assignment.application;
 
+import io.haechi.henesis.assignment.application.dto.BalanceDto;
 import io.haechi.henesis.assignment.application.dto.CreateDepositAddressRequest;
 import io.haechi.henesis.assignment.application.dto.DepositAddressDto;
+import io.haechi.henesis.assignment.application.dto.FlushDto;
 import io.haechi.henesis.assignment.application.dto.TransferDto;
 import io.haechi.henesis.assignment.application.dto.TransferRequest;
 import io.haechi.henesis.assignment.domain.BalanceManager;
+import io.haechi.henesis.assignment.domain.BalanceRepository;
 import io.haechi.henesis.assignment.domain.Blockchain;
 import io.haechi.henesis.assignment.domain.DepositAddress;
 import io.haechi.henesis.assignment.domain.DepositAddressRepository;
@@ -15,8 +18,8 @@ import io.haechi.henesis.assignment.domain.TransferRepository;
 import io.haechi.henesis.assignment.domain.exception.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -26,27 +29,53 @@ import java.util.stream.Collectors;
 public class ExchangeApplicationService {
     private final HenesisClientSupplier henesisClientSupplier;
     private final DepositAddressRepository depositAddressRepository;
+    private final BalanceRepository balanceRepository;
     private final TransferRepository transferRepository;
     private final BalanceManager balanceManager;
 
     public ExchangeApplicationService(
             HenesisClientSupplier henesisClientSupplier,
             DepositAddressRepository depositAddressRepository,
+            BalanceRepository balanceRepository,
             TransferRepository transferRepository,
             BalanceManager balanceManager
     ) {
         this.henesisClientSupplier = henesisClientSupplier;
         this.depositAddressRepository = depositAddressRepository;
+        this.balanceRepository = balanceRepository;
         this.transferRepository = transferRepository;
         this.balanceManager = balanceManager;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<DepositAddressDto> getDepositAddresses(Blockchain blockchain) {
         return this.depositAddressRepository.findAllByBlockchain(blockchain)
                 .stream()
                 .map(DepositAddressDto::new)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public DepositAddressDto getDepositAddress(Long depositAddressId, Blockchain blockchain) {
+        return this.depositAddressRepository.findByBlockchainAndId(blockchain, depositAddressId)
+                .map(DepositAddressDto::new)
+                .orElseThrow(() -> new BadRequestException(String.format("there is no '%s' deposit address at '%s'", depositAddressId, blockchain.toString())));
+    }
+
+    @Transactional(readOnly = true)
+    public List<BalanceDto> getDepositAddressBalances(Long depositAddressId, Blockchain blockchain) {
+        DepositAddress depositAddress = this.depositAddressRepository.findByBlockchainAndId(blockchain, depositAddressId)
+                .orElseThrow(() -> new BadRequestException(String.format("there is no '%s' deposit address at '%s'", depositAddressId, blockchain.toString())));
+        return this.balanceRepository.findAllByDepositAddress(depositAddress).stream()
+                .map(BalanceDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public TransferDto getTransfer(Long transferId) {
+        return this.transferRepository.findById(transferId)
+                .map(TransferDto::new)
+                .orElseThrow(() -> new BadRequestException(String.format("there is no '%s' transfer", transferId)));
     }
 
     @Transactional
@@ -96,7 +125,7 @@ public class ExchangeApplicationService {
     }
 
     @Transactional
-    public TransferDto flush(
+    public FlushDto flush(
             Blockchain blockchain,
             List<Long> depositAddressIds,
             String symbol
@@ -153,6 +182,6 @@ public class ExchangeApplicationService {
                 )
         );
 
-        return new TransferDto(this.transferRepository.save(flushTransfer));
+        return new FlushDto(this.transferRepository.save(flushTransfer));
     }
 }

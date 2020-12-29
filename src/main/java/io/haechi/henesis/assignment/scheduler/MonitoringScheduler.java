@@ -83,13 +83,13 @@ public class MonitoringScheduler {
                         if (this.transferRepository.existsByBlockchainAndHenesisTransactionIdAndType(this.blockchain, transfer.getHenesisTransactionId(), Transfer.Type.FLUSH)) {
                             return;
                         }
-                        depositAddress = this.depositAddressRepository.findByAddress(transfer.getFrom())
+                        depositAddress = this.depositAddressRepository.findByBlockchainAndAddress(this.blockchain, transfer.getFrom())
                                 .orElseThrow(() -> new IllegalStateException(String.format("there is no '%s' deposit address", transfer.getFrom())));
                     }
 
                     if (transfer.isDeposit() && transfer.isDepositAddress()) {
                         // deposit address로의 입금 반영
-                        depositAddress = this.depositAddressRepository.findByAddress(transfer.getTo())
+                        depositAddress = this.depositAddressRepository.findByBlockchainAndAddress(this.blockchain, transfer.getTo())
                                 .orElseThrow(() -> new IllegalStateException(String.format("there is no '%s' deposit address", transfer.getTo())));
                     }
 

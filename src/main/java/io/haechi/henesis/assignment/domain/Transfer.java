@@ -126,6 +126,7 @@ public class Transfer extends DomainEntity {
             Blockchain blockchain,
             Owner owner,
             Type type,
+            Status status,
             LocalDateTime henesisUpdatedAt
     ) {
         this.henesisTransactionId = henesisTransactionId;
@@ -134,6 +135,7 @@ public class Transfer extends DomainEntity {
         this.henesisUpdatedAt = henesisUpdatedAt;
         this.owner = owner;
         this.type = type;
+        this.status = status;
     }
 
     public static Transfer fromHenesis(
@@ -170,6 +172,7 @@ public class Transfer extends DomainEntity {
             String henesisTransactionId,
             String symbol,
             Blockchain blockchain,
+            Status status,
             LocalDateTime henesisUpdatedAt
     ) {
         return new Transfer(
@@ -178,6 +181,7 @@ public class Transfer extends DomainEntity {
                 blockchain,
                 Owner.MASTER_WALLET,
                 Type.FLUSH,
+                status,
                 henesisUpdatedAt
         );
     }

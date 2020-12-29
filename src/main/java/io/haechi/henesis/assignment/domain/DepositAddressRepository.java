@@ -11,7 +11,9 @@ import java.util.Optional;
 @Repository
 @Transactional
 public interface DepositAddressRepository extends JpaRepository<DepositAddress, Long> {
-    Optional<DepositAddress> findByAddress(String address);
+    Optional<DepositAddress> findByBlockchainAndAddress(Blockchain blockchain, String address);
+
+    Optional<DepositAddress> findByBlockchainAndId(Blockchain blockchain, Long id);
 
     List<DepositAddress> findAllByBlockchainAndStatus(Blockchain blockchain, DepositAddress.Status status);
 

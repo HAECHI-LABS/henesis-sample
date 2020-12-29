@@ -74,7 +74,7 @@ public class BtcMonitoringScheduler {
                     }
 
                     if (transfer.isDeposit() && transfer.isDepositAddress()) {
-                        depositAddress = this.depositAddressRepository.findByAddress(transfer.getTo())
+                        depositAddress = this.depositAddressRepository.findByBlockchainAndAddress(Blockchain.BITCOIN, transfer.getTo())
                                 .orElseThrow(() -> new IllegalStateException(String.format("there is no '%s' deposit address", transfer.getTo())));
                     }
 

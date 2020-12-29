@@ -1,9 +1,13 @@
 app:
   henesis:
+    # docker-compose에서 세팅되는 enclave api의 url
     url: http://localhost:3000
+    # henesis 사용을 위한 secret key (참고: https://app.gitbook.com/@henesis/s/henesis-wallet/integrate-with-api/authentication)
     api-secret: pvZ4CrBm5z9/uBSQgmkOvm/kDxkFiLxx8RSZZMkWRo4=
+    # henesis 사용을 위한 access token (참고: https://app.gitbook.com/@henesis/s/henesis-wallet/integrate-with-api/authentication)
     access-token: eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6InRvYnlAaGFlY2hpLmlvIiwiaWQiOiJjMDBiNWIxMDA4NjU4MGM2ZTc0NTZlZDQwYTcxMDkzZSIsInR5cGUiOiJMT05HIiwiaXNzIjoid2FsbGV0LXByb2QtdGVzdG5ldCIsImlhdCI6MTU5NDcyNzM2MCwiZXhwIjoxMDAwMDAxNTk0NzI3MzYwfQ.ueBjMrq3xT9F86geXxaoaIxQyXjKG4coMweSHj4muJw6yojjtbfuhUKfIjGFUE1kFDrmR-sT_G7uEOU4WKUMCA
 
+    # 마스터지갑 id, address, passphrase, 입출금 내역 추적을 위해 폴링 주기 한 번에 입출금 내역을 가져올 사이즈
     eth-master-wallet-id: "3d5898988fdcbb77535eb7eade178a8e"
     eth-master-wallet-address: "0x2eda67cc0aaf88a7defc80c51e5d0e543852de0f"
     eth-passphrase: "password"
@@ -21,7 +25,7 @@ app:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/henesis
+    url: jdbc:postgresql://localhost:5433/henesis
     username: user
     password: password
     platform: postgres
@@ -51,6 +55,3 @@ spring:
 
 server:
   port: 8080
-  error:
-    whitelabel:
-      enabled: false

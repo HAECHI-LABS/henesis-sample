@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.haechi.henesis'
-version = '0.0.1-SNAPSHOT'
+archivesBaseName = 'henesis-example'
 sourceCompatibility = '1.8'
 
 configurations {

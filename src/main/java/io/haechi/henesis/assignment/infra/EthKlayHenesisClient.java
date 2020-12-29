@@ -256,6 +256,7 @@ public class EthKlayHenesisClient implements HenesisClient {
                 response.getId(),
                 symbol,
                 Blockchain.of(response.getBlockchain()),
+                Transfer.Status.of(response.getStatus()),
                 Utils.toLocalDateTime(response.getCreatedAt())
         );
     }
